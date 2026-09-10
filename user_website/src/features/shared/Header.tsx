@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { Menu, Search, ShoppingBag, User as UserIcon, X, LogOut, Globe } from 'lucide-react';
+import { Search, ShoppingBag, User as UserIcon, LogOut, Globe, MoreVertical, X } from 'lucide-react';
 import { useCart } from '../cart/CartContext';
 import { useAuth } from '../auth/AuthContext';
 import { useLanguage } from './LanguageContext';
@@ -33,7 +33,7 @@ export const Header: React.FC<HeaderProps> = ({ searchQuery, setSearchQuery }) =
   const { totalItems, openCart } = useCart();
   const { user, isAuthenticated, openAuthModal, logout } = useAuth();
   const { language, setLanguage, t } = useLanguage();
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [is3DotMenuOpen, setIs3DotMenuOpen] = useState(false);
 
   // Typewriter effect state for interactive search placeholder
   const [suggestionIndex, setSuggestionIndex] = useState(0);
@@ -72,26 +72,66 @@ export const Header: React.FC<HeaderProps> = ({ searchQuery, setSearchQuery }) =
   return (
     <header className="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-gray-100 shadow-2xs transition-all">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-16 sm:h-20 gap-3">
+        <div className="flex items-center justify-between h-20 sm:h-24 gap-3">
           
-          {/* Left section: Mobile Hamburger + Official Image Logo */}
-          <div className="flex items-center space-x-3">
-            <button
-              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-              className="lg:hidden p-2 text-gray-700 hover:text-orange-500 rounded-xl hover:bg-gray-100 transition"
-              aria-label="Toggle Menu"
-            >
-              {isMobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
-            </button>
-
-            {/* Official Mex Tanim Store Logo */}
-            <div className="flex items-center cursor-pointer">
+          {/* Left section: Official Large Image Logo + 3-Dot Navbar Button (Side-by-side) */}
+          <div className="flex items-center space-x-2 sm:space-x-3">
+            
+            {/* Official Mex Tanim Store Logo (Increased height so text & slogan are perfectly readable) */}
+            <a href="#" className="flex items-center cursor-pointer shrink-0">
               <img
                 src="/images/logo.png"
                 alt="Mex Tanim Store Logo"
-                className="h-10 sm:h-12 w-auto object-contain hover:scale-105 transition-all"
+                className="h-12 sm:h-16 md:h-18 max-h-20 w-auto object-contain hover:scale-105 transition-all"
               />
+            </a>
+
+            {/* 3-Dot Navbar Button (Positioned side-by-side right next to the logo) */}
+            <div className="relative">
+              <button
+                onClick={() => setIs3DotMenuOpen(!is3DotMenuOpen)}
+                className="p-2 sm:p-2.5 text-slate-800 hover:text-orange-500 hover:bg-orange-50 rounded-xl border border-gray-200 transition-all flex items-center justify-center shadow-2xs active:scale-95"
+                title="Navigation Menu"
+                aria-label="Toggle 3-dot menu"
+              >
+                {is3DotMenuOpen ? <X className="w-5 h-5 text-orange-500" /> : <MoreVertical className="w-5 h-5 sm:w-6 sm:h-6" />}
+              </button>
+
+              {/* 3-Dot Navbar Popup Menu */}
+              {is3DotMenuOpen && (
+                <div className="absolute left-0 mt-2 w-56 bg-white border border-gray-200 rounded-2xl shadow-2xl z-50 p-2 space-y-1 animate-in fade-in slide-in-from-top-2 duration-200">
+                  <a
+                    href="#hero"
+                    onClick={() => setIs3DotMenuOpen(false)}
+                    className="flex items-center space-x-2 px-3 py-2 text-xs font-bold text-gray-700 hover:bg-orange-50 hover:text-orange-600 rounded-xl transition"
+                  >
+                    <span>🏠 Home</span>
+                  </a>
+                  <a
+                    href="#categories"
+                    onClick={() => setIs3DotMenuOpen(false)}
+                    className="flex items-center space-x-2 px-3 py-2 text-xs font-bold text-gray-700 hover:bg-orange-50 hover:text-orange-600 rounded-xl transition"
+                  >
+                    <span>📦 {t.categoriesTitle}</span>
+                  </a>
+                  <a
+                    href="#products"
+                    onClick={() => setIs3DotMenuOpen(false)}
+                    className="flex items-center space-x-2 px-3 py-2 text-xs font-bold text-gray-700 hover:bg-orange-50 hover:text-orange-600 rounded-xl transition"
+                  >
+                    <span>🔥 {t.featuredProducts}</span>
+                  </a>
+                  <a
+                    href="#app-install"
+                    onClick={() => setIs3DotMenuOpen(false)}
+                    className="flex items-center space-x-2 px-3 py-2 text-xs font-bold text-gray-700 hover:bg-orange-50 hover:text-orange-600 rounded-xl transition"
+                  >
+                    <span>📱 {t.appInstallBtn}</span>
+                  </a>
+                </div>
+              )}
             </div>
+
           </div>
 
           {/* Center Search Bar with Animated Typewriter Placeholder */}
@@ -182,42 +222,6 @@ export const Header: React.FC<HeaderProps> = ({ searchQuery, setSearchQuery }) =
 
           </div>
         </div>
-
-        {/* Mobile Navigation Drawer */}
-        {isMobileMenuOpen && (
-          <div className="lg:hidden border-t border-gray-100 py-3 space-y-2 animate-in slide-in-from-top duration-200">
-            <nav className="flex flex-col space-y-1 text-sm font-medium text-gray-700">
-              <a href="#hero" onClick={() => setIsMobileMenuOpen(false)} className="px-3 py-2 rounded-lg hover:bg-orange-50 hover:text-orange-600 transition">
-                Home
-              </a>
-              <a href="#categories" onClick={() => setIsMobileMenuOpen(false)} className="px-3 py-2 rounded-lg hover:bg-orange-50 hover:text-orange-600 transition">
-                {t.categoriesTitle}
-              </a>
-              <a href="#products" onClick={() => setIsMobileMenuOpen(false)} className="px-3 py-2 rounded-lg hover:bg-orange-50 hover:text-orange-600 transition">
-                {t.featuredProducts}
-              </a>
-            </nav>
-
-            {/* Language Switcher in Mobile Drawer */}
-            <div className="pt-2 border-t border-gray-100 flex items-center justify-between px-3">
-              <span className="text-xs font-bold text-gray-600">Language / ভাষা:</span>
-              <div className="flex items-center space-x-1 bg-gray-100 p-1 rounded-lg">
-                <button
-                  onClick={() => setLanguage('en')}
-                  className={`px-3 py-1 text-xs font-bold rounded-md transition ${language === 'en' ? 'bg-orange-500 text-white shadow-xs' : 'text-gray-600'}`}
-                >
-                  English
-                </button>
-                <button
-                  onClick={() => setLanguage('bn')}
-                  className={`px-3 py-1 text-xs font-bold rounded-md transition ${language === 'bn' ? 'bg-orange-500 text-white shadow-xs' : 'text-gray-600'}`}
-                >
-                  বাংলা
-                </button>
-              </div>
-            </div>
-          </div>
-        )}
       </div>
     </header>
   );
