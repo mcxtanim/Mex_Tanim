@@ -21,12 +21,12 @@ export default function Home() {
           onSelectCategory={setSelectedCategory}
         />
 
-        <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6">
+        <main className="w-full px-2 sm:px-4 lg:px-6 py-4 sm:py-6">
           {/* Main 2-Column Layout: Left Sticky Sidebar + Right Hero & Product Grid */}
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 items-start">
             
             {/* Left Category Sidebar: Sticky & Independent Scroll */}
-            <aside className="lg:col-span-4 xl:col-span-3 sticky top-24 h-[calc(100vh-7rem)] overflow-y-auto scrollbar-thin pr-0.5">
+            <aside className="lg:col-span-4 xl:col-span-3 sticky top-24 max-h-[calc(100vh-7rem)] overflow-y-auto scrollbar-thin pr-1">
               <CategorySidebar
                 selectedCategory={selectedCategory}
                 onSelectCategory={setSelectedCategory}
@@ -35,7 +35,7 @@ export default function Home() {
 
             {/* Right Main Content Column */}
             <div className="lg:col-span-8 xl:col-span-9 space-y-6">
-              <HeroBanner />
+              {selectedCategory === 'all' && <HeroBanner />}
               <ProductGrid
                 selectedCategory={selectedCategory}
                 searchQuery={searchQuery}

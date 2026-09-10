@@ -84,7 +84,7 @@ export const Header: React.FC<HeaderProps> = ({ searchQuery, setSearchQuery }) =
 
   return (
     <header className="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-gray-100 shadow-2xs transition-all">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="w-full px-2 sm:px-4 lg:px-6">
         <div className="flex items-center justify-between h-20 sm:h-24 gap-3">
           
           {/* Left section: Circular Hamburger Menu Button (Left of Logo) + Official Logo */}

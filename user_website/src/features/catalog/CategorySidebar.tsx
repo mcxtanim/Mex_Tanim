@@ -50,72 +50,72 @@ export const CategorySidebar: React.FC<CategorySidebarProps> = ({
       id: 'all',
       nameEn: 'ALL CATEGORIES',
       nameBn: 'সকল ক্যাটাগরি',
-      icon: Grid,
-      colorClass: 'bg-slate-100 text-slate-800 border border-slate-200',
+      letterBadge: 'A',
+      colorClass: 'bg-slate-900 text-white shadow-md shadow-slate-900/20',
       staticCount: PRODUCTS.length,
     },
     {
       id: 'mice',
       nameEn: 'GAMING MICE',
       nameBn: 'গেমিং মাউস',
-      icon: Mouse,
-      colorClass: 'bg-orange-500/15 text-orange-600 border border-orange-500/20',
+      letterBadge: 'G',
+      colorClass: 'bg-gradient-to-br from-orange-500 to-amber-600 text-white shadow-md shadow-orange-500/30',
       staticCount: 18,
     },
     {
       id: 'keyboards',
       nameEn: 'MECHANICAL KEYBOARDS',
       nameBn: 'মেকানিক্যাল কীবোর্ড',
-      icon: Keyboard,
-      colorClass: 'bg-blue-500/15 text-blue-600 border border-blue-500/20',
+      letterBadge: 'M',
+      colorClass: 'bg-gradient-to-br from-blue-600 to-indigo-700 text-white shadow-md shadow-blue-500/30',
       staticCount: 15,
     },
     {
       id: 'headphones',
       nameEn: 'GAMING HEADSETS',
       nameBn: 'গেমিং হেডসেট',
-      icon: Headphones,
-      colorClass: 'bg-purple-500/15 text-purple-600 border border-purple-500/20',
+      letterBadge: 'H',
+      colorClass: 'bg-gradient-to-br from-purple-600 to-pink-600 text-white shadow-md shadow-purple-500/30',
       staticCount: 24,
     },
     {
       id: 'chargers',
       nameEn: 'FAST CHARGERS',
       nameBn: 'ফাস্ট চার্জার',
-      icon: Zap,
-      colorClass: 'bg-amber-500/15 text-amber-600 border border-amber-500/20',
+      letterBadge: 'F',
+      colorClass: 'bg-gradient-to-br from-amber-500 to-yellow-600 text-white shadow-md shadow-amber-500/30',
       staticCount: 32,
     },
     {
       id: 'finger-sleeves',
       nameEn: 'FINGER SLEEVES',
       nameBn: 'ফিঙ্গার স্লিকস',
-      icon: Shield,
-      colorClass: 'bg-emerald-500/15 text-emerald-600 border border-emerald-500/20',
+      letterBadge: 'S',
+      colorClass: 'bg-gradient-to-br from-emerald-500 to-teal-600 text-white shadow-md shadow-emerald-500/30',
       staticCount: 12,
     },
     {
       id: 'cables',
       nameEn: 'CABLES',
       nameBn: 'কেবলস',
-      icon: Cable,
-      colorClass: 'bg-indigo-500/15 text-indigo-600 border border-indigo-500/20',
+      letterBadge: 'C',
+      colorClass: 'bg-gradient-to-br from-cyan-500 to-blue-600 text-white shadow-md shadow-cyan-500/30',
       staticCount: 40,
     },
     {
       id: 'soundboxes',
       nameEn: 'SOUNDBOXES',
       nameBn: 'সাউন্ডবক্স',
-      icon: Speaker,
-      colorClass: 'bg-rose-500/15 text-rose-600 border border-rose-500/20',
+      letterBadge: 'B',
+      colorClass: 'bg-gradient-to-br from-rose-500 to-red-600 text-white shadow-md shadow-rose-500/30',
       staticCount: 16,
     },
     {
       id: 'trimmers',
       nameEn: 'TRIMMERS',
       nameBn: 'ট্রিমার',
-      icon: Scissors,
-      colorClass: 'bg-teal-500/15 text-teal-600 border border-teal-500/20',
+      letterBadge: 'T',
+      colorClass: 'bg-gradient-to-br from-violet-600 to-purple-700 text-white shadow-md shadow-violet-500/30',
       staticCount: 10,
     },
   ];
@@ -168,7 +168,6 @@ export const CategorySidebar: React.FC<CategorySidebarProps> = ({
       {/* List of Category Cards */}
       <div className={`space-y-2.5 ${isMobileOpen ? 'block' : 'hidden lg:block'}`}>
         {CATEGORIES.map((cat) => {
-          const Icon = cat.icon;
           const isSelected =
             selectedCategory === cat.id ||
             (selectedCategory === 'sleeves' && cat.id === 'finger-sleeves') ||
@@ -189,15 +188,15 @@ export const CategorySidebar: React.FC<CategorySidebarProps> = ({
               }`}
             >
               <div className="flex items-center space-x-3 min-w-0">
-                {/* Colorful Rounded Square Icon Container */}
+                {/* Colorful Rounded Square Capital Letter Badge Container */}
                 <div
-                  className={`w-10 h-10 sm:w-11 sm:h-11 rounded-xl flex items-center justify-center shrink-0 transition-transform duration-300 group-hover:scale-110 ${
+                  className={`w-10 h-10 sm:w-11 sm:h-11 rounded-xl flex items-center justify-center shrink-0 font-black text-base sm:text-lg transition-transform duration-300 group-hover:scale-110 ${
                     isSelected
                       ? 'bg-orange-500 text-white shadow-md shadow-orange-500/30'
                       : cat.colorClass
                   }`}
                 >
-                  <Icon className="w-5 h-5 stroke-[2.2]" />
+                  {cat.letterBadge}
                 </div>
 
                 {/* Category Name & Count */}
