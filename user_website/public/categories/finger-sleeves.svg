@@ -1,21 +1,21 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" fill="none">
   <defs>
     <linearGradient id="sleeveBody" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#334155"/>
-      <stop offset="50%" stop-color="#1e293b"/>
-      <stop offset="100%" stop-color="#0f172a"/>
+      <stop offset="0%" stop-color="#2a2d3d"/>
+      <stop offset="50%" stop-color="#181a24"/>
+      <stop offset="100%" stop-color="#0d0e15"/>
     </linearGradient>
-    <linearGradient id="fiberGlow" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#38bdf8"/>
-      <stop offset="50%" stop-color="#0284c7"/>
-      <stop offset="100%" stop-color="#0369a1"/>
+    <linearGradient id="fiberRed" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#ff4d4d"/>
+      <stop offset="50%" stop-color="#ef4444"/>
+      <stop offset="100%" stop-color="#991b1b"/>
     </linearGradient>
-    <linearGradient id="cuffOrange" x1="0%" y1="0%" x2="100%" y2="0%">
-      <stop offset="0%" stop-color="#f97316"/>
-      <stop offset="100%" stop-color="#ea580c"/>
+    <linearGradient id="cuffRed" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#ef4444"/>
+      <stop offset="100%" stop-color="#991b1b"/>
     </linearGradient>
     <filter id="sleeveShadow" x="-10%" y="-10%" width="120%" height="120%">
-      <feDropShadow dx="0" dy="16" stdDeviation="16" flood-color="#000000" flood-opacity="0.4"/>
+      <feDropShadow dx="0" dy="16" stdDeviation="16" flood-color="#000000" flood-opacity="0.6"/>
     </filter>
     <filter id="sparkGlow">
       <feGaussianBlur stdDeviation="6" result="blur"/>
@@ -27,52 +27,52 @@
     <!-- LEFT GAMING SLEEVE (Angled Left) -->
     <g transform="translate(40, 20) rotate(-12 180 260)">
       <!-- Main Sleeve Body Silhouette -->
-      <path d="M 140 100 C 185 85 220 100 220 140 L 220 380 C 220 405 140 405 140 380 Z" fill="url(#sleeveBody)" stroke="#475569" stroke-width="3"/>
+      <path d="M 140 100 C 185 85 220 100 220 140 L 220 380 C 220 405 140 405 140 380 Z" fill="url(#sleeveBody)" stroke="#ef4444" stroke-width="2"/>
 
-      <!-- Conductive Silver Fiber Weave Texture Lines -->
-      <path d="M 145 150 C 180 140 215 150 215 150" stroke="url(#fiberGlow)" stroke-width="2" stroke-dasharray="6 4"/>
-      <path d="M 142 190 C 180 180 218 190 218 190" stroke="url(#fiberGlow)" stroke-width="2" stroke-dasharray="6 4"/>
-      <path d="M 141 230 C 180 220 219 230 219 230" stroke="url(#fiberGlow)" stroke-width="2" stroke-dasharray="6 4"/>
-      <path d="M 140 270 C 180 260 220 270 220 270" stroke="url(#fiberGlow)" stroke-width="2" stroke-dasharray="6 4"/>
-      <path d="M 140 310 C 180 300 220 310 220 310" stroke="url(#fiberGlow)" stroke-width="2" stroke-dasharray="6 4"/>
-      <path d="M 140 350 C 180 340 220 350 220 350" stroke="url(#fiberGlow)" stroke-width="2" stroke-dasharray="6 4"/>
+      <!-- Conductive Silver & Red Fiber Weave Texture Lines -->
+      <path d="M 145 150 C 180 140 215 150 215 150" stroke="url(#fiberRed)" stroke-width="2" stroke-dasharray="6 4"/>
+      <path d="M 142 190 C 180 180 218 190 218 190" stroke="url(#fiberRed)" stroke-width="2" stroke-dasharray="6 4"/>
+      <path d="M 141 230 C 180 220 219 230 219 230" stroke="url(#fiberRed)" stroke-width="2" stroke-dasharray="6 4"/>
+      <path d="M 140 270 C 180 260 220 270 220 270" stroke="url(#fiberRed)" stroke-width="2" stroke-dasharray="6 4"/>
+      <path d="M 140 310 C 180 300 220 310 220 310" stroke="url(#fiberRed)" stroke-width="2" stroke-dasharray="6 4"/>
+      <path d="M 140 350 C 180 340 220 350 220 350" stroke="url(#fiberRed)" stroke-width="2" stroke-dasharray="6 4"/>
 
-      <!-- High-Elastic Orange Ribbed Cuff Ring (Bottom) -->
-      <rect x="136" y="375" width="88" height="24" rx="8" fill="url(#cuffOrange)" stroke="#ffedd5" stroke-width="1.5"/>
+      <!-- High-Elastic Crimson Red Ribbed Cuff Ring (Bottom) -->
+      <rect x="136" y="375" width="88" height="24" rx="8" fill="url(#cuffRed)" stroke="#fee2e2" stroke-width="1.5"/>
       <line x1="150" y1="375" x2="150" y2="399" stroke="#ffffff" opacity="0.5"/>
       <line x1="164" y1="375" x2="164" y2="399" stroke="#ffffff" opacity="0.5"/>
       <line x1="178" y1="375" x2="178" y2="399" stroke="#ffffff" opacity="0.5"/>
       <line x1="192" y1="375" x2="192" y2="399" stroke="#ffffff" opacity="0.5"/>
       <line x1="206" y1="375" x2="206" y2="399" stroke="#ffffff" opacity="0.5"/>
 
-      <!-- Touchscreen Spark at Tip -->
-      <circle cx="180" cy="98" r="14" fill="#38bdf8" opacity="0.3" filter="url(#sparkGlow)"/>
+      <!-- Touchscreen Red Spark at Tip -->
+      <circle cx="180" cy="98" r="14" fill="#ef4444" opacity="0.4" filter="url(#sparkGlow)"/>
       <circle cx="180" cy="98" r="6" fill="#ffffff" filter="url(#sparkGlow)"/>
     </g>
 
     <!-- RIGHT GAMING SLEEVE (Angled Right) -->
     <g transform="translate(-10, 20) rotate(12 330 260)">
       <!-- Main Sleeve Body Silhouette -->
-      <path d="M 290 100 C 335 85 370 100 370 140 L 370 380 C 370 405 290 405 290 380 Z" fill="url(#sleeveBody)" stroke="#475569" stroke-width="3"/>
+      <path d="M 290 100 C 335 85 370 100 370 140 L 370 380 C 370 405 290 405 290 380 Z" fill="url(#sleeveBody)" stroke="#ef4444" stroke-width="2"/>
 
-      <!-- Conductive Silver Fiber Weave Texture Lines -->
-      <path d="M 295 150 C 330 140 365 150 365 150" stroke="url(#fiberGlow)" stroke-width="2" stroke-dasharray="6 4"/>
-      <path d="M 292 190 C 330 180 368 190 368 190" stroke="url(#fiberGlow)" stroke-width="2" stroke-dasharray="6 4"/>
-      <path d="M 291 230 C 330 220 369 230 369 230" stroke="url(#fiberGlow)" stroke-width="2" stroke-dasharray="6 4"/>
-      <path d="M 290 270 C 330 260 370 270 370 270" stroke="url(#fiberGlow)" stroke-width="2" stroke-dasharray="6 4"/>
-      <path d="M 290 310 C 330 300 370 310 370 310" stroke="url(#fiberGlow)" stroke-width="2" stroke-dasharray="6 4"/>
-      <path d="M 290 350 C 330 340 370 350 370 350" stroke="url(#fiberGlow)" stroke-width="2" stroke-dasharray="6 4"/>
+      <!-- Conductive Silver & Red Fiber Weave Texture Lines -->
+      <path d="M 295 150 C 330 140 365 150 365 150" stroke="url(#fiberRed)" stroke-width="2" stroke-dasharray="6 4"/>
+      <path d="M 292 190 C 330 180 368 190 368 190" stroke="url(#fiberRed)" stroke-width="2" stroke-dasharray="6 4"/>
+      <path d="M 291 230 C 330 220 369 230 369 230" stroke="url(#fiberRed)" stroke-width="2" stroke-dasharray="6 4"/>
+      <path d="M 290 270 C 330 260 370 270 370 270" stroke="url(#fiberRed)" stroke-width="2" stroke-dasharray="6 4"/>
+      <path d="M 290 310 C 330 300 370 310 370 310" stroke="url(#fiberRed)" stroke-width="2" stroke-dasharray="6 4"/>
+      <path d="M 290 350 C 330 340 370 350 370 350" stroke="url(#fiberRed)" stroke-width="2" stroke-dasharray="6 4"/>
 
-      <!-- High-Elastic Orange Ribbed Cuff Ring (Bottom) -->
-      <rect x="286" y="375" width="88" height="24" rx="8" fill="url(#cuffOrange)" stroke="#ffedd5" stroke-width="1.5"/>
+      <!-- High-Elastic Crimson Red Ribbed Cuff Ring (Bottom) -->
+      <rect x="286" y="375" width="88" height="24" rx="8" fill="url(#cuffRed)" stroke="#fee2e2" stroke-width="1.5"/>
       <line x1="300" y1="375" x2="300" y2="399" stroke="#ffffff" opacity="0.5"/>
       <line x1="314" y1="375" x2="314" y2="399" stroke="#ffffff" opacity="0.5"/>
       <line x1="328" y1="375" x2="328" y2="399" stroke="#ffffff" opacity="0.5"/>
       <line x1="342" y1="375" x2="342" y2="399" stroke="#ffffff" opacity="0.5"/>
       <line x1="356" y1="375" x2="356" y2="399" stroke="#ffffff" opacity="0.5"/>
 
-      <!-- Touchscreen Spark at Tip -->
-      <circle cx="330" cy="98" r="14" fill="#38bdf8" opacity="0.3" filter="url(#sparkGlow)"/>
+      <!-- Touchscreen Red Spark at Tip -->
+      <circle cx="330" cy="98" r="14" fill="#ef4444" opacity="0.4" filter="url(#sparkGlow)"/>
       <circle cx="330" cy="98" r="6" fill="#ffffff" filter="url(#sparkGlow)"/>
     </g>
   </g>

@@ -42,7 +42,7 @@ export const CategoryShowcase: React.FC<CategoryShowcaseProps> = ({
       if (container.scrollLeft >= maxScroll - 10) {
         container.scrollTo({ left: 0, behavior: 'smooth' });
       } else {
-        container.scrollBy({ left: 180, behavior: 'smooth' });
+        container.scrollBy({ left: 360, behavior: 'smooth' });
       }
     }, 2500);
 
@@ -55,7 +55,7 @@ export const CategoryShowcase: React.FC<CategoryShowcaseProps> = ({
 
   const handleScroll = (direction: 'left' | 'right') => {
     if (scrollRef.current) {
-      const scrollAmount = direction === 'left' ? -320 : 320;
+      const scrollAmount = direction === 'left' ? -360 : 360;
       scrollRef.current.scrollBy({ left: scrollAmount, behavior: 'smooth' });
     }
   };
