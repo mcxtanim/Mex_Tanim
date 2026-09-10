@@ -32,6 +32,19 @@ const SEARCH_SUGGESTIONS_BN = [
   'জেবিএল সাউন্ডবক্স',
 ];
 
+const CATEGORY_MAP: Record<string, { en: string; bn: string }> = {
+  mice: { en: 'GAMING MICE', bn: 'গেমিং মাউস' },
+  keyboards: { en: 'MECHANICAL KEYBOARDS', bn: 'মেকানিক্যাল কীবোর্ড' },
+  headphones: { en: 'GAMING HEADSETS', bn: 'গেমিং হেডসেট' },
+  chargers: { en: 'FAST CHARGERS', bn: 'ফাস্ট চার্জার' },
+  'finger-sleeves': { en: 'FINGER SLEEVES', bn: 'ফিঙ্গার স্লিকস' },
+  sleeves: { en: 'FINGER SLEEVES', bn: 'ফিঙ্গার স্লিকস' },
+  cables: { en: 'CABLES', bn: 'কেবলস' },
+  soundboxes: { en: 'SOUNDBOXES', bn: 'সাউন্ডবক্স' },
+  soundbox: { en: 'SOUNDBOXES', bn: 'সাউন্ডবক্স' },
+  trimmers: { en: 'TRIMMERS', bn: 'ট্রিমার' },
+};
+
 export const Header: React.FC<HeaderProps> = ({
   searchQuery,
   setSearchQuery,
@@ -82,18 +95,38 @@ export const Header: React.FC<HeaderProps> = ({
       <div className="w-full px-2 sm:px-4 lg:px-6">
         <div className="flex items-center justify-between h-20 sm:h-24 gap-3">
           
-          {/* Left section: Circular Hamburger Menu Button (Left of Logo) + Official Logo */}
-          <div className="flex items-center space-x-3 sm:space-x-4">
+          {/* Left section: Circular Hamburger Menu Button (Left of Logo) + Active Category Badge + Official Logo */}
+          <div className="flex items-center space-x-2 sm:space-x-3 shrink-0">
             
             {/* Round Circular Hamburger Menu Button */}
             <button
               onClick={() => setIsCategoryMenuOpen(true)}
-              className="w-10 h-10 sm:w-11 sm:h-11 rounded-full bg-gray-200/90 hover:bg-gray-300 text-black transition-all flex items-center justify-center shadow-2xs active:scale-95 border border-gray-300/50 cursor-pointer"
+              className="w-10 h-10 sm:w-11 sm:h-11 rounded-full bg-gray-200/90 hover:bg-gray-300 text-black transition-all flex items-center justify-center shadow-2xs active:scale-95 border border-gray-300/50 cursor-pointer shrink-0"
               title="Product Categories"
               aria-label="Toggle Product Categories Menu"
             >
               <Menu className="w-5 h-5 sm:w-6 sm:h-6 text-black stroke-[2.5]" />
             </button>
+
+            {/* Active Category Badge & Reset Button */}
+            {selectedCategory !== 'all' && (
+              <div className="flex items-center space-x-1.5 bg-orange-100/90 border border-orange-300 text-orange-900 px-2.5 py-1 rounded-full text-xs font-bold shadow-xs shrink-0 animate-in fade-in duration-200">
+                <span className="truncate max-w-[90px] sm:max-w-[130px] uppercase tracking-wide">
+                  {language === 'bn'
+                    ? CATEGORY_MAP[selectedCategory]?.bn || selectedCategory
+                    : CATEGORY_MAP[selectedCategory]?.en || selectedCategory}
+                </span>
+                <button
+                  onClick={() => onSelectCategory && onSelectCategory('all')}
+                  className="ml-1 text-xs text-orange-700 hover:text-white bg-orange-200 hover:bg-orange-600 px-1.5 py-0.5 rounded-full font-bold cursor-pointer transition-all flex items-center gap-1"
+                  title={language === 'bn' ? 'রিসেট' : 'Reset'}
+                  aria-label="Reset Category Filter"
+                >
+                  <X className="w-3 h-3 stroke-[3]" />
+                  <span className="hidden sm:inline">{language === 'bn' ? 'রিসেট' : 'Reset'}</span>
+                </button>
+              </div>
+            )}
 
             {/* Official Mex Tanim Store Logo */}
             <a href="#" className="flex items-center justify-center cursor-pointer shrink-0 group">
