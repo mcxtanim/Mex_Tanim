@@ -59,9 +59,10 @@ export default function Home() {
         />
         
         <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6 space-y-6">
+          {selectedCategory === 'all' && <HeroBanner />}
+
           {selectedCategory === 'all' ? (
             <>
-              <HeroBanner />
               <CategoryGrid
                 selectedCategory={selectedCategory}
                 onSelectCategory={setSelectedCategory}
@@ -122,4 +123,3 @@ export default function Home() {
     </div>
   );
 }
-

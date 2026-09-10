@@ -1,11 +1,14 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { Menu, Search, ShoppingBag, User as UserIcon, LogOut, Globe, X } from 'lucide-react';
+import { Menu, Search, ShoppingBag, User as UserIcon, LogOut, Globe, X, RotateCcw } from 'lucide-react';
 import { useCart } from '../cart/CartContext';
 import { useAuth } from '../auth/AuthContext';
 import { useLanguage } from './LanguageContext';
 import { CategorySidebar } from '../catalog/CategorySidebar';
+import { CategoryGrid } from '../catalog/CategoryGrid';
+import { ProductGrid } from '../catalog/ProductGrid';
+import { PRODUCTS } from '../catalog/mockData';
 
 interface HeaderProps {
   searchQuery: string;
@@ -32,6 +35,21 @@ const SEARCH_SUGGESTIONS_BN = [
   'জেবিএল সাউন্ডবক্স',
 ];
 
+const CATEGORY_META: Record<string, { en: string; bn: string; badge: string }> = {
+  all: { en: 'All Products', bn: 'সকল পণ্য', badge: 'A' },
+  mice: { en: 'Gaming Mice', bn: 'গেমিং মাউস', badge: 'G' },
+  keyboards: { en: 'Mechanical Keyboards', bn: 'মেকানিক্যাল কীবোর্ড', badge: 'M' },
+  headphones: { en: 'Gaming Headsets', bn: 'গেমিং হেডসেট', badge: 'H' },
+  chargers: { en: 'Fast Chargers', bn: 'ফাস্ট চার্জার', badge: 'F' },
+  'fast-chargers': { en: 'Fast Chargers', bn: 'ফাস্ট চার্জার', badge: 'F' },
+  'finger-sleeves': { en: 'Finger Sleeves', bn: 'ফিঙ্গার স্লিকস', badge: 'S' },
+  sleeves: { en: 'Finger Sleeves', bn: 'ফিঙ্গার স্লিকস', badge: 'S' },
+  cables: { en: 'Cables', bn: 'केवलস', badge: 'C' },
+  soundboxes: { en: 'Soundboxes', bn: 'সাউন্ডবক্স', badge: 'B' },
+  soundbox: { en: 'Soundboxes', bn: 'সাউন্ডবক্স', badge: 'B' },
+  trimmers: { en: 'Trimmers', bn: 'ট্রিমার', badge: 'T' },
+};
+
 export const Header: React.FC<HeaderProps> = ({
   searchQuery,
   setSearchQuery,
@@ -44,7 +62,7 @@ export const Header: React.FC<HeaderProps> = ({
 
   const [isCategoryDrawerOpen, setIsCategoryDrawerOpen] = useState(false);
 
-  // Keyboard listener for Escape key to close category drawer
+  // Keyboard listener for Escape key to close category drawer/browser
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Escape') {
@@ -92,6 +110,23 @@ export const Header: React.FC<HeaderProps> = ({
     : language === 'bn'
     ? `খুঁজুন "${displayText}"...`
     : `Search "${displayText}"...`;
+
+  const currentMeta = CATEGORY_META[selectedCategory] || {
+    en: selectedCategory.replace('-', ' '),
+    bn: selectedCategory,
+    badge: selectedCategory.charAt(0).toUpperCase(),
+  };
+
+  const productCount = PRODUCTS.filter(
+    (p) =>
+      p.category === selectedCategory ||
+      (selectedCategory === 'finger-sleeves' && p.category === 'sleeves') ||
+      (selectedCategory === 'sleeves' && p.category === 'finger-sleeves') ||
+      (selectedCategory === 'soundboxes' && p.category === 'soundbox') ||
+      (selectedCategory === 'soundbox' && p.category === 'soundboxes') ||
+      (selectedCategory === 'chargers' && p.category === 'fast-chargers') ||
+      (selectedCategory === 'fast-chargers' && p.category === 'chargers')
+  ).length;
 
   return (
     <>
@@ -235,48 +270,117 @@ export const Header: React.FC<HeaderProps> = ({
         </div>
       </header>
 
-      {/* Category Navigation Slide-out Drawer */}
+      {/* Persistent Two-Pane Category Browser Overlay */}
       {isCategoryDrawerOpen && (
-        <div className="fixed inset-0 z-50 overflow-hidden flex">
+        <div className="fixed inset-0 z-50 overflow-hidden flex items-center justify-center p-0 sm:p-4">
           {/* Dark Backdrop Overlay */}
           <div
-            className="fixed inset-0 bg-slate-950/60 backdrop-blur-sm transition-opacity duration-300"
+            className="fixed inset-0 bg-slate-950/80 backdrop-blur-md transition-opacity duration-300"
             onClick={() => setIsCategoryDrawerOpen(false)}
             aria-hidden="true"
           />
 
-          {/* Left Slide-out Panel */}
-          <div className="relative w-full max-w-xs sm:max-w-sm bg-slate-900/95 backdrop-blur-2xl text-white shadow-2xl h-full flex flex-col z-10 border-r border-slate-800/80 animate-in slide-in-from-left duration-300">
+          {/* Persistent Two-Pane Modal/Drawer Container */}
+          <div className="relative z-10 w-full h-full sm:h-[90vh] max-w-7xl bg-slate-900 text-white sm:rounded-3xl shadow-2xl flex flex-col overflow-hidden border border-slate-800 animate-in fade-in zoom-in-95 duration-200">
             
-            {/* Drawer Top Bar */}
-            <div className="flex items-center justify-between px-5 py-4 border-b border-slate-800/80 bg-slate-950/40">
-              <div className="flex items-center space-x-2.5">
-                <span className="w-2.5 h-6 bg-orange-500 rounded-full inline-block shadow-sm"></span>
-                <h2 className="text-base font-extrabold text-white tracking-wide">
-                  {language === 'bn' ? 'ব্রাউজ ক্যাটাগরি' : 'Category Drawer'}
+            {/* Overlay Header Bar */}
+            <div className="flex items-center justify-between px-5 sm:px-6 py-4 border-b border-slate-800 bg-slate-950/80 shrink-0">
+              <div className="flex items-center space-x-3">
+                <span className="w-3 h-6 bg-orange-500 rounded-full inline-block shadow-sm"></span>
+                <h2 className="text-base sm:text-lg font-black text-white tracking-wide uppercase">
+                  {language === 'bn' ? 'ক্যাটাগরি ব্রাউজার' : 'Category Browser'}
                 </h2>
               </div>
               <button
                 onClick={() => setIsCategoryDrawerOpen(false)}
                 className="p-2 text-gray-400 hover:text-white hover:bg-slate-800 rounded-full transition active:scale-95 cursor-pointer"
-                aria-label="Close drawer"
+                aria-label="Close browser"
               >
-                <X className="w-5 h-5" />
+                <X className="w-5 h-5 sm:w-6 sm:h-6" />
               </button>
             </div>
 
-            {/* Drawer Content */}
-            <div className="flex-1 overflow-y-auto p-4 sm:p-5">
-              <CategorySidebar
-                selectedCategory={selectedCategory}
-                onSelectCategory={(cat) => {
-                  if (onSelectCategory) {
-                    onSelectCategory(cat);
-                  }
-                  setIsCategoryDrawerOpen(false);
-                }}
-                onCloseMobile={() => setIsCategoryDrawerOpen(false)}
-              />
+            {/* Two-Pane Content Body */}
+            <div className="flex-1 flex flex-col md:flex-row overflow-hidden min-h-0">
+              
+              {/* Left Pane: Category Navigation List */}
+              <div className="overflow-y-auto h-full w-full md:w-80 shrink-0 p-4 border-b md:border-b-0 md:border-r border-slate-800 bg-slate-950/40">
+                <CategorySidebar
+                  selectedCategory={selectedCategory}
+                  onSelectCategory={(cat) => {
+                    if (onSelectCategory) {
+                      onSelectCategory(cat);
+                    }
+                  }}
+                />
+              </div>
+
+              {/* Right Pane: Category Content / Product Area */}
+              <div className="overflow-y-auto h-full flex-1 p-4 sm:p-6 bg-slate-950/20 text-slate-100">
+                {selectedCategory === 'all' ? (
+                  <div className="space-y-6">
+                    <CategoryGrid
+                      selectedCategory={selectedCategory}
+                      onSelectCategory={(cat) => {
+                        if (onSelectCategory) onSelectCategory(cat);
+                      }}
+                    />
+                    <ProductGrid
+                      selectedCategory={selectedCategory}
+                      searchQuery={searchQuery}
+                      onSelectCategory={(cat) => {
+                        if (onSelectCategory) onSelectCategory(cat);
+                      }}
+                    />
+                  </div>
+                ) : (
+                  <div className="space-y-6">
+                    {/* Category Header Bar */}
+                    <div className="bg-gradient-to-r from-slate-800 via-slate-800 to-slate-900 text-white rounded-3xl p-5 sm:p-6 shadow-xl relative overflow-hidden flex flex-col sm:flex-row sm:items-center justify-between gap-4 border border-slate-700/60">
+                      <div className="absolute -right-12 -bottom-12 w-48 h-48 bg-orange-500/15 rounded-full blur-3xl pointer-events-none" />
+                      
+                      <div className="flex items-center space-x-4 relative z-10">
+                        <div className="w-12 h-12 rounded-2xl bg-orange-500 flex items-center justify-center shadow-lg shadow-orange-500/30 text-white font-black text-xl shrink-0">
+                          {currentMeta.badge}
+                        </div>
+                        <div>
+                          <div className="flex items-center space-x-2">
+                            <span className="text-[11px] font-black text-orange-400 uppercase tracking-widest">
+                              {language === 'bn' ? 'ক্যাটাগরি ভিউ' : 'Category View'}
+                            </span>
+                            <span className="bg-orange-500/20 text-orange-300 text-[11px] font-extrabold px-2.5 py-0.5 rounded-full border border-orange-500/30">
+                              {productCount} {language === 'bn' ? 'টি পণ্য' : 'products'}
+                            </span>
+                          </div>
+                          <h1 className="text-xl sm:text-2xl font-black text-white capitalize mt-0.5">
+                            {language === 'bn' ? currentMeta.bn : currentMeta.en}
+                          </h1>
+                        </div>
+                      </div>
+
+                      {onSelectCategory && (
+                        <button
+                          onClick={() => onSelectCategory('all')}
+                          className="relative z-10 self-start sm:self-auto bg-white/10 hover:bg-white/20 text-white border border-white/20 hover:border-orange-500/50 px-4 py-2 rounded-2xl text-xs sm:text-sm font-bold transition flex items-center space-x-2 active:scale-95 shadow-sm cursor-pointer"
+                        >
+                          <span>{language === 'bn' ? 'সকল পণ্য দেখুন' : 'Show All Products'}</span>
+                          <RotateCcw className="w-4 h-4 text-orange-400" />
+                        </button>
+                      )}
+                    </div>
+
+                    {/* Product Grid */}
+                    <ProductGrid
+                      selectedCategory={selectedCategory}
+                      searchQuery={searchQuery}
+                      onSelectCategory={(cat) => {
+                        if (onSelectCategory) onSelectCategory(cat);
+                      }}
+                    />
+                  </div>
+                )}
+              </div>
+
             </div>
 
           </div>
@@ -285,4 +389,3 @@ export const Header: React.FC<HeaderProps> = ({
     </>
   );
 };
-
