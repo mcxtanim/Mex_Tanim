@@ -168,14 +168,14 @@ export const Header: React.FC<HeaderProps> = ({
                 </div>
               )}
 
-              {/* Official Mex Tanim Store Logo */}
-              <a href="#" className="flex items-center cursor-pointer shrink-0 group">
-                <img
-                  src="/images/logo.png"
-                  alt="Mex Tanim Store Logo"
-                  className="h-10 sm:h-12 md:h-14 max-h-16 w-auto object-contain group-hover:scale-105 transition-all"
-                />
-              </a>
+            {/* Official Mex Tanim Store Logo (Increased by 20%) */}
+            <a href="#" className="flex items-center cursor-pointer shrink-0 group">
+              <img
+                src="/images/logo.png"
+                alt="Mex Tanim Store Logo"
+                className="h-12 sm:h-15 md:h-18 max-h-20 sm:max-h-24 w-auto object-contain group-hover:scale-105 transition-all"
+              />
+            </a>
 
             </div>
 
