@@ -1,15 +1,12 @@
-# node_modules
+# Ignore node_modules everywhere
 node_modules/
-user_website/node_modules/
-admin_website/node_modules/
+**/node_modules/
 
-# Next.js build output
+# Ignore Next.js build output everywhere
 .next/
-user_website/.next/
-admin_website/.next/
-tsconfig.tsbuildinfo
-user_website/tsconfig.tsbuildinfo
-admin_website/tsconfig.tsbuildinfo
+**/.next/
+*.tsbuildinfo
+**/*.tsbuildinfo
 
 # Logs & OS files
 *.log
