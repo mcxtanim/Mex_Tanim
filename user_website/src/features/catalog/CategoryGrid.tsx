@@ -7,11 +7,13 @@ import { useLanguage } from '../shared/LanguageContext';
 interface CategoryGridProps {
   selectedCategory: string;
   onSelectCategory: (category: string) => void;
+  onCloseBrowser?: () => void;
 }
 
 export const CategoryGrid: React.FC<CategoryGridProps> = ({
   selectedCategory,
   onSelectCategory,
+  onCloseBrowser,
 }) => {
   const { t } = useLanguage();
 
@@ -37,8 +39,17 @@ export const CategoryGrid: React.FC<CategoryGridProps> = ({
           <span>{t.categoriesTitle}</span>
         </h2>
         <button
-          onClick={() => onSelectCategory('all')}
-          className="text-xs sm:text-sm font-bold text-orange-600 hover:text-orange-700 hover:underline transition flex items-center space-x-1"
+          onClick={() => {
+            onSelectCategory('all');
+            if (onCloseBrowser) onCloseBrowser();
+            setTimeout(() => {
+              const prodEl = document.getElementById('products');
+              if (prodEl) {
+                prodEl.scrollIntoView({ behavior: 'smooth' });
+              }
+            }, 100);
+          }}
+          className="text-xs sm:text-sm font-bold text-orange-600 hover:text-orange-700 hover:underline transition flex items-center space-x-1 cursor-pointer bg-orange-50 px-3 py-1 rounded-full border border-orange-200"
         >
           <span>{t.viewAll}</span>
           <span>›</span>

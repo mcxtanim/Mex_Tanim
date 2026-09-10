@@ -291,13 +291,30 @@ export const Header: React.FC<HeaderProps> = ({
                   {language === 'bn' ? 'ক্যাটাগরি ব্রাউজার' : 'Category Browser'}
                 </h2>
               </div>
-              <button
-                onClick={() => setIsCategoryDrawerOpen(false)}
-                className="p-2 text-gray-400 hover:text-white hover:bg-slate-800 rounded-full transition active:scale-95 cursor-pointer"
-                aria-label="Close browser"
-              >
-                <X className="w-5 h-5 sm:w-6 sm:h-6" />
-              </button>
+
+              <div className="flex items-center space-x-2 sm:space-x-3">
+                {/* Home Page Navigation Button */}
+                <button
+                  onClick={() => {
+                    setIsCategoryDrawerOpen(false);
+                    if (onSelectCategory) onSelectCategory('all');
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                  }}
+                  className="bg-orange-500 hover:bg-orange-600 text-white font-extrabold px-3.5 py-1.5 sm:px-4 sm:py-2 rounded-2xl text-xs sm:text-sm flex items-center space-x-1.5 transition active:scale-95 shadow-md cursor-pointer border border-orange-400/40"
+                  title="Go to Homepage"
+                >
+                  <span className="text-sm">🏠</span>
+                  <span>{language === 'bn' ? 'হোম পেজ' : 'Home Page'}</span>
+                </button>
+
+                <button
+                  onClick={() => setIsCategoryDrawerOpen(false)}
+                  className="p-2 text-gray-400 hover:text-white hover:bg-slate-800 rounded-full transition active:scale-95 cursor-pointer"
+                  aria-label="Close browser"
+                >
+                  <X className="w-5 h-5 sm:w-6 sm:h-6" />
+                </button>
+              </div>
             </div>
 
             {/* Two-Pane Content Body */}
@@ -324,6 +341,7 @@ export const Header: React.FC<HeaderProps> = ({
                       onSelectCategory={(cat) => {
                         if (onSelectCategory) onSelectCategory(cat);
                       }}
+                      onCloseBrowser={() => setIsCategoryDrawerOpen(false)}
                     />
                     <ProductGrid
                       selectedCategory={selectedCategory}
