@@ -1,0 +1,41 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" fill="none">
+  <defs>
+    <linearGradient id="allGrad1" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#fb923c"/>
+      <stop offset="100%" stop-color="#ea580c"/>
+    </linearGradient>
+    <linearGradient id="allGrad2" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#38bdf8"/>
+      <stop offset="100%" stop-color="#0284c7"/>
+    </linearGradient>
+    <linearGradient id="allGrad3" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#c084fc"/>
+      <stop offset="100%" stop-color="#7e22ce"/>
+    </linearGradient>
+    <linearGradient id="allGrad4" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#34d399"/>
+      <stop offset="100%" stop-color="#059669"/>
+    </linearGradient>
+    <filter id="allShadow" x="-10%" y="-10%" width="120%" height="120%">
+      <feDropShadow dx="0" dy="16" stdDeviation="16" flood-color="#000000" flood-opacity="0.4"/>
+    </filter>
+  </defs>
+
+  <g filter="url(#allShadow)">
+    <!-- Tile 1: Top-Left (Orange) -->
+    <rect x="80" y="80" width="160" height="160" rx="36" fill="url(#allGrad1)"/>
+    <circle cx="160" cy="160" r="32" fill="#ffffff" opacity="0.9"/>
+
+    <!-- Tile 2: Top-Right (Cyan) -->
+    <rect x="272" y="80" width="160" height="160" rx="36" fill="url(#allGrad2)"/>
+    <rect x="328" y="136" width="48" height="48" rx="12" fill="#ffffff" opacity="0.9"/>
+
+    <!-- Tile 3: Bottom-Left (Purple) -->
+    <rect x="80" y="272" width="160" height="160" rx="36" fill="url(#allGrad3)"/>
+    <polygon points="160,320 192,384 128,384" fill="#ffffff" opacity="0.9"/>
+
+    <!-- Tile 4: Bottom-Right (Emerald) -->
+    <rect x="272" y="272" width="160" height="160" rx="36" fill="url(#allGrad4)"/>
+    <circle cx="352" cy="352" r="24" fill="#ffffff" opacity="0.9"/>
+  </g>
+</svg>

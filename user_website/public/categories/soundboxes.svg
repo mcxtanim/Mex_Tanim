@@ -1,0 +1,67 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" fill="none">
+  <defs>
+    <linearGradient id="boxBody" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#f43f5e"/>
+      <stop offset="50%" stop-color="#e11d48"/>
+      <stop offset="100%" stop-color="#9f1239"/>
+    </linearGradient>
+    <linearGradient id="meshGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#18181b"/>
+      <stop offset="100%" stop-color="#09090b"/>
+    </linearGradient>
+    <linearGradient id="bassCap" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#3f3f46"/>
+      <stop offset="50%" stop-color="#71717a"/>
+      <stop offset="100%" stop-color="#27272a"/>
+    </linearGradient>
+    <filter id="speakerShadow" x="-10%" y="-10%" width="120%" height="120%">
+      <feDropShadow dx="0" dy="16" stdDeviation="16" flood-color="#000000" flood-opacity="0.45"/>
+    </filter>
+  </defs>
+
+  <g filter="url(#speakerShadow)">
+    <!-- Passive Bass Radiator End Cap (Left) -->
+    <rect x="70" y="156" width="36" height="200" rx="18" fill="url(#bassCap)" stroke="#18181b" stroke-width="4"/>
+    <ellipse cx="88" cy="256" rx="8" ry="70" fill="#18181b"/>
+
+    <!-- Passive Bass Radiator End Cap (Right) -->
+    <rect x="406" y="156" width="36" height="200" rx="18" fill="url(#bassCap)" stroke="#18181b" stroke-width="4"/>
+    <ellipse cx="424" cy="256" rx="8" ry="70" fill="#18181b"/>
+
+    <!-- Main Cylindrical Speaker Body -->
+    <rect x="96" y="146" width="320" height="220" rx="44" fill="url(#boxBody)" stroke="#be123c" stroke-width="4"/>
+
+    <!-- Honeycomb Speaker Grille Mesh Center Section -->
+    <rect x="136" y="166" width="240" height="180" rx="30" fill="url(#meshGrad)" stroke="#881337" stroke-width="3"/>
+
+    <!-- Grille Honeycomb Pattern Dots -->
+    <g fill="#27272a" opacity="0.8">
+      <circle cx="160" cy="190" r="4"/><circle cx="190" cy="190" r="4"/><circle cx="220" cy="190" r="4"/><circle cx="256" cy="190" r="4"/><circle cx="290" cy="190" r="4"/><circle cx="320" cy="190" r="4"/><circle cx="350" cy="190" r="4"/>
+      <circle cx="175" cy="210" r="4"/><circle cx="205" cy="210" r="4"/><circle cx="238" cy="210" r="4"/><circle cx="274" cy="210" r="4"/><circle cx="305" cy="210" r="4"/><circle cx="335" cy="210" r="4"/>
+      <circle cx="160" cy="230" r="4"/><circle cx="190" cy="230" r="4"/><circle cx="220" cy="230" r="4"/><circle cx="256" cy="230" r="4"/><circle cx="290" cy="230" r="4"/><circle cx="320" cy="230" r="4"/><circle cx="350" cy="230" r="4"/>
+      <circle cx="175" cy="256" r="4"/><circle cx="205" cy="256" r="4"/><circle cx="238" cy="256" r="4"/><circle cx="274" cy="256" r="4"/><circle cx="305" cy="256" r="4"/><circle cx="335" cy="256" r="4"/>
+      <circle cx="160" cy="282" r="4"/><circle cx="190" cy="282" r="4"/><circle cx="220" cy="282" r="4"/><circle cx="256" cy="282" r="4"/><circle cx="290" cy="282" r="4"/><circle cx="320" cy="282" r="4"/><circle cx="350" cy="282" r="4"/>
+      <circle cx="175" cy="305" r="4"/><circle cx="205" cy="305" r="4"/><circle cx="238" cy="305" r="4"/><circle cx="274" cy="305" r="4"/><circle cx="305" cy="305" r="4"/><circle cx="335" cy="305" r="4"/>
+      <circle cx="160" cy="325" r="4"/><circle cx="190" cy="325" r="4"/><circle cx="220" cy="325" r="4"/><circle cx="256" cy="325" r="4"/><circle cx="290" cy="325" r="4"/><circle cx="320" cy="325" r="4"/><circle cx="350" cy="325" r="4"/>
+    </g>
+
+    <!-- Top Rubber Control Strip Buttons -->
+    <path d="M 180 146 L 332 146" stroke="#9f1239" stroke-width="12" stroke-linecap="round"/>
+    
+    <!-- Plus Volume Button Icon -->
+    <path d="M 200 140 L 200 152 M 194 146 L 206 146" stroke="#ffffff" stroke-width="3" stroke-linecap="round"/>
+
+    <!-- Bluetooth Icon -->
+    <path d="M 240 140 L 248 146 L 244 152 L 244 140 L 248 146 L 240 152" stroke="#ffffff" stroke-width="2.5" fill="none"/>
+
+    <!-- Play/Pause Button Icon -->
+    <polygon points="274,141 282,146 274,151" fill="#ffffff"/>
+
+    <!-- Minus Volume Button Icon -->
+    <line x1="310" y1="146" x2="322" y2="146" stroke="#ffffff" stroke-width="3" stroke-linecap="round"/>
+
+    <!-- Woven Lanyard Carrying Strap Loop (Right) -->
+    <path d="M 436 210 C 490 200 490 310 436 300" fill="none" stroke="#e11d48" stroke-width="12" stroke-linecap="round"/>
+    <path d="M 436 210 C 490 200 490 310 436 300" fill="none" stroke="#fb7185" stroke-width="3" stroke-linecap="round" stroke-dasharray="6 4"/>
+  </g>
+</svg>

@@ -4,6 +4,7 @@ import React from 'react';
 import { ChevronRight } from 'lucide-react';
 import { useLanguage } from '../shared/LanguageContext';
 import { CATEGORIES, getCategoryProductCount, isCategorySelected } from './categoryData';
+import { CategoryThumbnail } from './CategoryThumbnail';
 
 interface CategorySidebarProps {
   selectedCategory: string;
@@ -21,7 +22,6 @@ export const CategorySidebar: React.FC<CategorySidebarProps> = ({
     <div className="w-full space-y-2.5">
       {/* List of Category Cards */}
       {CATEGORIES.map((cat) => {
-        const Icon = cat.icon;
         const isSelected = isCategorySelected(selectedCategory, cat.id);
         const count = getCategoryProductCount(cat.id, cat.staticCount);
 
@@ -38,17 +38,13 @@ export const CategorySidebar: React.FC<CategorySidebarProps> = ({
             }`}
           >
             <div className="flex items-center space-x-3 min-w-0">
-              {/* Icon Container with Badge */}
+              {/* Category SVG Asset Thumbnail Container with Badge */}
               <div className="relative shrink-0">
-                <div
-                  className={`w-10 h-10 sm:w-11 sm:h-11 rounded-xl flex items-center justify-center transition-transform duration-300 group-hover:scale-110 ${
-                    isSelected
-                      ? 'bg-orange-500 text-white shadow-md shadow-orange-500/30'
-                      : cat.colorClass
-                  }`}
-                >
-                  <Icon className="w-5 h-5 stroke-[2.2]" />
-                </div>
+                <CategoryThumbnail
+                  category={cat}
+                  variant="icon"
+                  isSelected={isSelected}
+                />
                 <span
                   className={`absolute -top-1 -right-1 w-4 h-4 rounded-full text-[9px] font-black flex items-center justify-center border border-white shadow-xs ${
                     isSelected

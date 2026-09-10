@@ -20,6 +20,7 @@ export interface CategoryItem {
   icon: ComponentType<{ className?: string }>;
   colorClass: string;
   staticCount?: number;
+  image: string;
 }
 
 export const getCategoryProductCount = (catId: string, staticCount: number = 0): number => {
@@ -57,6 +58,7 @@ export const CATEGORIES: CategoryItem[] = [
     colorClass: 'bg-slate-100 text-slate-800 border border-slate-200',
     badge: 'A',
     staticCount: PRODUCTS.length,
+    image: '/categories/all.svg',
   },
   {
     id: 'mice',
@@ -66,6 +68,7 @@ export const CATEGORIES: CategoryItem[] = [
     colorClass: 'bg-orange-500/15 text-orange-600 border border-orange-500/20',
     badge: 'G',
     staticCount: 18,
+    image: '/categories/gaming-mice.svg',
   },
   {
     id: 'keyboards',
@@ -75,6 +78,7 @@ export const CATEGORIES: CategoryItem[] = [
     colorClass: 'bg-blue-500/15 text-blue-600 border border-blue-500/20',
     badge: 'M',
     staticCount: 15,
+    image: '/categories/mechanical-keyboards.svg',
   },
   {
     id: 'headphones',
@@ -84,6 +88,7 @@ export const CATEGORIES: CategoryItem[] = [
     colorClass: 'bg-purple-500/15 text-purple-600 border border-purple-500/20',
     badge: 'H',
     staticCount: 24,
+    image: '/categories/gaming-headsets.svg',
   },
   {
     id: 'chargers',
@@ -93,6 +98,7 @@ export const CATEGORIES: CategoryItem[] = [
     colorClass: 'bg-amber-500/15 text-amber-600 border border-amber-500/20',
     badge: 'F',
     staticCount: 32,
+    image: '/categories/fast-chargers.svg',
   },
   {
     id: 'finger-sleeves',
@@ -102,15 +108,17 @@ export const CATEGORIES: CategoryItem[] = [
     colorClass: 'bg-emerald-500/15 text-emerald-600 border border-emerald-500/20',
     badge: 'S',
     staticCount: 12,
+    image: '/categories/finger-sleeves.svg',
   },
   {
     id: 'cables',
     nameEn: 'CABLES',
-    nameBn: 'কেবলস',
+    nameBn: 'केवलস',
     icon: Cable,
     colorClass: 'bg-indigo-500/15 text-indigo-600 border border-indigo-500/20',
     badge: 'C',
     staticCount: 40,
+    image: '/categories/cables.svg',
   },
   {
     id: 'soundboxes',
@@ -120,6 +128,7 @@ export const CATEGORIES: CategoryItem[] = [
     colorClass: 'bg-rose-500/15 text-rose-600 border border-rose-500/20',
     badge: 'B',
     staticCount: 16,
+    image: '/categories/soundboxes.svg',
   },
   {
     id: 'trimmers',
@@ -129,5 +138,6 @@ export const CATEGORIES: CategoryItem[] = [
     colorClass: 'bg-teal-500/15 text-teal-600 border border-teal-500/20',
     badge: 'T',
     staticCount: 10,
+    image: '/categories/trimmers.svg',
   },
 ];

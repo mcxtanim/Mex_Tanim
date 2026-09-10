@@ -4,6 +4,7 @@ import React, { useRef, useEffect } from 'react';
 import { ChevronLeft, ChevronRight, ArrowRight } from 'lucide-react';
 import { useLanguage } from '../shared/LanguageContext';
 import { CATEGORIES, isCategorySelected } from './categoryData';
+import { CategoryThumbnail } from './CategoryThumbnail';
 
 interface CategoryShowcaseProps {
   selectedCategory: string;
@@ -120,32 +121,15 @@ export const CategoryShowcase: React.FC<CategoryShowcaseProps> = ({
         style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
       >
         {CATEGORIES.map((cat) => {
-          const Icon = cat.icon;
           const selected = isCategorySelected(selectedCategory, cat.id);
-          const catName = language === 'bn' ? cat.nameBn : cat.nameEn;
 
           return (
-            <button
+            <CategoryThumbnail
               key={cat.id}
-              onClick={() => {
-                onSelectCategory(cat.id);
-              }}
-              className={`snap-start shrink-0 flex-none rounded-2xl p-4 text-center flex flex-col items-center justify-center min-w-[130px] sm:min-w-[150px] md:min-w-[160px] h-[140px] sm:h-[160px] transition-all duration-300 group cursor-pointer ${
-                selected
-                  ? 'border-2 border-orange-500 bg-white shadow-md scale-105'
-                  : 'bg-gradient-to-b from-gray-100 to-gray-50/70 border border-gray-200/80 shadow-2xs hover:shadow-lg hover:border-orange-400'
-              }`}
-            >
-              {/* Icon Container */}
-              <div className="w-12 h-12 flex items-center justify-center text-slate-900 group-hover:scale-110 transition-transform duration-300">
-                <Icon className="w-8 h-8 stroke-[2]" />
-              </div>
-
-              {/* Category Name */}
-              <span className="text-xs font-black uppercase text-slate-900 tracking-wider text-center mt-2 group-hover:text-orange-600 transition-colors line-clamp-2">
-                {catName}
-              </span>
-            </button>
+              category={cat}
+              isSelected={selected}
+              onClick={() => onSelectCategory(cat.id)}
+            />
           );
         })}
       </div>
