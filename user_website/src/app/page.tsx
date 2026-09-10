@@ -5,7 +5,6 @@ import { Header } from '@/features/shared/Header';
 import { HeroBanner } from '@/features/catalog/HeroBanner';
 import { CategoryGrid } from '@/features/catalog/CategoryGrid';
 import { ProductGrid } from '@/features/catalog/ProductGrid';
-import { AppInstallBanner } from '@/features/shared/AppInstallBanner';
 import { Footer } from '@/features/shared/Footer';
 import { useLanguage } from '@/features/shared/LanguageContext';
 import { PRODUCTS } from '@/features/catalog/mockData';
@@ -72,7 +71,7 @@ export default function Home() {
                 searchQuery={searchQuery}
                 onSelectCategory={setSelectedCategory}
               />
-              <AppInstallBanner />
+
             </>
           ) : (
             <>
@@ -114,7 +113,7 @@ export default function Home() {
                 searchQuery={searchQuery}
                 onSelectCategory={setSelectedCategory}
               />
-              <AppInstallBanner />
+
             </>
           )}
         </main>
