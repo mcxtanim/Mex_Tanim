@@ -1,7 +1,7 @@
 'use client';
 
-import React, { useState } from 'react';
-import { Menu, Search, ShoppingBag, User as UserIcon, Gamepad2, X, LogOut, Globe } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { Menu, Search, ShoppingBag, User as UserIcon, X, LogOut, Globe } from 'lucide-react';
 import { useCart } from '../cart/CartContext';
 import { useAuth } from '../auth/AuthContext';
 import { useLanguage } from './LanguageContext';
@@ -11,18 +11,70 @@ interface HeaderProps {
   setSearchQuery: (query: string) => void;
 }
 
+const SEARCH_SUGGESTIONS_EN = [
+  'Fantech 7.1 Gaming Headset',
+  'Razer DeathAdder Mouse',
+  'Redragon Mechanical Keyboard',
+  'Baseus 65W GaN Charger',
+  'PUBG Sweatproof Finger Sleeves',
+  'JBL Bluetooth Soundbox',
+];
+
+const SEARCH_SUGGESTIONS_BN = [
+  'ফ্যানটেক ৭.১ গেমিং হেডসেট',
+  'রেজার ডেথঅ্যাডার মাউস',
+  'রেড্রাগন মেকানিক্যাল কীবোর্ড',
+  'বেসাস ৬৫W ফাস্ট চার্জার',
+  'পাবজি ফিঙ্গার স্লিকস',
+  'জেবিএল সাউন্ডবক্স',
+];
+
 export const Header: React.FC<HeaderProps> = ({ searchQuery, setSearchQuery }) => {
   const { totalItems, openCart } = useCart();
   const { user, isAuthenticated, openAuthModal, logout } = useAuth();
   const { language, setLanguage, t } = useLanguage();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
+  // Typewriter effect state for interactive search placeholder
+  const [suggestionIndex, setSuggestionIndex] = useState(0);
+  const [displayText, setDisplayText] = useState('');
+  const [isDeleting, setIsDeleting] = useState(false);
+
+  useEffect(() => {
+    const suggestions = language === 'bn' ? SEARCH_SUGGESTIONS_BN : SEARCH_SUGGESTIONS_EN;
+    const currentFullText = suggestions[suggestionIndex % suggestions.length];
+    
+    const typingSpeed = isDeleting ? 40 : 85;
+
+    const timer = setTimeout(() => {
+      if (!isDeleting && displayText === currentFullText) {
+        setTimeout(() => setIsDeleting(true), 1800);
+      } else if (isDeleting && displayText === '') {
+        setIsDeleting(false);
+        setSuggestionIndex((prev) => (prev + 1) % suggestions.length);
+      } else {
+        const nextChar = isDeleting
+          ? currentFullText.substring(0, displayText.length - 1)
+          : currentFullText.substring(0, displayText.length + 1);
+        setDisplayText(nextChar);
+      }
+    }, typingSpeed);
+
+    return () => clearTimeout(timer);
+  }, [displayText, isDeleting, suggestionIndex, language]);
+
+  const animatedPlaceholder = searchQuery
+    ? ''
+    : language === 'bn'
+    ? `খুঁজুন "${displayText}"...`
+    : `Search "${displayText}"...`;
+
   return (
     <header className="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-gray-100 shadow-2xs transition-all">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16 sm:h-20 gap-3">
           
-          {/* Left section: Mobile Hamburger + Brand Logo */}
+          {/* Left section: Mobile Hamburger + Official Image Logo */}
           <div className="flex items-center space-x-3">
             <button
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
@@ -32,31 +84,25 @@ export const Header: React.FC<HeaderProps> = ({ searchQuery, setSearchQuery }) =
               {isMobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
             </button>
 
-            {/* Logo */}
-            <div className="flex items-center space-x-2.5 cursor-pointer">
-              <div className="bg-gradient-to-tr from-orange-600 to-amber-500 p-2 rounded-xl text-white shadow-md shadow-orange-500/20">
-                <Gamepad2 className="w-6 h-6 sm:w-7 sm:h-7" />
-              </div>
-              <div className="flex flex-col">
-                <span className="font-extrabold text-lg sm:text-xl tracking-tight text-slate-900 leading-tight">
-                  Mex Tanim <span className="text-orange-500">Store</span>
-                </span>
-                <span className="text-[10px] text-gray-500 font-medium hidden sm:inline-block">
-                  {t.tagline}
-                </span>
-              </div>
+            {/* Official Mex Tanim Store Logo */}
+            <div className="flex items-center cursor-pointer">
+              <img
+                src="/images/logo.png"
+                alt="Mex Tanim Store Logo"
+                className="h-10 sm:h-12 w-auto object-contain hover:scale-105 transition-all"
+              />
             </div>
           </div>
 
-          {/* Center Search Bar */}
+          {/* Center Search Bar with Animated Typewriter Placeholder */}
           <div className="flex-1 max-w-md mx-1 sm:mx-4">
             <div className="relative">
               <input
                 type="text"
-                placeholder={t.searchPlaceholder}
+                placeholder={animatedPlaceholder}
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full bg-gray-100/90 text-gray-800 placeholder-gray-400 pl-10 pr-4 py-2 sm:py-2.5 text-xs sm:text-sm rounded-full border border-transparent focus:border-orange-500 focus:bg-white focus:ring-2 focus:ring-orange-500/20 outline-none transition"
+                className="w-full bg-gray-100/90 text-gray-800 placeholder-gray-500 font-medium pl-10 pr-4 py-2 sm:py-2.5 text-xs sm:text-sm rounded-full border border-transparent focus:border-orange-500 focus:bg-white focus:ring-2 focus:ring-orange-500/20 outline-none transition-all"
               />
               <Search className="w-4 h-4 text-gray-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
               {searchQuery && (
@@ -120,7 +166,7 @@ export const Header: React.FC<HeaderProps> = ({ searchQuery, setSearchQuery }) =
               </div>
             )}
 
-            {/* LANGUAGE TOGGLE BUTTON (Placed at the very right side of the top header) */}
+            {/* LANGUAGE TOGGLE BUTTON */}
             <div className="pl-1 border-l border-gray-200">
               <button
                 onClick={() => setLanguage(language === 'en' ? 'bn' : 'en')}

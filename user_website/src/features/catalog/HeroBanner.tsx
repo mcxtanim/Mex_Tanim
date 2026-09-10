@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { ChevronLeft, ChevronRight, ShoppingBag, Flame, Sparkles, Award } from 'lucide-react';
+import { ChevronLeft, ChevronRight, ShoppingBag, Flame } from 'lucide-react';
 import { useLanguage } from '../shared/LanguageContext';
 
 const BANNER_IMAGES = [
@@ -44,19 +44,19 @@ export const HeroBanner: React.FC = () => {
               className="w-full h-full object-cover object-center rounded-3xl"
             />
             {/* Subtle Gradient Overlay for visual polish */}
-            <div className="absolute inset-0 bg-gradient-to-t from-slate-950/50 via-transparent to-black/20 pointer-events-none" />
+            <div className="absolute inset-0 bg-gradient-to-t from-slate-950/60 via-transparent to-black/20 pointer-events-none" />
           </div>
         ))}
 
-        {/* Top Floating Badge */}
-        <div className="absolute top-4 left-4 sm:top-6 sm:left-6 z-20 flex items-center space-x-2 bg-slate-900/80 backdrop-blur-md px-3.5 py-1.5 rounded-full border border-orange-500/40 shadow-lg">
+        {/* Bottom-Left Floating Badge (Moved from Top-Left to Bottom-Left per user directive) */}
+        <div className="absolute bottom-6 left-6 sm:bottom-8 sm:left-8 z-20 flex items-center space-x-2 bg-slate-950/85 backdrop-blur-md px-4 py-2 rounded-full border border-orange-500/40 shadow-xl">
           <Flame className="w-4 h-4 text-orange-400 animate-pulse" />
           <span className="text-xs font-black text-white tracking-wider">
             Mex Tanim <span className="text-orange-400">Exclusive Deals</span>
           </span>
         </div>
 
-        {/* Floating Shop Now Action Button */}
+        {/* Floating Shop Now Action Button on Bottom-Right */}
         <div className="absolute bottom-6 right-6 sm:bottom-8 sm:right-10 z-20 hidden sm:flex items-center space-x-3">
           <a
             href="#products"
