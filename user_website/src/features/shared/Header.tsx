@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { Menu, Search, ShoppingBag, User as UserIcon, X, LogOut, Globe } from 'lucide-react';
+import { Menu, Search, ShoppingBag, User as UserIcon, X, LogOut, Globe, Mouse, Keyboard, Headphones, Zap, Shield, Cable, Speaker, Scissors, Grid } from 'lucide-react';
 import { useCart } from '../cart/CartContext';
 import { useAuth } from '../auth/AuthContext';
 import { useLanguage } from './LanguageContext';
@@ -10,7 +10,6 @@ interface HeaderProps {
   searchQuery: string;
   setSearchQuery: (query: string) => void;
   onSelectCategory?: (category: string) => void;
-  selectedCategory?: string;
 }
 
 const SEARCH_SUGGESTIONS_EN = [
@@ -31,28 +30,11 @@ const SEARCH_SUGGESTIONS_BN = [
   'জেবিএল সাউন্ডবক্স',
 ];
 
-const CATEGORY_MAP: Record<string, { en: string; bn: string }> = {
-  mice: { en: 'GAMING MICE', bn: 'গেমিং মাউস' },
-  keyboards: { en: 'MECHANICAL KEYBOARDS', bn: 'মেকানিক্যাল কীবোর্ড' },
-  headphones: { en: 'GAMING HEADSETS', bn: 'গেমিং হেডসেট' },
-  chargers: { en: 'FAST CHARGERS', bn: 'ফাস্ট চার্জার' },
-  'finger-sleeves': { en: 'FINGER SLEEVES', bn: 'ফিঙ্গার স্লিকস' },
-  sleeves: { en: 'FINGER SLEEVES', bn: 'ফিঙ্গার স্লিকস' },
-  cables: { en: 'CABLES', bn: 'কেবলস' },
-  soundboxes: { en: 'SOUNDBOXES', bn: 'সাউন্ডবক্স' },
-  soundbox: { en: 'SOUNDBOXES', bn: 'সাউন্ডবক্স' },
-  trimmers: { en: 'TRIMMERS', bn: 'ট্রিমার' },
-};
-
-export const Header: React.FC<HeaderProps> = ({
-  searchQuery,
-  setSearchQuery,
-  onSelectCategory,
-  selectedCategory = 'all',
-}) => {
+export const Header: React.FC<HeaderProps> = ({ searchQuery, setSearchQuery }) => {
   const { totalItems, openCart } = useCart();
   const { user, isAuthenticated, openAuthModal, logout } = useAuth();
   const { language, setLanguage, t } = useLanguage();
+  const [isCategoryMenuOpen, setIsCategoryMenuOpen] = useState(false);
 
   // Typewriter effect state for interactive search placeholder
   const [suggestionIndex, setSuggestionIndex] = useState(0);
@@ -88,59 +70,83 @@ export const Header: React.FC<HeaderProps> = ({
     ? `খুঁজুন "${displayText}"...`
     : `Search "${displayText}"...`;
 
+  const CATEGORIES = [
+    { id: 'all', name: t.categories.all, icon: Grid },
+    { id: 'mice', name: t.categories.mice, icon: Mouse },
+    { id: 'keyboards', name: t.categories.keyboards, icon: Keyboard },
+    { id: 'headphones', name: t.categories.headphones, icon: Headphones },
+    { id: 'chargers', name: t.categories.chargers, icon: Zap },
+    { id: 'sleeves', name: t.categories.sleeves, icon: Shield },
+    { id: 'cables', name: t.categories.cables, icon: Cable },
+    { id: 'soundbox', name: t.categories.soundbox, icon: Speaker },
+    { id: 'trimmers', name: t.categories.trimmers, icon: Scissors },
+  ];
+
   return (
     <header className="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-gray-100 shadow-2xs transition-all">
-      <div className="w-full px-2 sm:px-4 lg:px-6">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-20 sm:h-24 gap-3">
           
-          {/* Left section: Circular Hamburger Menu Button (Left of Logo) + Active Category Badge + Official Logo */}
-          <div className="flex items-center space-x-2 sm:space-x-3 shrink-0">
+          {/* Left section: Circular Hamburger Menu Button (Left of Logo) + Official Logo */}
+          <div className="flex items-center space-x-3 sm:space-x-4">
             
-            {/* Round Circular Hamburger Menu Button */}
-            <button
-              onClick={() => {
-                if (onSelectCategory) {
-                  onSelectCategory('all');
-                }
-                const el = document.getElementById('categories');
-                if (el) {
-                  el.scrollIntoView({ behavior: 'smooth' });
-                }
-              }}
-              className="w-10 h-10 sm:w-11 sm:h-11 rounded-full bg-gray-200/90 hover:bg-gray-300 text-black transition-all flex items-center justify-center shadow-2xs active:scale-95 border border-gray-300/50 cursor-pointer shrink-0"
-              title="Product Categories"
-              aria-label="Scroll to Product Categories"
-            >
-              <Menu className="w-5 h-5 sm:w-6 sm:h-6 text-black stroke-[2.5]" />
-            </button>
+            {/* Round Circular Hamburger Menu Button (Image 1 Style, Left Side of Logo) */}
+            <div className="relative">
+              <button
+                onClick={() => setIsCategoryMenuOpen(!isCategoryMenuOpen)}
+                className="w-10 h-10 sm:w-11 sm:h-11 rounded-full bg-gray-200/90 hover:bg-gray-300 text-black transition-all flex items-center justify-center shadow-2xs active:scale-95 border border-gray-300/50"
+                title="Product Categories"
+                aria-label="Toggle Product Categories Menu"
+              >
+                {isCategoryMenuOpen ? (
+                  <X className="w-5 h-5 text-black stroke-[2.5]" />
+                ) : (
+                  <Menu className="w-5 h-5 sm:w-6 sm:h-6 text-black stroke-[2.5]" />
+                )}
+              </button>
 
-            {/* Active Category Badge & Reset Button */}
-            {selectedCategory !== 'all' && (
-              <div className="flex items-center space-x-1.5 bg-orange-100/90 border border-orange-300 text-orange-900 px-2.5 py-1 rounded-full text-xs font-bold shadow-xs shrink-0 animate-in fade-in duration-200">
-                <span className="truncate max-w-[90px] sm:max-w-[130px] uppercase tracking-wide">
-                  {language === 'bn'
-                    ? CATEGORY_MAP[selectedCategory]?.bn || selectedCategory
-                    : CATEGORY_MAP[selectedCategory]?.en || selectedCategory}
-                </span>
-                <button
-                  onClick={() => onSelectCategory && onSelectCategory('all')}
-                  className="ml-1 text-xs text-orange-700 hover:text-white bg-orange-200 hover:bg-orange-600 px-1.5 py-0.5 rounded-full font-bold cursor-pointer transition-all flex items-center gap-1"
-                  title={language === 'bn' ? 'রিসেট' : 'Reset'}
-                  aria-label="Reset Category Filter"
-                >
-                  <X className="w-3 h-3 stroke-[3]" />
-                  <span className="hidden sm:inline">{language === 'bn' ? 'রিসেট' : 'Reset'}</span>
-                </button>
-              </div>
-            )}
+              {/* Product Categories Dropdown Menu */}
+              {isCategoryMenuOpen && (
+                <div className="absolute left-0 mt-2 w-64 bg-white border border-gray-200 rounded-2xl shadow-2xl z-50 p-3 space-y-1 animate-in fade-in slide-in-from-top-2 duration-200">
+                  <div className="px-3 py-2 border-b border-gray-100 mb-1 flex items-center justify-between">
+                    <span className="text-xs font-black text-slate-900 uppercase tracking-wider">
+                      {t.categoriesTitle}
+                    </span>
+                    <span className="text-[10px] font-bold text-orange-600 bg-orange-50 px-2 py-0.5 rounded-full">
+                      8 Categories
+                    </span>
+                  </div>
 
-            {/* Official Mex Tanim Store Logo */}
-            <a href="#" className="flex items-center justify-center cursor-pointer shrink-0 group">
+                  {CATEGORIES.map((cat) => {
+                    const Icon = cat.icon;
+                    return (
+                      <a
+                        key={cat.id}
+                        href="#categories"
+                        onClick={() => setIsCategoryMenuOpen(false)}
+                        className="flex items-center space-x-3 px-3 py-2 text-xs font-bold text-gray-700 hover:bg-orange-50 hover:text-orange-600 rounded-xl transition group"
+                      >
+                        <div className="p-1.5 rounded-lg bg-gray-100 group-hover:bg-orange-500 group-hover:text-white transition">
+                          <Icon className="w-4 h-4" />
+                        </div>
+                        <span>{cat.name}</span>
+                      </a>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
+
+            {/* Official Mex Tanim Store Logo (Image 2 Style - Clear, Large, Readable Logo & Tagline) */}
+            <a href="#" className="flex flex-col items-start justify-center cursor-pointer shrink-0 group">
               <img
                 src="/images/logo.png"
                 alt="Mex Tanim Store Logo"
                 className="h-8 sm:h-10 md:h-12 w-auto max-w-[150px] sm:max-w-[200px] object-contain group-hover:scale-105 transition-all"
               />
+              <span className="text-[11px] sm:text-xs md:text-sm font-black tracking-widest text-orange-600 uppercase block leading-none mt-0.5 drop-shadow-xs">
+                GADGETS FOR A SMARTER YOU
+              </span>
             </a>
 
           </div>
@@ -173,7 +179,7 @@ export const Header: React.FC<HeaderProps> = ({
             {/* Official Add to Cart / Bag Icon Button */}
             <button
               onClick={openCart}
-              className="relative p-2.5 bg-slate-900 hover:bg-orange-600 text-white rounded-xl shadow-md transition-all active:scale-95 flex items-center gap-1.5 cursor-pointer"
+              className="relative p-2.5 bg-slate-900 hover:bg-orange-600 text-white rounded-xl shadow-md transition-all active:scale-95 flex items-center gap-1.5"
               title={t.cart}
             >
               <ShoppingBag className="w-5 h-5 sm:w-5 sm:h-5 text-orange-400 group-hover:text-white" />
@@ -194,7 +200,7 @@ export const Header: React.FC<HeaderProps> = ({
                 </span>
                 <button
                   onClick={logout}
-                  className="text-gray-400 hover:text-red-500 transition p-1 cursor-pointer"
+                  className="text-gray-400 hover:text-red-500 transition p-1"
                   title={t.logout}
                 >
                   <LogOut className="w-4 h-4" />
@@ -204,13 +210,13 @@ export const Header: React.FC<HeaderProps> = ({
               <div className="flex items-center space-x-1 sm:space-x-2">
                 <button
                   onClick={() => openAuthModal('register')}
-                  className="hidden sm:inline-flex px-3 py-2 text-xs font-bold text-slate-800 hover:text-orange-600 rounded-full hover:bg-gray-100 transition cursor-pointer"
+                  className="hidden sm:inline-flex px-3 py-2 text-xs font-bold text-slate-800 hover:text-orange-600 rounded-full hover:bg-gray-100 transition"
                 >
                   {t.register}
                 </button>
                 <button
                   onClick={() => openAuthModal('login')}
-                  className="px-3.5 py-2 text-xs font-bold text-white bg-slate-900 hover:bg-slate-800 rounded-full shadow-sm transition active:scale-95 cursor-pointer"
+                  className="px-3.5 py-2 text-xs font-bold text-white bg-slate-900 hover:bg-slate-800 rounded-full shadow-sm transition active:scale-95"
                 >
                   {t.login}
                 </button>
@@ -221,7 +227,7 @@ export const Header: React.FC<HeaderProps> = ({
             <div className="pl-1 border-l border-gray-200">
               <button
                 onClick={() => setLanguage(language === 'en' ? 'bn' : 'en')}
-                className="flex items-center space-x-1 bg-gray-100 hover:bg-gray-200 border border-gray-300 px-2.5 py-1.5 rounded-full text-xs font-extrabold text-slate-800 transition active:scale-95 cursor-pointer"
+                className="flex items-center space-x-1 bg-gray-100 hover:bg-gray-200 border border-gray-300 px-2.5 py-1.5 rounded-full text-xs font-extrabold text-slate-800 transition active:scale-95"
                 title="Switch Language / ভাষা পরিবর্তন করুন"
               >
                 <Globe className="w-3.5 h-3.5 text-orange-500" />
@@ -234,7 +240,6 @@ export const Header: React.FC<HeaderProps> = ({
           </div>
         </div>
       </div>
-
     </header>
   );
 };

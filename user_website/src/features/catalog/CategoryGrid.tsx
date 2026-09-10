@@ -1,18 +1,7 @@
 'use client';
 
 import React from 'react';
-import {
-  Mouse,
-  Keyboard,
-  Headphones,
-  Zap,
-  Shield,
-  Cable,
-  Speaker,
-  Scissors,
-  ChevronRight,
-  Radio,
-} from 'lucide-react';
+import { Mouse, Keyboard, Headphones, Zap, Shield, Cable, Speaker, Scissors, Grid } from 'lucide-react';
 import { useLanguage } from '../shared/LanguageContext';
 export { CategorySidebar } from './CategorySidebar';
 
@@ -25,125 +14,71 @@ export const CategoryGrid: React.FC<CategoryGridProps> = ({
   selectedCategory,
   onSelectCategory,
 }) => {
-  const { t, language } = useLanguage();
+  const { t } = useLanguage();
 
   const CATEGORIES = [
-    {
-      id: 'headphones',
-      labelEn: 'GAMING EARPHONE',
-      labelBn: 'গেমিং ইয়ারফোন',
-      icon: Radio,
-    },
-    {
-      id: 'mice',
-      labelEn: 'GAMING MICE',
-      labelBn: 'গেমিং মাউস',
-      icon: Mouse,
-    },
-    {
-      id: 'keyboards',
-      labelEn: 'MECHANICAL KEYBOARDS',
-      labelBn: 'মেকানিক্যাল কীবোর্ড',
-      icon: Keyboard,
-    },
-    {
-      id: 'headphones',
-      labelEn: 'GAMING HEADSETS',
-      labelBn: 'গেমিং হেডসেট',
-      icon: Headphones,
-    },
-    {
-      id: 'chargers',
-      labelEn: 'FAST CHARGERS',
-      labelBn: 'ফাস্ট চার্জার',
-      icon: Zap,
-    },
-    {
-      id: 'finger-sleeves',
-      labelEn: 'FINGER SLEEVES',
-      labelBn: 'ফিঙ্গার স্লিকস',
-      icon: Shield,
-    },
-    {
-      id: 'cables',
-      labelEn: 'CABLES',
-      labelBn: 'কেবলস',
-      icon: Cable,
-    },
-    {
-      id: 'soundboxes',
-      labelEn: 'SOUNDBOXES',
-      labelBn: 'সাউন্ডবক্স',
-      icon: Speaker,
-    },
-    {
-      id: 'trimmers',
-      labelEn: 'TRIMMERS',
-      labelBn: 'ট্রিমার',
-      icon: Scissors,
-    },
+    { id: 'all', name: t.categories.all, icon: Grid },
+    { id: 'mice', name: t.categories.mice, icon: Mouse },
+    { id: 'keyboards', name: t.categories.keyboards, icon: Keyboard },
+    { id: 'headphones', name: t.categories.headphones, icon: Headphones },
+    { id: 'chargers', name: t.categories.chargers, icon: Zap },
+    { id: 'sleeves', name: t.categories.sleeves, icon: Shield },
+    { id: 'cables', name: t.categories.cables, icon: Cable },
+    { id: 'soundbox', name: t.categories.soundbox, icon: Speaker },
+    { id: 'trimmers', name: t.categories.trimmers, icon: Scissors },
   ];
 
   return (
-    <section id="categories" className="w-full py-4">
-      {/* Header: All Categories & View All > Pill */}
+    <section id="categories" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+      
+      {/* Category Section Header */}
       <div className="flex items-center justify-between mb-4">
-        <div className="flex items-center space-x-2.5">
-          <span className="w-2.5 h-6 bg-orange-500 rounded-full inline-block shadow-sm"></span>
-          <h2 className="text-lg sm:text-xl font-black text-slate-900 tracking-tight">
-            {t.categoriesTitle}
-          </h2>
-        </div>
-
+        <h2 className="text-lg sm:text-xl font-extrabold text-slate-900 flex items-center space-x-2">
+          <span className="w-2.5 h-6 bg-orange-500 rounded-full inline-block"></span>
+          <span>{t.categoriesTitle}</span>
+        </h2>
         <button
           onClick={() => onSelectCategory('all')}
-          className="flex items-center space-x-1.5 px-3.5 py-1.5 rounded-full bg-orange-50 hover:bg-orange-100 border border-orange-200 text-orange-600 hover:text-orange-700 text-xs sm:text-sm font-bold transition-all shadow-2xs active:scale-95 cursor-pointer"
+          className="text-xs sm:text-sm font-bold text-orange-600 hover:text-orange-700 hover:underline transition flex items-center space-x-1"
         >
           <span>{t.viewAll}</span>
-          <ChevronRight className="w-4 h-4 stroke-[2.5]" />
+          <span>›</span>
         </button>
       </div>
 
-      {/* Grid of 9 Category Cards */}
+      {/* Categories Horizontal Scroll / Grid */}
       <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-9 gap-2.5 sm:gap-3">
-        {CATEGORIES.map((cat, idx) => {
+        {CATEGORIES.map((cat) => {
           const Icon = cat.icon;
-          const isSelected =
-            selectedCategory === cat.id ||
-            (selectedCategory === 'sleeves' && cat.id === 'finger-sleeves') ||
-            (selectedCategory === 'soundbox' && cat.id === 'soundboxes');
-          const label = language === 'bn' ? cat.labelBn : cat.labelEn;
+          const isSelected = selectedCategory === cat.id;
 
           return (
             <button
-              key={`${cat.id}-${idx}`}
+              key={cat.id}
               onClick={() => onSelectCategory(cat.id)}
-              className={`flex flex-col items-center justify-between p-3 rounded-2xl border transition-all duration-200 group cursor-pointer min-h-[100px] sm:min-h-[110px] ${
+              className={`flex flex-col items-center justify-center p-3 sm:p-4 rounded-2xl border transition-all duration-200 group ${
                 isSelected
                   ? 'bg-slate-900 border-slate-900 text-white shadow-lg shadow-slate-900/20 scale-105'
-                  : 'bg-white border-gray-200/80 text-gray-800 hover:border-orange-500/60 hover:shadow-md hover:-translate-y-0.5'
+                  : 'bg-white border-gray-200/80 text-gray-700 hover:border-orange-500 hover:text-orange-600 hover:shadow-md'
               }`}
             >
               <div
-                className={`p-2.5 rounded-xl transition-all duration-200 ${
+                className={`p-2.5 rounded-xl mb-2 transition ${
                   isSelected
-                    ? 'bg-orange-500 text-white shadow-xs'
-                    : 'bg-gray-100 text-gray-700 group-hover:bg-orange-50 group-hover:text-orange-500'
+                    ? 'bg-orange-500 text-white'
+                    : 'bg-gray-100 text-gray-600 group-hover:bg-orange-50 group-hover:text-orange-500'
                 }`}
               >
-                <Icon className="w-5 h-5 sm:w-6 sm:h-6 stroke-[2]" />
+                <Icon className="w-5 h-5 sm:w-6 sm:h-6" />
               </div>
-              <span
-                className={`text-[10px] sm:text-[11px] font-black text-center uppercase tracking-tight line-clamp-2 leading-tight ${
-                  isSelected ? 'text-white' : 'text-slate-900 group-hover:text-orange-600'
-                }`}
-              >
-                {label}
+              <span className="text-[11px] sm:text-xs font-bold text-center line-clamp-1">
+                {cat.name}
               </span>
             </button>
           );
         })}
       </div>
+
     </section>
   );
 };
