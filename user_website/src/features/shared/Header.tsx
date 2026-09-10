@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { Search, ShoppingBag, User as UserIcon, LogOut, Globe, MoreVertical, X } from 'lucide-react';
+import { Menu, Search, ShoppingBag, User as UserIcon, LogOut, Globe, X } from 'lucide-react';
 import { useCart } from '../cart/CartContext';
 import { useAuth } from '../auth/AuthContext';
 import { useLanguage } from './LanguageContext';
@@ -33,7 +33,6 @@ export const Header: React.FC<HeaderProps> = ({ searchQuery, setSearchQuery }) =
   const { totalItems, openCart } = useCart();
   const { user, isAuthenticated, openAuthModal, logout } = useAuth();
   const { language, setLanguage, t } = useLanguage();
-  const [is3DotMenuOpen, setIs3DotMenuOpen] = useState(false);
 
   // Typewriter effect state for interactive search placeholder
   const [suggestionIndex, setSuggestionIndex] = useState(0);
@@ -74,63 +73,32 @@ export const Header: React.FC<HeaderProps> = ({ searchQuery, setSearchQuery }) =
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-20 sm:h-24 gap-3">
           
-          {/* Left section: Official Large Image Logo + 3-Dot Navbar Button (Side-by-side) */}
-          <div className="flex items-center space-x-2 sm:space-x-3">
+          {/* Left section: Circular Hamburger Menu Button (Left of Logo) + Official Large Logo */}
+          <div className="flex items-center space-x-3 sm:space-x-4">
             
-            {/* Official Mex Tanim Store Logo (Increased height so text & slogan are perfectly readable) */}
-            <a href="#" className="flex items-center cursor-pointer shrink-0">
+            {/* Round Circular Hamburger Menu Button (Positioned on the LEFT side of Logo) */}
+            <button
+              onClick={() => {
+                const catEl = document.getElementById('categories');
+                if (catEl) {
+                  catEl.scrollIntoView({ behavior: 'smooth' });
+                }
+              }}
+              className="w-10 h-10 sm:w-11 sm:h-11 rounded-full bg-gray-200/90 hover:bg-gray-300 text-black transition-all flex items-center justify-center shadow-2xs active:scale-95 border border-gray-300/50 cursor-pointer shrink-0"
+              title="Product Categories"
+              aria-label="Toggle Product Categories Menu"
+            >
+              <Menu className="w-5 h-5 sm:w-6 sm:h-6 text-black stroke-[2.5]" />
+            </button>
+
+            {/* Official Mex Tanim Store Logo (Updated New Image) */}
+            <a href="#" className="flex items-center cursor-pointer shrink-0 group">
               <img
                 src="/images/logo.png"
                 alt="Mex Tanim Store Logo"
-                className="h-12 sm:h-16 md:h-18 max-h-20 w-auto object-contain hover:scale-105 transition-all"
+                className="h-10 sm:h-12 md:h-14 max-h-16 w-auto object-contain group-hover:scale-105 transition-all"
               />
             </a>
-
-            {/* 3-Dot Navbar Button (Positioned side-by-side right next to the logo) */}
-            <div className="relative">
-              <button
-                onClick={() => setIs3DotMenuOpen(!is3DotMenuOpen)}
-                className="p-2 sm:p-2.5 text-slate-800 hover:text-orange-500 hover:bg-orange-50 rounded-xl border border-gray-200 transition-all flex items-center justify-center shadow-2xs active:scale-95"
-                title="Navigation Menu"
-                aria-label="Toggle 3-dot menu"
-              >
-                {is3DotMenuOpen ? <X className="w-5 h-5 text-orange-500" /> : <MoreVertical className="w-5 h-5 sm:w-6 sm:h-6" />}
-              </button>
-
-              {/* 3-Dot Navbar Popup Menu */}
-              {is3DotMenuOpen && (
-                <div className="absolute left-0 mt-2 w-56 bg-white border border-gray-200 rounded-2xl shadow-2xl z-50 p-2 space-y-1 animate-in fade-in slide-in-from-top-2 duration-200">
-                  <a
-                    href="#hero"
-                    onClick={() => setIs3DotMenuOpen(false)}
-                    className="flex items-center space-x-2 px-3 py-2 text-xs font-bold text-gray-700 hover:bg-orange-50 hover:text-orange-600 rounded-xl transition"
-                  >
-                    <span>🏠 Home</span>
-                  </a>
-                  <a
-                    href="#categories"
-                    onClick={() => setIs3DotMenuOpen(false)}
-                    className="flex items-center space-x-2 px-3 py-2 text-xs font-bold text-gray-700 hover:bg-orange-50 hover:text-orange-600 rounded-xl transition"
-                  >
-                    <span>📦 {t.categoriesTitle}</span>
-                  </a>
-                  <a
-                    href="#products"
-                    onClick={() => setIs3DotMenuOpen(false)}
-                    className="flex items-center space-x-2 px-3 py-2 text-xs font-bold text-gray-700 hover:bg-orange-50 hover:text-orange-600 rounded-xl transition"
-                  >
-                    <span>🔥 {t.featuredProducts}</span>
-                  </a>
-                  <a
-                    href="#app-install"
-                    onClick={() => setIs3DotMenuOpen(false)}
-                    className="flex items-center space-x-2 px-3 py-2 text-xs font-bold text-gray-700 hover:bg-orange-50 hover:text-orange-600 rounded-xl transition"
-                  >
-                    <span>📱 {t.appInstallBtn}</span>
-                  </a>
-                </div>
-              )}
-            </div>
 
           </div>
 
