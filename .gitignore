@@ -1,0 +1,18 @@
+# node_modules
+node_modules/
+user_website/node_modules/
+admin_website/node_modules/
+
+# Next.js build output
+.next/
+user_website/.next/
+admin_website/.next/
+tsconfig.tsbuildinfo
+user_website/tsconfig.tsbuildinfo
+admin_website/tsconfig.tsbuildinfo
+
+# Logs & OS files
+*.log
+npm-debug.log*
+.DS_Store
+Thumbs.db
