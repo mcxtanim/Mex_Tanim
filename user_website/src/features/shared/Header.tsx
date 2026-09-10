@@ -9,6 +9,7 @@ import { useLanguage } from './LanguageContext';
 interface HeaderProps {
   searchQuery: string;
   setSearchQuery: (query: string) => void;
+  onSelectCategory?: (category: string) => void;
 }
 
 const SEARCH_SUGGESTIONS_EN = [
@@ -136,13 +137,16 @@ export const Header: React.FC<HeaderProps> = ({ searchQuery, setSearchQuery }) =
               )}
             </div>
 
-            {/* Official Mex Tanim Store Logo (Image 2 Style - Clear, Large, Readable) */}
-            <a href="#" className="flex items-center cursor-pointer shrink-0">
+            {/* Official Mex Tanim Store Logo (Image 2 Style - Clear, Large, Readable Logo & Tagline) */}
+            <a href="#" className="flex flex-col items-start justify-center cursor-pointer shrink-0 group">
               <img
                 src="/images/logo.png"
                 alt="Mex Tanim Store Logo"
-                className="h-12 sm:h-14 md:h-16 w-auto max-w-[200px] sm:max-w-[240px] object-contain hover:scale-105 transition-all"
+                className="h-8 sm:h-10 md:h-12 w-auto max-w-[150px] sm:max-w-[200px] object-contain group-hover:scale-105 transition-all"
               />
+              <span className="text-[11px] sm:text-xs md:text-sm font-black tracking-widest text-orange-600 uppercase block leading-none mt-0.5 drop-shadow-xs">
+                GADGETS FOR A SMARTER YOU
+              </span>
             </a>
 
           </div>

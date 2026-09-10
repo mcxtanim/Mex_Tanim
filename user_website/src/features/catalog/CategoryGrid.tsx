@@ -3,6 +3,7 @@
 import React from 'react';
 import { Mouse, Keyboard, Headphones, Zap, Shield, Cable, Speaker, Scissors, Grid } from 'lucide-react';
 import { useLanguage } from '../shared/LanguageContext';
+export { CategorySidebar } from './CategorySidebar';
 
 interface CategoryGridProps {
   selectedCategory: string;
