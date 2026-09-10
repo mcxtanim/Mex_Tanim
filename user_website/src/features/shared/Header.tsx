@@ -5,7 +5,6 @@ import { Menu, Search, ShoppingBag, User as UserIcon, X, LogOut, Globe } from 'l
 import { useCart } from '../cart/CartContext';
 import { useAuth } from '../auth/AuthContext';
 import { useLanguage } from './LanguageContext';
-import { CategorySidebar } from '../catalog/CategorySidebar';
 
 interface HeaderProps {
   searchQuery: string;
@@ -54,7 +53,6 @@ export const Header: React.FC<HeaderProps> = ({
   const { totalItems, openCart } = useCart();
   const { user, isAuthenticated, openAuthModal, logout } = useAuth();
   const { language, setLanguage, t } = useLanguage();
-  const [isCategoryMenuOpen, setIsCategoryMenuOpen] = useState(false);
 
   // Typewriter effect state for interactive search placeholder
   const [suggestionIndex, setSuggestionIndex] = useState(0);
@@ -100,10 +98,18 @@ export const Header: React.FC<HeaderProps> = ({
             
             {/* Round Circular Hamburger Menu Button */}
             <button
-              onClick={() => setIsCategoryMenuOpen(true)}
+              onClick={() => {
+                if (onSelectCategory) {
+                  onSelectCategory('all');
+                }
+                const el = document.getElementById('categories');
+                if (el) {
+                  el.scrollIntoView({ behavior: 'smooth' });
+                }
+              }}
               className="w-10 h-10 sm:w-11 sm:h-11 rounded-full bg-gray-200/90 hover:bg-gray-300 text-black transition-all flex items-center justify-center shadow-2xs active:scale-95 border border-gray-300/50 cursor-pointer shrink-0"
               title="Product Categories"
-              aria-label="Toggle Product Categories Menu"
+              aria-label="Scroll to Product Categories"
             >
               <Menu className="w-5 h-5 sm:w-6 sm:h-6 text-black stroke-[2.5]" />
             </button>
@@ -229,49 +235,6 @@ export const Header: React.FC<HeaderProps> = ({
         </div>
       </div>
 
-      {/* Full Slide-Over Left Drawer / Overlay for Categories */}
-      {isCategoryMenuOpen && (
-        <div className="fixed inset-0 z-50 flex">
-          {/* Backdrop overlay */}
-          <div
-            className="fixed inset-0 bg-black/50 backdrop-blur-xs transition-opacity duration-300 animate-in fade-in"
-            onClick={() => setIsCategoryMenuOpen(false)}
-          />
-
-          {/* Drawer content sliding from left */}
-          <div className="relative z-10 w-full max-w-xs sm:max-w-sm bg-white h-full shadow-2xl flex flex-col overflow-y-auto animate-in slide-in-from-left duration-300 p-4 sm:p-5">
-            <div className="flex items-center justify-between pb-3 mb-3 border-b border-gray-100 shrink-0">
-              <a href="#" onClick={() => setIsCategoryMenuOpen(false)}>
-                <img
-                  src="/images/logo.png"
-                  alt="Mex Tanim Store Logo"
-                  className="h-8 w-auto object-contain"
-                />
-              </a>
-              <button
-                onClick={() => setIsCategoryMenuOpen(false)}
-                className="p-2 rounded-full bg-gray-100 hover:bg-gray-200 text-gray-700 transition cursor-pointer"
-                aria-label="Close categories menu"
-              >
-                <X className="w-5 h-5" />
-              </button>
-            </div>
-
-            <div className="flex-1 overflow-y-auto">
-              <CategorySidebar
-                selectedCategory={selectedCategory}
-                onSelectCategory={(category) => {
-                  if (onSelectCategory) {
-                    onSelectCategory(category);
-                  }
-                  setIsCategoryMenuOpen(false);
-                }}
-                onCloseMobile={() => setIsCategoryMenuOpen(false)}
-              />
-            </div>
-          </div>
-        </div>
-      )}
     </header>
   );
 };

@@ -22,8 +22,16 @@ export const ProductGrid: React.FC<ProductGridProps> = ({
 
   const filteredProducts = PRODUCTS.filter((product) => {
     // Category Filter
-    if (selectedCategory !== 'all' && product.category !== selectedCategory) {
-      return false;
+    if (selectedCategory !== 'all') {
+      const isMatch =
+        product.category === selectedCategory ||
+        (selectedCategory === 'finger-sleeves' && product.category === 'sleeves') ||
+        (selectedCategory === 'sleeves' && product.category === 'finger-sleeves') ||
+        (selectedCategory === 'soundboxes' && product.category === 'soundbox') ||
+        (selectedCategory === 'soundbox' && product.category === 'soundboxes') ||
+        (selectedCategory === 'headphones' && product.category === 'earphones') ||
+        (selectedCategory === 'earphones' && product.category === 'headphones');
+      if (!isMatch) return false;
     }
     // Search Filter
     if (searchQuery.trim() !== '') {
