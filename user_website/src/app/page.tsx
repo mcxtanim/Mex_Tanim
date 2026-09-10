@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 import { Header } from '@/features/shared/Header';
 import { HeroBanner } from '@/features/catalog/HeroBanner';
-import { CategoryGrid } from '@/features/catalog/CategoryGrid';
+import { CategoryShowcase } from '@/features/catalog/CategoryShowcase';
 import { ProductGrid } from '@/features/catalog/ProductGrid';
 import { Footer } from '@/features/shared/Footer';
 import { useLanguage } from '@/features/shared/LanguageContext';
@@ -62,7 +62,7 @@ export default function Home() {
 
           {selectedCategory === 'all' ? (
             <>
-              <CategoryGrid
+              <CategoryShowcase
                 selectedCategory={selectedCategory}
                 onSelectCategory={setSelectedCategory}
               />

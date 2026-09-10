@@ -1,8 +1,8 @@
 'use client';
 
 import React from 'react';
-import { Mouse, Keyboard, Headphones, Zap, Shield, Cable, Speaker, Scissors, Grid } from 'lucide-react';
 import { useLanguage } from '../shared/LanguageContext';
+import { CATEGORIES, isCategorySelected } from './categoryData';
 
 interface CategoryGridProps {
   selectedCategory: string;
@@ -15,19 +15,7 @@ export const CategoryGrid: React.FC<CategoryGridProps> = ({
   onSelectCategory,
   onCloseBrowser,
 }) => {
-  const { t } = useLanguage();
-
-  const CATEGORIES = [
-    { id: 'all', name: t.categories.all, icon: Grid },
-    { id: 'mice', name: t.categories.mice, icon: Mouse },
-    { id: 'keyboards', name: t.categories.keyboards, icon: Keyboard },
-    { id: 'headphones', name: t.categories.headphones, icon: Headphones },
-    { id: 'chargers', name: t.categories.chargers, icon: Zap },
-    { id: 'sleeves', name: t.categories.sleeves, icon: Shield },
-    { id: 'cables', name: t.categories.cables, icon: Cable },
-    { id: 'soundbox', name: t.categories.soundbox, icon: Speaker },
-    { id: 'trimmers', name: t.categories.trimmers, icon: Scissors },
-  ];
+  const { language, t } = useLanguage();
 
   return (
     <section id="categories" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
@@ -60,13 +48,14 @@ export const CategoryGrid: React.FC<CategoryGridProps> = ({
       <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-9 gap-2.5 sm:gap-3">
         {CATEGORIES.map((cat) => {
           const Icon = cat.icon;
-          const isSelected = selectedCategory === cat.id;
+          const isSelected = isCategorySelected(selectedCategory, cat.id);
+          const catName = language === 'bn' ? cat.nameBn : cat.nameEn;
 
           return (
             <button
               key={cat.id}
               onClick={() => onSelectCategory(cat.id)}
-              className={`flex flex-col items-center justify-center p-3 sm:p-4 rounded-2xl border transition-all duration-200 group ${
+              className={`flex flex-col items-center justify-center p-3 sm:p-4 rounded-2xl border transition-all duration-200 group cursor-pointer ${
                 isSelected
                   ? 'bg-slate-900 border-slate-900 text-white shadow-lg shadow-slate-900/20 scale-105'
                   : 'bg-white border-gray-200/80 text-gray-700 hover:border-orange-500 hover:text-orange-600 hover:shadow-md'
@@ -82,7 +71,7 @@ export const CategoryGrid: React.FC<CategoryGridProps> = ({
                 <Icon className="w-5 h-5 sm:w-6 sm:h-6" />
               </div>
               <span className="text-[11px] sm:text-xs font-bold text-center line-clamp-1">
-                {cat.name}
+                {catName}
               </span>
             </button>
           );
