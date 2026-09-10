@@ -52,6 +52,7 @@ export const CategorySidebar: React.FC<CategorySidebarProps> = ({
       nameBn: 'সকল ক্যাটাগরি',
       icon: Grid,
       colorClass: 'bg-slate-100 text-slate-800 border border-slate-200',
+      badge: 'A',
       staticCount: PRODUCTS.length,
     },
     {
@@ -60,6 +61,7 @@ export const CategorySidebar: React.FC<CategorySidebarProps> = ({
       nameBn: 'গেমিং মাউস',
       icon: Mouse,
       colorClass: 'bg-orange-500/15 text-orange-600 border border-orange-500/20',
+      badge: 'G',
       staticCount: 18,
     },
     {
@@ -68,6 +70,7 @@ export const CategorySidebar: React.FC<CategorySidebarProps> = ({
       nameBn: 'মেকানিক্যাল কীবোর্ড',
       icon: Keyboard,
       colorClass: 'bg-blue-500/15 text-blue-600 border border-blue-500/20',
+      badge: 'M',
       staticCount: 15,
     },
     {
@@ -76,6 +79,7 @@ export const CategorySidebar: React.FC<CategorySidebarProps> = ({
       nameBn: 'গেমিং হেডসেট',
       icon: Headphones,
       colorClass: 'bg-purple-500/15 text-purple-600 border border-purple-500/20',
+      badge: 'H',
       staticCount: 24,
     },
     {
@@ -84,6 +88,7 @@ export const CategorySidebar: React.FC<CategorySidebarProps> = ({
       nameBn: 'ফাস্ট চার্জার',
       icon: Zap,
       colorClass: 'bg-amber-500/15 text-amber-600 border border-amber-500/20',
+      badge: 'F',
       staticCount: 32,
     },
     {
@@ -92,6 +97,7 @@ export const CategorySidebar: React.FC<CategorySidebarProps> = ({
       nameBn: 'ফিঙ্গার স্লিকস',
       icon: Shield,
       colorClass: 'bg-emerald-500/15 text-emerald-600 border border-emerald-500/20',
+      badge: 'S',
       staticCount: 12,
     },
     {
@@ -100,6 +106,7 @@ export const CategorySidebar: React.FC<CategorySidebarProps> = ({
       nameBn: 'কেবলস',
       icon: Cable,
       colorClass: 'bg-indigo-500/15 text-indigo-600 border border-indigo-500/20',
+      badge: 'C',
       staticCount: 40,
     },
     {
@@ -108,6 +115,7 @@ export const CategorySidebar: React.FC<CategorySidebarProps> = ({
       nameBn: 'সাউন্ডবক্স',
       icon: Speaker,
       colorClass: 'bg-rose-500/15 text-rose-600 border border-rose-500/20',
+      badge: 'B',
       staticCount: 16,
     },
     {
@@ -116,6 +124,7 @@ export const CategorySidebar: React.FC<CategorySidebarProps> = ({
       nameBn: 'ট্রিমার',
       icon: Scissors,
       colorClass: 'bg-teal-500/15 text-teal-600 border border-teal-500/20',
+      badge: 'T',
       staticCount: 10,
     },
   ];
@@ -189,15 +198,26 @@ export const CategorySidebar: React.FC<CategorySidebarProps> = ({
               }`}
             >
               <div className="flex items-center space-x-3 min-w-0">
-                {/* Colorful Rounded Square Icon Container */}
-                <div
-                  className={`w-10 h-10 sm:w-11 sm:h-11 rounded-xl flex items-center justify-center shrink-0 transition-transform duration-300 group-hover:scale-110 ${
-                    isSelected
-                      ? 'bg-orange-500 text-white shadow-md shadow-orange-500/30'
-                      : cat.colorClass
-                  }`}
-                >
-                  <Icon className="w-5 h-5 stroke-[2.2]" />
+                {/* Colorful Rounded Square Icon Container with Capital Letter Badge */}
+                <div className="relative shrink-0">
+                  <div
+                    className={`w-10 h-10 sm:w-11 sm:h-11 rounded-xl flex items-center justify-center transition-transform duration-300 group-hover:scale-110 ${
+                      isSelected
+                        ? 'bg-orange-500 text-white shadow-md shadow-orange-500/30'
+                        : cat.colorClass
+                    }`}
+                  >
+                    <Icon className="w-5 h-5 stroke-[2.2]" />
+                  </div>
+                  <span
+                    className={`absolute -top-1 -right-1 w-4 h-4 rounded-full text-[9px] font-black flex items-center justify-center border border-white shadow-xs ${
+                      isSelected
+                        ? 'bg-white text-slate-900'
+                        : 'bg-slate-900 text-white'
+                    }`}
+                  >
+                    {cat.badge}
+                  </span>
                 </div>
 
                 {/* Category Name & Count */}

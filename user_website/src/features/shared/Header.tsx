@@ -1,15 +1,17 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { Menu, Search, ShoppingBag, User as UserIcon, X, LogOut, Globe, Mouse, Keyboard, Headphones, Zap, Shield, Cable, Speaker, Scissors, Grid } from 'lucide-react';
+import { Menu, Search, ShoppingBag, User as UserIcon, X, LogOut, Globe } from 'lucide-react';
 import { useCart } from '../cart/CartContext';
 import { useAuth } from '../auth/AuthContext';
 import { useLanguage } from './LanguageContext';
+import { CategorySidebar } from '../catalog/CategorySidebar';
 
 interface HeaderProps {
   searchQuery: string;
   setSearchQuery: (query: string) => void;
   onSelectCategory?: (category: string) => void;
+  selectedCategory?: string;
 }
 
 const SEARCH_SUGGESTIONS_EN = [
@@ -30,7 +32,12 @@ const SEARCH_SUGGESTIONS_BN = [
   'জেবিএল সাউন্ডবক্স',
 ];
 
-export const Header: React.FC<HeaderProps> = ({ searchQuery, setSearchQuery }) => {
+export const Header: React.FC<HeaderProps> = ({
+  searchQuery,
+  setSearchQuery,
+  onSelectCategory,
+  selectedCategory,
+}) => {
   const { totalItems, openCart } = useCart();
   const { user, isAuthenticated, openAuthModal, logout } = useAuth();
   const { language, setLanguage, t } = useLanguage();
@@ -70,18 +77,6 @@ export const Header: React.FC<HeaderProps> = ({ searchQuery, setSearchQuery }) =
     ? `খুঁজুন "${displayText}"...`
     : `Search "${displayText}"...`;
 
-  const CATEGORIES = [
-    { id: 'all', name: t.categories.all, icon: Grid },
-    { id: 'mice', name: t.categories.mice, icon: Mouse },
-    { id: 'keyboards', name: t.categories.keyboards, icon: Keyboard },
-    { id: 'headphones', name: t.categories.headphones, icon: Headphones },
-    { id: 'chargers', name: t.categories.chargers, icon: Zap },
-    { id: 'sleeves', name: t.categories.sleeves, icon: Shield },
-    { id: 'cables', name: t.categories.cables, icon: Cable },
-    { id: 'soundbox', name: t.categories.soundbox, icon: Speaker },
-    { id: 'trimmers', name: t.categories.trimmers, icon: Scissors },
-  ];
-
   return (
     <header className="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-gray-100 shadow-2xs transition-all">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -90,63 +85,69 @@ export const Header: React.FC<HeaderProps> = ({ searchQuery, setSearchQuery }) =
           {/* Left section: Circular Hamburger Menu Button (Left of Logo) + Official Logo */}
           <div className="flex items-center space-x-3 sm:space-x-4">
             
-            {/* Round Circular Hamburger Menu Button (Image 1 Style, Left Side of Logo) */}
-            <div className="relative">
-              <button
-                onClick={() => setIsCategoryMenuOpen(!isCategoryMenuOpen)}
-                className="w-10 h-10 sm:w-11 sm:h-11 rounded-full bg-gray-200/90 hover:bg-gray-300 text-black transition-all flex items-center justify-center shadow-2xs active:scale-95 border border-gray-300/50"
-                title="Product Categories"
-                aria-label="Toggle Product Categories Menu"
-              >
-                {isCategoryMenuOpen ? (
-                  <X className="w-5 h-5 text-black stroke-[2.5]" />
-                ) : (
-                  <Menu className="w-5 h-5 sm:w-6 sm:h-6 text-black stroke-[2.5]" />
-                )}
-              </button>
+            {/* Round Circular Hamburger Menu Button */}
+            <button
+              onClick={() => setIsCategoryMenuOpen(!isCategoryMenuOpen)}
+              className="w-10 h-10 sm:w-11 sm:h-11 rounded-full bg-gray-200/90 hover:bg-gray-300 text-black transition-all flex items-center justify-center shadow-2xs active:scale-95 border border-gray-300/50 cursor-pointer"
+              title="Product Categories"
+              aria-label="Toggle Product Categories Menu"
+            >
+              {isCategoryMenuOpen ? (
+                <X className="w-5 h-5 text-black stroke-[2.5]" />
+              ) : (
+                <Menu className="w-5 h-5 sm:w-6 sm:h-6 text-black stroke-[2.5]" />
+              )}
+            </button>
 
-              {/* Product Categories Dropdown Menu */}
-              {isCategoryMenuOpen && (
-                <div className="absolute left-0 mt-2 w-64 bg-white border border-gray-200 rounded-2xl shadow-2xl z-50 p-3 space-y-1 animate-in fade-in slide-in-from-top-2 duration-200">
-                  <div className="px-3 py-2 border-b border-gray-100 mb-1 flex items-center justify-between">
-                    <span className="text-xs font-black text-slate-900 uppercase tracking-wider">
-                      {t.categoriesTitle}
-                    </span>
-                    <span className="text-[10px] font-bold text-orange-600 bg-orange-50 px-2 py-0.5 rounded-full">
-                      8 Categories
-                    </span>
+            {/* Slide-Out Left Category Drawer Overlay */}
+            {isCategoryMenuOpen && (
+              <div className="fixed inset-0 z-50 flex">
+                {/* Backdrop Overlay */}
+                <div
+                  className="fixed inset-0 bg-black/60 backdrop-blur-sm transition-opacity duration-300"
+                  onClick={() => setIsCategoryMenuOpen(false)}
+                />
+
+                {/* Left Drawer Panel */}
+                <div className="relative w-80 sm:w-96 max-w-[85vw] bg-slate-50/95 backdrop-blur-xl h-full shadow-2xl p-4 sm:p-6 overflow-y-auto z-10 border-r border-white/20 transition-transform duration-300">
+                  <div className="flex items-center justify-between pb-4 mb-4 border-b border-gray-200">
+                    <a href="#" className="flex items-center cursor-pointer shrink-0">
+                      <img
+                        src="/images/logo.png"
+                        alt="Mex Tanim Store Logo"
+                        className="h-8 sm:h-9 w-auto max-w-[160px] object-contain"
+                      />
+                    </a>
+                    <button
+                      onClick={() => setIsCategoryMenuOpen(false)}
+                      className="p-2 rounded-full bg-gray-200/80 hover:bg-gray-300 text-slate-800 transition cursor-pointer"
+                      title="Close Menu"
+                    >
+                      <X className="w-5 h-5 stroke-[2.5]" />
+                    </button>
                   </div>
 
-                  {CATEGORIES.map((cat) => {
-                    const Icon = cat.icon;
-                    return (
-                      <a
-                        key={cat.id}
-                        href="#categories"
-                        onClick={() => setIsCategoryMenuOpen(false)}
-                        className="flex items-center space-x-3 px-3 py-2 text-xs font-bold text-gray-700 hover:bg-orange-50 hover:text-orange-600 rounded-xl transition group"
-                      >
-                        <div className="p-1.5 rounded-lg bg-gray-100 group-hover:bg-orange-500 group-hover:text-white transition">
-                          <Icon className="w-4 h-4" />
-                        </div>
-                        <span>{cat.name}</span>
-                      </a>
-                    );
-                  })}
+                  <CategorySidebar
+                    selectedCategory={selectedCategory || 'all'}
+                    onSelectCategory={(catId) => {
+                      if (onSelectCategory) {
+                        onSelectCategory(catId);
+                      }
+                      setIsCategoryMenuOpen(false);
+                    }}
+                    onCloseMobile={() => setIsCategoryMenuOpen(false)}
+                  />
                 </div>
-              )}
-            </div>
+              </div>
+            )}
 
-            {/* Official Mex Tanim Store Logo (Image 2 Style - Clear, Large, Readable Logo & Tagline) */}
-            <a href="#" className="flex flex-col items-start justify-center cursor-pointer shrink-0 group">
+            {/* Official Mex Tanim Store Logo (Clean Logo Image, no extra text below) */}
+            <a href="#" className="flex items-center cursor-pointer shrink-0 group">
               <img
                 src="/images/logo.png"
                 alt="Mex Tanim Store Logo"
                 className="h-8 sm:h-10 md:h-12 w-auto max-w-[150px] sm:max-w-[200px] object-contain group-hover:scale-105 transition-all"
               />
-              <span className="text-[11px] sm:text-xs md:text-sm font-black tracking-widest text-orange-600 uppercase block leading-none mt-0.5 drop-shadow-xs">
-                GADGETS FOR A SMARTER YOU
-              </span>
             </a>
 
           </div>

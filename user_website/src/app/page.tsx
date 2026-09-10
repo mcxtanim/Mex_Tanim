@@ -5,7 +5,6 @@ import { Header } from '@/features/shared/Header';
 import { HeroBanner } from '@/features/catalog/HeroBanner';
 import { CategorySidebar } from '@/features/catalog/CategorySidebar';
 import { ProductGrid } from '@/features/catalog/ProductGrid';
-import { AppInstallBanner } from '@/features/shared/AppInstallBanner';
 import { Footer } from '@/features/shared/Footer';
 
 export default function Home() {
@@ -19,6 +18,7 @@ export default function Home() {
           searchQuery={searchQuery}
           setSearchQuery={setSearchQuery}
           onSelectCategory={setSelectedCategory}
+          selectedCategory={selectedCategory}
         />
 
         <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6">
@@ -26,7 +26,7 @@ export default function Home() {
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
             
             {/* Left Category Sidebar: Sticky & Independent Scroll */}
-            <aside className="lg:col-span-4 xl:col-span-3 sticky top-24 h-[calc(100vh-7rem)] overflow-y-auto scrollbar-thin pr-0.5">
+            <aside className="lg:col-span-4 xl:col-span-3 sticky top-28 self-start max-h-[calc(100vh-8rem)] overflow-y-auto scrollbar-thin pr-1">
               <CategorySidebar
                 selectedCategory={selectedCategory}
                 onSelectCategory={setSelectedCategory}
@@ -42,10 +42,6 @@ export default function Home() {
               />
             </div>
 
-          </div>
-
-          <div className="mt-8">
-            <AppInstallBanner />
           </div>
         </main>
       </div>
