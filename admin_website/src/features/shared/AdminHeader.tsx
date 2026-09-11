@@ -1,6 +1,6 @@
 "use client";
 
-import { Bell, Search, User, Sparkles } from "lucide-react";
+import { Bell, Search, ExternalLink } from "lucide-react";
 import { AdminHeaderProps } from "./types";
 
 export function AdminHeader({ title = "Dashboard", subtitle = "Overview & Store Analytics" }: AdminHeaderProps) {
@@ -12,6 +12,17 @@ export function AdminHeader({ title = "Dashboard", subtitle = "Overview & Store 
       </div>
 
       <div className="flex items-center gap-4">
+        {/* Quick Link to Customer Store */}
+        <a
+          href="http://localhost:3000"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="hidden md:flex items-center space-x-1.5 px-3 py-1.5 bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 rounded-xl text-xs font-bold transition cursor-pointer"
+        >
+          <span>Customer Store</span>
+          <ExternalLink className="w-3.5 h-3.5" />
+        </a>
+
         {/* Quick Search */}
         <div className="relative w-64 hidden sm:block">
           <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />

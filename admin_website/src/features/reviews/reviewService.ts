@@ -1,8 +1,8 @@
-import { AdminReview } from "./types";
+import { AdminProductReview } from "./types";
 
 const REVIEWS_STORAGE_KEY = "mex_tanim_product_reviews";
 
-const INITIAL_SEED_REVIEWS: AdminReview[] = [
+const SEED_REVIEWS: AdminProductReview[] = [
   {
     id: "rev-101",
     productId: "prod-1",
@@ -32,27 +32,34 @@ const INITIAL_SEED_REVIEWS: AdminReview[] = [
   },
 ];
 
-export function getStoredReviews(): AdminReview[] {
-  if (typeof window === "undefined") return INITIAL_SEED_REVIEWS;
+export function getAdminStoredReviews(): AdminProductReview[] {
+  if (typeof window === "undefined") return SEED_REVIEWS;
   try {
-    const data = localStorage.getItem(REVIEWS_STORAGE_KEY);
-    if (!data) {
-      localStorage.setItem(REVIEWS_STORAGE_KEY, JSON.stringify(INITIAL_SEED_REVIEWS));
-      return INITIAL_SEED_REVIEWS;
+    const raw = localStorage.getItem(REVIEWS_STORAGE_KEY);
+    if (!raw) {
+      localStorage.setItem(REVIEWS_STORAGE_KEY, JSON.stringify(SEED_REVIEWS));
+      return SEED_REVIEWS;
     }
-    const parsed = JSON.parse(data);
-    return Array.isArray(parsed) ? parsed : INITIAL_SEED_REVIEWS;
-  } catch (error) {
-    console.error("Error reading reviews from localStorage", error);
-    return INITIAL_SEED_REVIEWS;
+    const parsed = JSON.parse(raw);
+    return Array.isArray(parsed) ? parsed : SEED_REVIEWS;
+  } catch (err) {
+    console.error("Error reading reviews in admin:", err);
+    return SEED_REVIEWS;
   }
 }
 
-export function deleteStoredReview(reviewId: string, current: AdminReview[]): AdminReview[] {
-  const updated = current.filter((r) => r.id !== reviewId);
-  if (typeof window !== "undefined") {
-    localStorage.setItem(REVIEWS_STORAGE_KEY, JSON.stringify(updated));
+export function saveAdminReviews(reviews: AdminProductReview[]): void {
+  if (typeof window === "undefined") return;
+  try {
+    localStorage.setItem(REVIEWS_STORAGE_KEY, JSON.stringify(reviews));
     window.dispatchEvent(new Event("storage"));
+  } catch (err) {
+    console.error("Error saving reviews in admin:", err);
   }
+}
+
+export function deleteAdminReview(reviewId: string, current: AdminProductReview[]): AdminProductReview[] {
+  const updated = current.filter((r) => r.id !== reviewId);
+  saveAdminReviews(updated);
   return updated;
 }

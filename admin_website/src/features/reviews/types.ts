@@ -1,4 +1,4 @@
-export interface AdminReview {
+export interface AdminProductReview {
   id: string;
   productId: string;
   orderId?: string;

@@ -23,7 +23,7 @@ export function AdminSidebar() {
     { name: "Products", href: "/products", icon: Package },
     { name: "Orders", href: "/orders", icon: ShoppingCart },
     { name: "Categories", href: "/categories", icon: FolderTree },
-    { name: "Customer Reviews", href: "/reviews", icon: Star },
+    { name: "Reviews", href: "/reviews", icon: Star },
   ];
 
   return (

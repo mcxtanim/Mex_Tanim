@@ -1,7 +1,7 @@
 import { Order, OrderStatus } from "./types";
 import { initialOrders } from "./seedData";
 
-const STORAGE_KEY = "mex_tanim_admin_orders";
+const STORAGE_KEY = "mex_tanim_customer_orders";
 
 export function getStoredOrders(): Order[] {
   if (typeof window === "undefined") return initialOrders;
@@ -11,7 +11,8 @@ export function getStoredOrders(): Order[] {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(initialOrders));
       return initialOrders;
     }
-    return JSON.parse(data);
+    const parsed = JSON.parse(data);
+    return Array.isArray(parsed) && parsed.length > 0 ? parsed : initialOrders;
   } catch (error) {
     console.error("Error reading orders from localStorage", error);
     return initialOrders;
@@ -22,7 +23,7 @@ export function saveStoredOrders(orders: Order[]): void {
   if (typeof window === "undefined") return;
   try {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(orders));
-    window.dispatchEvent(new Event('storage'));
+    window.dispatchEvent(new Event("storage"));
   } catch (error) {
     console.error("Error saving orders to localStorage", error);
   }
