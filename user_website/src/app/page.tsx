@@ -6,6 +6,7 @@ import { HeroBanner } from '@/features/catalog/HeroBanner';
 import { CategoryShowcase } from '@/features/catalog/CategoryShowcase';
 import { ProductGrid } from '@/features/catalog/ProductGrid';
 import { ProductTabsSection } from '@/features/catalog/ProductTabsSection';
+import { ComboOfferSection } from '@/features/catalog/ComboOfferSection';
 import { Footer } from '@/features/shared/Footer';
 import { useLanguage } from '@/features/shared/LanguageContext';
 import { PRODUCTS } from '@/features/catalog/mockData';
@@ -69,6 +70,9 @@ export default function Home() {
               />
               {/* Main Product Showcase Tabs (Featured default, Best Sellers, New Arrivals) with Top-to-Bottom Category Rails */}
               <ProductTabsSection />
+
+              {/* Dedicated COMBO OFFER Section - Placed right above footer */}
+              <ComboOfferSection />
             </>
           ) : (
             <>
@@ -113,6 +117,9 @@ export default function Home() {
                 searchQuery={searchQuery}
                 onSelectCategory={setSelectedCategory}
               />
+
+              {/* Dedicated COMBO OFFER Section */}
+              <ComboOfferSection />
             </>
           )}
         </main>

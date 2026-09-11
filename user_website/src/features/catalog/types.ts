@@ -15,6 +15,8 @@ export interface Product {
   isFeatured?: boolean;
   isBestSeller?: boolean;
   isNewArrival?: boolean;
+  isComboOffer?: boolean;
+  soldCount?: number;
   description: string;
   descriptionBn: string;
   specs: string[];
