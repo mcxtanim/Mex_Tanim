@@ -8,7 +8,6 @@ import {
   Check,
   ShieldCheck,
   Truck,
-  MessageCircle,
   Share2,
   ChevronLeft,
   ChevronRight,
@@ -21,6 +20,7 @@ import { PRODUCTS, COMBO_PRODUCTS } from './mockData';
 import { ProductCard } from './ProductCard';
 import { useCart } from '../cart/CartContext';
 import { useLanguage } from '../shared/LanguageContext';
+import { WhatsAppIcon } from '../shared/WhatsAppIcon';
 
 const DEVELOPER_WHATSAPP = '8801317170609';
 
@@ -417,7 +417,7 @@ export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
                   onClick={handleWhatsAppOrder}
                   className="w-full py-3 bg-[#25D366] hover:bg-[#20bd5a] text-white font-black text-xs sm:text-sm rounded-2xl shadow-md transition active:scale-95 flex items-center justify-center space-x-2 cursor-pointer"
                 >
-                  <MessageCircle className="w-4 h-4 fill-current" />
+                  <WhatsAppIcon className="w-4 h-4 fill-current" />
                   <span>{language === 'bn' ? 'হোয়াটসঅ্যাপ অর্ডার' : 'WhatsApp Order'}</span>
                 </button>
               </div>
