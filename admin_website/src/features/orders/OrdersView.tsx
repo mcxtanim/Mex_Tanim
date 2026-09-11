@@ -14,7 +14,12 @@ export function OrdersView() {
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
 
   useEffect(() => {
-    setOrders(getStoredOrders());
+    const handleLoad = () => {
+      setOrders(getStoredOrders());
+    };
+    handleLoad();
+    window.addEventListener('storage', handleLoad);
+    return () => window.removeEventListener('storage', handleLoad);
   }, []);
 
   const handleStatusChange = (orderId: string, newStatus: OrderStatus) => {
@@ -36,8 +41,12 @@ export function OrdersView() {
 
   const tabItems: { label: string; value: "All" | OrderStatus; count: number }[] = [
     { label: "All Orders", value: "All", count: orders.length },
-    { label: "Pending", value: "Pending", count: orders.filter((o) => o.status === "Pending").length },
+    { label: "Order Placed", value: "Order Placed", count: orders.filter((o) => o.status === "Order Placed" || o.status === "Pending").length },
+    { label: "Confirmed", value: "Confirmed", count: orders.filter((o) => o.status === "Confirmed").length },
     { label: "Processing", value: "Processing", count: orders.filter((o) => o.status === "Processing").length },
+    { label: "Packing", value: "Packing", count: orders.filter((o) => o.status === "Packing").length },
+    { label: "Shipped", value: "Shipped", count: orders.filter((o) => o.status === "Shipped").length },
+    { label: "Out for Delivery", value: "Out for Delivery", count: orders.filter((o) => o.status === "Out for Delivery").length },
     { label: "Delivered", value: "Delivered", count: orders.filter((o) => o.status === "Delivered").length },
     { label: "Cancelled", value: "Cancelled", count: orders.filter((o) => o.status === "Cancelled").length },
   ];

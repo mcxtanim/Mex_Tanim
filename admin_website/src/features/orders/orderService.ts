@@ -22,6 +22,7 @@ export function saveStoredOrders(orders: Order[]): void {
   if (typeof window === "undefined") return;
   try {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(orders));
+    window.dispatchEvent(new Event('storage'));
   } catch (error) {
     console.error("Error saving orders to localStorage", error);
   }
