@@ -4,7 +4,6 @@ import { LanguageProvider } from '@/features/shared/LanguageContext';
 import { CartProvider } from '@/features/cart/CartContext';
 import { AuthProvider } from '@/features/auth/AuthContext';
 import { CartDrawer } from '@/features/cart/CartDrawer';
-import { AuthModal } from '@/features/auth/AuthModal';
 import { FloatingChat } from '@/features/shared/FloatingChat';
 
 export const metadata: Metadata = {
@@ -25,7 +24,6 @@ export default function RootLayout({
             <CartProvider>
               {children}
               <CartDrawer />
-              <AuthModal />
               <FloatingChat />
             </CartProvider>
           </AuthProvider>

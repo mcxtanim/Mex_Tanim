@@ -205,15 +205,15 @@ export const Header: React.FC<HeaderProps> = ({
             {/* Right Action Buttons */}
             <div className="flex items-center space-x-2 sm:space-x-3">
               
-              {/* My Account & Orders Button */}
+              {/* My Orders Button */}
               <Link
-                href="/account"
+                href="/orders"
                 className="p-2 sm:px-3 sm:py-2 bg-slate-100 hover:bg-slate-900 hover:text-white text-slate-800 rounded-xl border border-gray-200/90 shadow-2xs transition-all active:scale-95 flex items-center gap-1.5 cursor-pointer font-extrabold text-xs shrink-0"
-                title={language === 'bn' ? 'আমার অ্যাকাউন্ট ও অর্ডার ট্র্যাকিং' : 'My Account & Orders'}
+                title={language === 'bn' ? 'আমার অর্ডার ও ট্র্যাকিং' : 'My Orders & Tracking'}
               >
-                <UserIcon className="w-4 h-4 text-orange-500" />
+                <Package className="w-4 h-4 text-orange-500" />
                 <span className="hidden sm:inline-block">
-                  {language === 'bn' ? 'মাই অ্যাকাউন্ট' : 'My Account'}
+                  {language === 'bn' ? 'আমার অর্ডার' : 'My Orders'}
                 </span>
               </Link>
 
@@ -231,38 +231,6 @@ export const Header: React.FC<HeaderProps> = ({
                   </span>
                 )}
               </button>
-
-              {/* Auth Buttons */}
-              {isAuthenticated ? (
-                <div className="flex items-center space-x-2 bg-gray-100 py-1.5 px-3 rounded-full border border-gray-200">
-                  <UserIcon className="w-4 h-4 text-orange-500" />
-                  <span className="text-xs font-bold text-gray-800 hidden md:inline-block max-w-[90px] truncate">
-                    {user?.name}
-                  </span>
-                  <button
-                    onClick={logout}
-                    className="text-gray-400 hover:text-red-500 transition p-1 cursor-pointer"
-                    title={t.logout}
-                  >
-                    <LogOut className="w-4 h-4" />
-                  </button>
-                </div>
-              ) : (
-                <div className="flex items-center space-x-1 sm:space-x-2">
-                  <button
-                    onClick={() => openAuthModal('register')}
-                    className="hidden sm:inline-flex px-3 py-2 text-xs font-bold text-slate-800 hover:text-orange-600 rounded-full hover:bg-gray-100 transition cursor-pointer"
-                  >
-                    {t.register}
-                  </button>
-                  <button
-                    onClick={() => openAuthModal('login')}
-                    className="px-3.5 py-2 text-xs font-bold text-white bg-slate-900 hover:bg-slate-800 rounded-full shadow-sm transition active:scale-95 cursor-pointer"
-                  >
-                    {t.login}
-                  </button>
-                </div>
-              )}
 
               {/* LANGUAGE TOGGLE BUTTON */}
               <div className="pl-1 border-l border-gray-200">

@@ -62,24 +62,24 @@ export const MyAccountView: React.FC = () => {
   return (
     <div className="space-y-8 animate-in fade-in duration-300">
       
-      {/* Account Banner */}
+      {/* Account & Orders Banner */}
       <div className="bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 rounded-3xl p-6 sm:p-8 text-white shadow-xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6 border border-slate-800">
         <div className="flex items-center space-x-4">
-          <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-orange-500 to-amber-500 text-white flex items-center justify-center font-black text-2xl shadow-lg ring-4 ring-white/10 shrink-0">
-            {savedAddress?.name ? savedAddress.name.charAt(0).toUpperCase() : <User className="w-8 h-8" />}
+          <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-gradient-to-br from-orange-500 to-amber-500 text-white flex items-center justify-center font-black text-2xl shadow-lg ring-4 ring-white/10 shrink-0">
+            <Package className="w-7 h-7 sm:w-8 sm:h-8" />
           </div>
           <div>
             <div className="flex items-center space-x-2">
               <h1 className="text-xl sm:text-2xl font-black tracking-tight">
-                {savedAddress?.name || (language === 'bn' ? 'সম্মানিত গেমার গ্রাহক' : 'Valued Customer')}
+                {savedAddress?.name ? `${savedAddress.name} - ${language === 'bn' ? 'আমার অর্ডারসমূহ' : 'My Orders'}` : (language === 'bn' ? 'আমার অর্ডারসমূহ (My Orders)' : 'My Orders')}
               </h1>
               <span className="bg-orange-500/30 text-orange-300 text-[10px] font-black uppercase px-2.5 py-0.5 rounded-full border border-orange-400/40">
-                {language === 'bn' ? 'ভেরিফাইড অ্যাকাউন্ট' : 'Verified Account'}
+                {language === 'bn' ? 'লাইভ সিঙ্ক' : 'Live Sync'}
               </span>
             </div>
             <p className="text-xs text-gray-300 font-medium mt-1 flex items-center space-x-2">
-              <Phone className="w-3.5 h-3.5 text-orange-400" />
-              <span>{savedAddress?.phone || (language === 'bn' ? 'মোবাইল নম্বর সংরক্ষণ করুন' : 'No saved phone yet')}</span>
+              <Truck className="w-3.5 h-3.5 text-orange-400" />
+              <span>{language === 'bn' ? 'আপনার অর্ডারের বর্তমান অবস্থা ও ৭-স্টেপ রিয়েল-টাইম ট্র্যাকিং' : 'Real-time 7-stage order status & tracking updates'}</span>
             </p>
           </div>
         </div>
@@ -90,7 +90,7 @@ export const MyAccountView: React.FC = () => {
           className="bg-white/10 hover:bg-white/20 border border-white/20 px-4 py-2.5 rounded-2xl text-xs font-bold transition flex items-center space-x-2 cursor-pointer active:scale-95"
         >
           <ShoppingBag className="w-4 h-4 text-orange-400" />
-          <span>{language === 'bn' ? `কার্ট ব্যাজ (${totalCartQty} Items)` : `My Cart (${totalCartQty} Items)`}</span>
+          <span>{language === 'bn' ? `আমার কার্ট (${totalCartQty} Items)` : `My Cart (${totalCartQty} Items)`}</span>
         </button>
       </div>
 
@@ -289,13 +289,21 @@ export const MyAccountView: React.FC = () => {
                   </div>
 
                   {/* Bottom Action Buttons */}
-                  <div className="pt-2 border-t border-gray-200/80 flex items-center justify-end space-x-3">
+                  <div className="pt-2 border-t border-gray-200/80 flex flex-wrap items-center justify-end gap-2.5">
                     <button
                       onClick={() => handleViewOrder(order)}
-                      className="px-4 py-2 bg-slate-900 hover:bg-orange-600 text-white font-extrabold text-xs rounded-xl shadow-md transition active:scale-95 flex items-center space-x-1.5 cursor-pointer"
+                      className="px-3.5 py-2 bg-orange-500 hover:bg-orange-600 text-white font-extrabold text-xs rounded-xl shadow-md transition active:scale-95 flex items-center space-x-1.5 cursor-pointer"
                     >
-                      <ExternalLink className="w-3.5 h-3.5" />
-                      <span>{language === 'bn' ? 'বিস্তারিত দেখুন ও ট্র্যাকিং' : 'View Details & Track'}</span>
+                      <Truck className="w-3.5 h-3.5" />
+                      <span>{language === 'bn' ? 'অর্ডার ট্র্যাকিং (7-Stage)' : 'Track Order'}</span>
+                    </button>
+
+                    <button
+                      onClick={() => handleViewOrder(order)}
+                      className="px-3.5 py-2 bg-slate-900 hover:bg-slate-800 text-white font-extrabold text-xs rounded-xl shadow-md transition active:scale-95 flex items-center space-x-1.5 cursor-pointer"
+                    >
+                      <ExternalLink className="w-3.5 h-3.5 text-orange-400" />
+                      <span>{language === 'bn' ? 'বিস্তারিত বিবরণ' : 'View Details'}</span>
                     </button>
                   </div>
                 </div>
