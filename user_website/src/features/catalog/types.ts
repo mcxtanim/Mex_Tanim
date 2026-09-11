@@ -4,6 +4,8 @@ export interface Product {
   nameBn: string;
   category: string;
   categoryBn: string;
+  brand?: string;
+  brandBn?: string;
   price: number;
   originalPrice: number;
   discountBadge: string;

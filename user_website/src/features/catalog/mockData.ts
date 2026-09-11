@@ -19,6 +19,8 @@ export const PRODUCTS: Product[] = [
     nameBn: 'ফ্যানটেক HG11 ক্যাপ্টেন ৭.১ গেমিং হেডসেট',
     category: 'headphones',
     categoryBn: 'হেডফোন',
+    brand: 'Fantech',
+    brandBn: 'ফ্যানটেক',
     price: 2450,
     originalPrice: 3200,
     discountBadge: '-23%',
@@ -40,6 +42,8 @@ export const PRODUCTS: Product[] = [
     nameBn: 'হ্যাভিট H2008d আরজিবি ৩.৫মিমি গেমিং হেডসেট',
     category: 'headphones',
     categoryBn: 'হেডফোন',
+    brand: 'Havit',
+    brandBn: 'হ্যাভিট',
     price: 1950,
     originalPrice: 2600,
     discountBadge: '-25%',
@@ -61,6 +65,8 @@ export const PRODUCTS: Product[] = [
     nameBn: 'রেজার ব্ল্যাকশার্ক V2 X গেমিং হেডসেট',
     category: 'headphones',
     categoryBn: 'হেডফোন',
+    brand: 'Razer',
+    brandBn: 'রেজার',
     price: 4800,
     originalPrice: 5800,
     discountBadge: '-17%',
@@ -84,6 +90,8 @@ export const PRODUCTS: Product[] = [
     nameBn: 'রেজার ডেথঅ্যাডার এসেনশিয়াল গেমিং মাউস',
     category: 'mice',
     categoryBn: 'গেমিং মাউস',
+    brand: 'Razer',
+    brandBn: 'রেজার',
     price: 1850,
     originalPrice: 2500,
     discountBadge: '-26%',
@@ -105,6 +113,8 @@ export const PRODUCTS: Product[] = [
     nameBn: 'লজিটেক G102 লাইটসিঙ্ক আরজিবি গেমিং মাউস',
     category: 'mice',
     categoryBn: 'গেমিং মাউস',
+    brand: 'Logitech',
+    brandBn: 'লজিটেক',
     price: 2150,
     originalPrice: 2700,
     discountBadge: '-20%',
@@ -128,6 +138,8 @@ export const PRODUCTS: Product[] = [
     nameBn: 'রেড্রাগন K552 আরজিবি মেকানিক্যাল গেমিং কীবোর্ড',
     category: 'keyboards',
     categoryBn: 'কীবোর্ড',
+    brand: 'Redragon',
+    brandBn: 'রেড্রাগন',
     price: 3600,
     originalPrice: 4500,
     discountBadge: '-20%',
@@ -149,6 +161,8 @@ export const PRODUCTS: Product[] = [
     nameBn: 'আউলা F75 ওয়্যারলেস ট্রাই-মোড মেকানিক্যাল কীবোর্ড',
     category: 'keyboards',
     categoryBn: 'কীবোর্ড',
+    brand: 'AULA',
+    brandBn: 'আউলা',
     price: 5200,
     originalPrice: 6500,
     discountBadge: '-20%',
@@ -172,6 +186,8 @@ export const PRODUCTS: Product[] = [
     nameBn: 'বেসাস ৬৫ ওয়াট GaN ফাস্ট চার্জার ৩-পোর্ট এডাপ্টার',
     category: 'chargers',
     categoryBn: 'ফাস্ট চার্জার',
+    brand: 'Baseus',
+    brandBn: 'বেসাস',
     price: 2100,
     originalPrice: 2800,
     discountBadge: '-25%',
@@ -195,6 +211,8 @@ export const PRODUCTS: Product[] = [
     nameBn: 'পাবজি / ফ্রি ফায়ার সোয়েটপ্রুফ গেমিং ফিঙ্গার স্লিক (জোড়া)',
     category: 'finger-sleeves',
     categoryBn: 'ফিঙ্গার স্লিক',
+    brand: 'Mex Tanim',
+    brandBn: 'মেক্স তানিম',
     price: 150,
     originalPrice: 250,
     discountBadge: '-40%',
@@ -218,6 +236,8 @@ export const PRODUCTS: Product[] = [
     nameBn: 'অ্যাঙ্কার পাওয়ারলাইন III টাইপ-সি টু টাইপ-সি ১০০W কেবল',
     category: 'cables',
     categoryBn: 'কেবলস',
+    brand: 'Anker',
+    brandBn: 'অ্যাঙ্কার',
     price: 1250,
     originalPrice: 1600,
     discountBadge: '-22%',
@@ -241,6 +261,8 @@ export const PRODUCTS: Product[] = [
     nameBn: 'জেবিএল গো ৩ পোর্টেবল ব্লুটুথ সাউন্ডবক্স',
     category: 'soundboxes',
     categoryBn: 'সাউন্ডবক্স',
+    brand: 'JBL',
+    brandBn: 'জেবিএল',
     price: 3950,
     originalPrice: 4800,
     discountBadge: '-18%',
@@ -264,6 +286,8 @@ export const PRODUCTS: Product[] = [
     nameBn: 'কিমি KM-৬৩৩০ প্রফেশনাল হেয়ার ও বিয়ার্ড ট্রিমার',
     category: 'trimmers',
     categoryBn: 'ট্রিমার',
+    brand: 'Kemei',
+    brandBn: 'কিমি',
     price: 990,
     originalPrice: 1500,
     discountBadge: '-34%',
@@ -289,6 +313,8 @@ export const COMBO_PRODUCTS: Product[] = [
     nameBn: 'ইস্পোর্টস গেমার প্রো বান্ডেল: মেকানিক্যাল কীবোর্ড + গেমিং মাউস + মাউসপ্যাড',
     category: 'keyboards',
     categoryBn: 'কম্বো অফার',
+    brand: 'Redragon',
+    brandBn: 'রেড্রাগন',
     price: 3990,
     originalPrice: 6200,
     discountBadge: '-36% OFF',
@@ -296,9 +322,9 @@ export const COMBO_PRODUCTS: Product[] = [
     reviewCount: 185,
     image: 'https://images.unsplash.com/photo-1587829741301-dc798b83add3?auto=format&fit=crop&w=600&q=80',
     comboImages: [
-      'https://images.unsplash.com/photo-1587829741301-dc798b83add3?auto=format&fit=crop&w=400&q=80', // Keyboard
-      'https://images.unsplash.com/photo-1615663245857-ac93bb7c39e7?auto=format&fit=crop&w=400&q=80', // Mouse
-      'https://images.unsplash.com/photo-1547394765-185e1e68f34e?auto=format&fit=crop&w=400&q=80', // Mousepad
+      'https://images.unsplash.com/photo-1587829741301-dc798b83add3?auto=format&fit=crop&w=400&q=80',
+      'https://images.unsplash.com/photo-1615663245857-ac93bb7c39e7?auto=format&fit=crop&w=400&q=80',
+      'https://images.unsplash.com/photo-1547394765-185e1e68f34e?auto=format&fit=crop&w=400&q=80',
     ],
     inStock: true,
     isPopular: true,
@@ -314,6 +340,8 @@ export const COMBO_PRODUCTS: Product[] = [
     nameBn: 'পাবজি মোবাইল প্রো কম্বো: ফিঙ্গার স্লিক ৩-প্যাক + ৬৫W চার্জার + কেবল',
     category: 'finger-sleeves',
     categoryBn: 'কম্বো অফার',
+    brand: 'Baseus',
+    brandBn: 'বেসাস',
     price: 1450,
     originalPrice: 2500,
     discountBadge: '-42% OFF',
@@ -321,9 +349,9 @@ export const COMBO_PRODUCTS: Product[] = [
     reviewCount: 320,
     image: 'https://images.unsplash.com/photo-1592840496694-26d035b52b48?auto=format&fit=crop&w=600&q=80',
     comboImages: [
-      'https://images.unsplash.com/photo-1592840496694-26d035b52b48?auto=format&fit=crop&w=400&q=80', // Finger sleeves
-      'https://images.unsplash.com/photo-1583863788434-e58a36330cf0?auto=format&fit=crop&w=400&q=80', // Fast charger
-      'https://images.unsplash.com/photo-1544816155-12df9643f363?auto=format&fit=crop&w=400&q=80', // Braided cable
+      'https://images.unsplash.com/photo-1592840496694-26d035b52b48?auto=format&fit=crop&w=400&q=80',
+      'https://images.unsplash.com/photo-1583863788434-e58a36330cf0?auto=format&fit=crop&w=400&q=80',
+      'https://images.unsplash.com/photo-1544816155-12df9643f363?auto=format&fit=crop&w=400&q=80',
     ],
     inStock: true,
     isPopular: true,
@@ -339,6 +367,8 @@ export const COMBO_PRODUCTS: Product[] = [
     nameBn: 'আল্টিমেট অডিও ডুও: ৭.১ আরজিবি হেডসেট + পোর্টেবল সাউন্ডবক্স স্পিকার',
     category: 'headphones',
     categoryBn: 'কম্বো অফার',
+    brand: 'Fantech',
+    brandBn: 'ফ্যানটেক',
     price: 5250,
     originalPrice: 8000,
     discountBadge: '-34% OFF',
@@ -346,8 +376,8 @@ export const COMBO_PRODUCTS: Product[] = [
     reviewCount: 142,
     image: 'https://images.unsplash.com/photo-1546435770-a3e426bf472b?auto=format&fit=crop&w=600&q=80',
     comboImages: [
-      'https://images.unsplash.com/photo-1546435770-a3e426bf472b?auto=format&fit=crop&w=400&q=80', // Headset
-      'https://images.unsplash.com/photo-1545454675-3531b543be5d?auto=format&fit=crop&w=400&q=80', // Speaker
+      'https://images.unsplash.com/photo-1546435770-a3e426bf472b?auto=format&fit=crop&w=400&q=80',
+      'https://images.unsplash.com/photo-1545454675-3531b543be5d?auto=format&fit=crop&w=400&q=80',
     ],
     inStock: true,
     isPopular: true,
@@ -363,6 +393,8 @@ export const COMBO_PRODUCTS: Product[] = [
     nameBn: 'স্ট্রিমার প্রো বান্ডেল: ওয়্যারলেস মেকানিক্যাল কীবোর্ড + আরজিবি মাউস',
     category: 'keyboards',
     categoryBn: 'কম্বো অফার',
+    brand: 'AULA',
+    brandBn: 'আউলা',
     price: 6990,
     originalPrice: 10500,
     discountBadge: '-33% OFF',
@@ -370,8 +402,8 @@ export const COMBO_PRODUCTS: Product[] = [
     reviewCount: 96,
     image: 'https://images.unsplash.com/photo-1595225476474-87563907a212?auto=format&fit=crop&w=600&q=80',
     comboImages: [
-      'https://images.unsplash.com/photo-1595225476474-87563907a212?auto=format&fit=crop&w=400&q=80', // Keyboard
-      'https://images.unsplash.com/photo-1527864550417-7fd91fc51a46?auto=format&fit=crop&w=400&q=80', // Mouse
+      'https://images.unsplash.com/photo-1595225476474-87563907a212?auto=format&fit=crop&w=400&q=80',
+      'https://images.unsplash.com/photo-1527864550417-7fd91fc51a46?auto=format&fit=crop&w=400&q=80',
     ],
     inStock: true,
     isPopular: true,
@@ -387,6 +419,8 @@ export const COMBO_PRODUCTS: Product[] = [
     nameBn: 'গ্রুমিং ও ফাস্ট পাওয়ার কিট: ট্রিমার + ১০০W ফাস্ট ওয়াল চার্জার',
     category: 'trimmers',
     categoryBn: 'কম্বো অফার',
+    brand: 'Kemei',
+    brandBn: 'কিমি',
     price: 2750,
     originalPrice: 4300,
     discountBadge: '-36% OFF',
@@ -394,8 +428,8 @@ export const COMBO_PRODUCTS: Product[] = [
     reviewCount: 210,
     image: 'https://images.unsplash.com/photo-1621607512214-68297480165e?auto=format&fit=crop&w=600&q=80',
     comboImages: [
-      'https://images.unsplash.com/photo-1621607512214-68297480165e?auto=format&fit=crop&w=400&q=80', // Trimmer
-      'https://images.unsplash.com/photo-1585338107529-13afc5f02586?auto=format&fit=crop&w=400&q=80', // Charger
+      'https://images.unsplash.com/photo-1621607512214-68297480165e?auto=format&fit=crop&w=400&q=80',
+      'https://images.unsplash.com/photo-1585338107529-13afc5f02586?auto=format&fit=crop&w=400&q=80',
     ],
     inStock: true,
     isPopular: false,
@@ -411,6 +445,8 @@ export const COMBO_PRODUCTS: Product[] = [
     nameBn: 'মোবাইল গেমার স্পিড প্যাক: কার্বন ফাইবার স্লিক + ৯০° এলবো টাইপ-সি কেবল',
     category: 'finger-sleeves',
     categoryBn: 'কম্বো অফার',
+    brand: 'Flydigi',
+    brandBn: 'ফ্লাইডিজি',
     price: 990,
     originalPrice: 1650,
     discountBadge: '-40% OFF',
@@ -418,8 +454,8 @@ export const COMBO_PRODUCTS: Product[] = [
     reviewCount: 285,
     image: 'https://images.unsplash.com/photo-1511512578047-dfb367046420?auto=format&fit=crop&w=600&q=80',
     comboImages: [
-      'https://images.unsplash.com/photo-1511512578047-dfb367046420?auto=format&fit=crop&w=400&q=80', // Sleeves
-      'https://images.unsplash.com/photo-1544816155-12df9643f363?auto=format&fit=crop&w=400&q=80', // Cable
+      'https://images.unsplash.com/photo-1511512578047-dfb367046420?auto=format&fit=crop&w=400&q=80',
+      'https://images.unsplash.com/photo-1544816155-12df9643f363?auto=format&fit=crop&w=400&q=80',
     ],
     inStock: true,
     isPopular: true,
@@ -430,3 +466,14 @@ export const COMBO_PRODUCTS: Product[] = [
     specs: ['Flydigi WASP 2 Pairs Sleeves', 'UGREEN 60W Right Angle Cable', 'Zero Latency Performance'],
   },
 ];
+
+export const getBrandName = (product?: Partial<Product> | null, language: string = 'en'): string => {
+  if (!product) return 'Mex Tanim';
+  if (language === 'bn' && product.brandBn) return product.brandBn;
+  if (product.brand) return product.brand;
+  if (product.name) {
+    const firstWord = product.name.trim().split(' ')[0];
+    if (firstWord && firstWord.length > 1) return firstWord;
+  }
+  return 'Mex Tanim';
+};

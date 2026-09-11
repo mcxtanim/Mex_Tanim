@@ -21,7 +21,7 @@ import {
 } from 'lucide-react';
 import { Header } from '@/features/shared/Header';
 import { Footer } from '@/features/shared/Footer';
-import { PRODUCTS, COMBO_PRODUCTS } from '@/features/catalog/mockData';
+import { PRODUCTS, COMBO_PRODUCTS, getBrandName } from '@/features/catalog/mockData';
 import { Product } from '@/features/catalog/types';
 import { ProductCard } from '@/features/catalog/ProductCard';
 import { useCart } from '@/features/cart/CartContext';
@@ -255,10 +255,16 @@ export default function DedicatedProductPage() {
 
             {/* RIGHT COLUMN — PRODUCT INFORMATION & PURCHASE CONTROLS */}
             <div className="md:col-span-6 space-y-6">
-              {/* Category & Stock Status Badges */}
-              <div className="flex items-center justify-between">
+              {/* Category, Brand & Stock Status Badges */}
+              <div className="flex flex-wrap items-center gap-2">
                 <span className="bg-orange-50 text-orange-600 font-extrabold text-xs uppercase px-3.5 py-1 rounded-full border border-orange-200">
                   {product.categoryBn || product.category}
+                </span>
+
+                {/* Brand Name Badge */}
+                <span className="bg-slate-100 text-slate-800 font-extrabold text-xs px-3.5 py-1 rounded-full border border-slate-200 flex items-center space-x-1">
+                  <span className="text-gray-500 font-medium">{language === 'bn' ? 'ব্র্যান্ড:' : 'Brand:'}</span>
+                  <span className="text-slate-900 font-black">{getBrandName(product, language)}</span>
                 </span>
 
                 <span className="flex items-center space-x-1.5 text-xs font-extrabold text-emerald-600 bg-emerald-50 px-3.5 py-1 rounded-full border border-emerald-200">
@@ -267,12 +273,17 @@ export default function DedicatedProductPage() {
                 </span>
               </div>
 
-              {/* Title */}
+              {/* Title & Brand Name */}
               <div>
                 <h1 className="text-2xl sm:text-3xl font-black text-slate-900 leading-tight">
                   {language === 'bn' ? product.nameBn : product.name}
                 </h1>
-                <p className="text-xs sm:text-sm text-gray-500 font-medium mt-1">{product.name}</p>
+                <div className="flex items-center space-x-2 mt-1.5 text-xs sm:text-sm">
+                  <span className="text-gray-500 font-medium">{language === 'bn' ? 'ব্র্যান্ড নাম:' : 'Brand Name:'}</span>
+                  <span className="font-black text-slate-900 bg-slate-100 border border-slate-200 px-2.5 py-0.5 rounded-lg shadow-2xs">
+                    {getBrandName(product, language)}
+                  </span>
+                </div>
               </div>
 
               {/* Rating Stars & Customer Review Count */}

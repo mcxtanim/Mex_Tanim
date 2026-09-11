@@ -4,6 +4,7 @@ import React from 'react';
 import { useRouter } from 'next/navigation';
 import { Star, ShoppingBag } from 'lucide-react';
 import { Product } from './types';
+import { getBrandName } from './mockData';
 import { useCart } from '../cart/CartContext';
 import { useLanguage } from '../shared/LanguageContext';
 
@@ -68,10 +69,16 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product, onSelect }) =
       <div className="p-4 flex-1 flex flex-col justify-between space-y-3">
         <div>
           <div className="flex items-center justify-between text-xs text-gray-500 mb-1">
-            <span className="font-semibold text-orange-600 uppercase text-[10px] tracking-wider">
-              {product.categoryBn || product.category}
-            </span>
-            <div className="flex items-center space-x-1 text-amber-500 font-bold text-[11px]">
+            <div className="flex items-center space-x-1.5 overflow-hidden">
+              <span className="font-semibold text-orange-600 uppercase text-[10px] tracking-wider truncate">
+                {product.categoryBn || product.category}
+              </span>
+              <span className="text-gray-300">•</span>
+              <span className="font-extrabold text-slate-800 text-[10px] bg-slate-100 px-1.5 py-0.5 rounded border border-slate-200/60 truncate">
+                {getBrandName(product, language)}
+              </span>
+            </div>
+            <div className="flex items-center space-x-1 text-amber-500 font-bold text-[11px] shrink-0 ml-1">
               <Star className="w-3.5 h-3.5 fill-amber-400 text-amber-400" />
               <span>{product.rating}</span>
             </div>

@@ -16,7 +16,7 @@ import {
   Zap,
 } from 'lucide-react';
 import { Product } from './types';
-import { PRODUCTS, COMBO_PRODUCTS } from './mockData';
+import { PRODUCTS, COMBO_PRODUCTS, getBrandName } from './mockData';
 import { ProductCard } from './ProductCard';
 import { useCart } from '../cart/CartContext';
 import { useLanguage } from '../shared/LanguageContext';
@@ -264,10 +264,16 @@ export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
 
           {/* RIGHT SIDE — PRODUCT INFORMATION & PURCHASE CONTROLS */}
           <div className="md:col-span-6 space-y-5">
-            {/* Category & Stock Badges */}
-            <div className="flex items-center justify-between">
+            {/* Category, Brand & Stock Badges */}
+            <div className="flex flex-wrap items-center gap-2">
               <span className="bg-orange-50 text-orange-600 font-extrabold text-xs uppercase px-3 py-1 rounded-full border border-orange-200">
                 {currentProduct.categoryBn || currentProduct.category}
+              </span>
+
+              {/* Brand Name Badge */}
+              <span className="bg-slate-100 text-slate-800 font-extrabold text-xs px-3 py-1 rounded-full border border-slate-200 flex items-center space-x-1">
+                <span className="text-gray-500 font-medium">{language === 'bn' ? 'ব্র্যান্ড:' : 'Brand:'}</span>
+                <span className="text-slate-900 font-black">{getBrandName(currentProduct, language)}</span>
               </span>
 
               {/* Stock availability */}
@@ -277,12 +283,17 @@ export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
               </span>
             </div>
 
-            {/* Product Title */}
+            {/* Product Title & Brand Name */}
             <div>
               <h1 className="text-xl sm:text-2xl font-black text-slate-900 leading-tight">
                 {language === 'bn' ? currentProduct.nameBn : currentProduct.name}
               </h1>
-              <p className="text-xs text-gray-500 font-medium mt-1">{currentProduct.name}</p>
+              <div className="flex items-center space-x-2 mt-1.5 text-xs sm:text-sm">
+                <span className="text-gray-500 font-medium">{language === 'bn' ? 'ব্র্যান্ড নাম:' : 'Brand Name:'}</span>
+                <span className="font-black text-slate-900 bg-slate-100 border border-slate-200 px-2.5 py-0.5 rounded-lg shadow-2xs">
+                  {getBrandName(currentProduct, language)}
+                </span>
+              </div>
             </div>
 
             {/* Rating Stars & Customer Review Count */}
