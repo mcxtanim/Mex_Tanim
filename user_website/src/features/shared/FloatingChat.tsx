@@ -1,21 +1,118 @@
 'use client';
 
-import React, { useState } from 'react';
-import { X, Send, Bot } from 'lucide-react';
+import React, { useState, useEffect, useRef } from 'react';
+import { X, Send, Bot, User, CheckCheck } from 'lucide-react';
 import { useLanguage } from './LanguageContext';
+
+interface ChatMessage {
+  id: string;
+  sender: 'user' | 'support';
+  text: string;
+  time: string;
+}
 
 export const FloatingChat: React.FC = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isWebChatOpen, setIsWebChatOpen] = useState(false);
-  const [message, setMessage] = useState('');
+  const [messageText, setMessageText] = useState('');
+  const [isTyping, setIsTyping] = useState(false);
   const { t, language } = useLanguage();
+  const messagesEndRef = useRef<HTMLDivElement>(null);
+
+  // Initial welcome chat messages
+  const defaultMessages: ChatMessage[] = [
+    {
+      id: 'welcome-1',
+      sender: 'support',
+      text: language === 'bn' 
+        ? '👋 স্বাগতম Mex Tanim Store গেমিং সাপোর্টে! যেকোনো গ্যাজেট বা অর্ডার সংক্রান্ত তথ্যের জন্য আমাদের লিখুন।' 
+        : '👋 Welcome to Mex Tanim Store Gaming Support! Ask us anything about gaming gadgets or orders.',
+      time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+    },
+  ];
+
+  const [messages, setMessages] = useState<ChatMessage[]>(() => {
+    if (typeof window !== 'undefined') {
+      const saved = localStorage.getItem('mex_tanim_chat_messages');
+      if (saved) {
+        try {
+          return JSON.parse(saved);
+        } catch {
+          // fallback
+        }
+      }
+    }
+    return defaultMessages;
+  });
+
+  // Save messages to localStorage
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('mex_tanim_chat_messages', JSON.stringify(messages));
+    }
+  }, [messages]);
+
+  // Auto scroll to bottom
+  useEffect(() => {
+    if (isWebChatOpen) {
+      messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    }
+  }, [messages, isWebChatOpen, isTyping]);
+
+  const generateAutoReply = (userMsg: string): string => {
+    const lower = userMsg.toLowerCase();
+    
+    if (lower.includes('price') || lower.includes('দাম') || lower.includes('কত')) {
+      return language === 'bn'
+        ? 'আমাদের সকল প্রোডাক্টের অফিশিয়াল সেরা দাম ওয়েবসাইটে দেওয়া আছে। কোনো নির্দিষ্ট প্রোডাক্টের ডিল জানতে চাইলে নাম লিখে জানান!'
+        : 'All product prices are updated live on our website. Let us know which specific model you are interested in!';
+    }
+    if (lower.includes('delivery') || lower.includes('ডেলিভারি') || lower.includes('শিপিং')) {
+      return language === 'bn'
+        ? '🚚 ডেলিভারি চার্জ: ঢাকার ভেতরে ৳৬০ (২৪-৪৮ ঘণ্টা) এবং ঢাকার বাইরে ৳১২০ (২-৩ দিন)। ক্যাশ অন ডেলিভারি প্রযোজ্য।'
+        : '🚚 Delivery charge: Inside Dhaka ৳60 (24-48 hrs), Outside Dhaka ৳120 (2-3 days). Cash on delivery available!';
+    }
+    if (lower.includes('mouse') || lower.includes('মাউস') || lower.includes('keyboard') || lower.includes('কীবোর্ড')) {
+      return language === 'bn'
+        ? '🎮 আমাদের স্টকে ১০০% অরিজিনাল ব্র্যান্ডেড গেমিং মাউস ও মেকানিক্যাল কীবোর্ড এভেলেবল আছে। কোনো নির্দিষ্ট মডেলের পরামর্শের জন্য আমরা প্রস্তুত!'
+        : '🎮 We have 100% authentic gaming mice & mechanical keyboards in stock. Let us know if you need recommendations!';
+    }
+    
+    return language === 'bn'
+      ? 'ধন্যবাদ! আপনার মেসেজটি আমাদের সাপোর্ট টিমের কাছে পৌঁছেছে। এডমিন অনলাইনেই শীঘ্রই বিস্তারিত উত্তর দেবেন। জরুরি তথ্যের জন্য কল করুন: 01700000000'
+      : 'Thank you! Your message has been received by our support team. An admin will respond shortly. For urgent help, call: 01700000000';
+  };
 
   const handleSend = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!message.trim()) return;
-    alert(`Message sent to Mex Tanim Gaming Support: "${message}"`);
-    setMessage('');
-    setIsWebChatOpen(false);
+    if (!messageText.trim()) return;
+
+    const currentTime = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    
+    // User message
+    const newMsg: ChatMessage = {
+      id: Date.now().toString(),
+      sender: 'user',
+      text: messageText.trim(),
+      time: currentTime,
+    };
+
+    setMessages((prev) => [...prev, newMsg]);
+    const userPrompt = messageText;
+    setMessageText('');
+    setIsTyping(true);
+
+    // Simulate automatic support reply after 1.2 seconds
+    setTimeout(() => {
+      setIsTyping(false);
+      const replyMsg: ChatMessage = {
+        id: (Date.now() + 1).toString(),
+        sender: 'support',
+        text: generateAutoReply(userPrompt),
+        time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+      };
+      setMessages((prev) => [...prev, replyMsg]);
+    }, 1200);
   };
 
   const handleWhatsAppClick = () => {
@@ -59,19 +156,20 @@ export const FloatingChat: React.FC = () => {
         }
       `}</style>
 
-      {/* Web Chat Interface Modal */}
+      {/* Interactive Web Live Chat Interface Modal */}
       {isWebChatOpen && (
-        <div className="mb-2 w-80 sm:w-96 bg-white rounded-3xl shadow-2xl border border-gray-200/80 overflow-hidden animate-in slide-in-from-bottom duration-200">
-          <div className="bg-slate-900 text-white p-4 flex items-center justify-between">
+        <div className="mb-2 w-80 sm:w-96 bg-white rounded-3xl shadow-2xl border border-gray-200/90 overflow-hidden flex flex-col h-[450px] animate-in slide-in-from-bottom duration-200">
+          {/* Header */}
+          <div className="bg-slate-900 text-white p-4 flex items-center justify-between shrink-0 border-b border-slate-800">
             <div className="flex items-center gap-3">
-              <div className="w-9 h-9 rounded-full bg-orange-500 flex items-center justify-center text-white">
+              <div className="w-10 h-10 rounded-full bg-gradient-to-tr from-orange-600 to-amber-500 flex items-center justify-center text-white shadow-md">
                 <Bot className="w-5 h-5" />
               </div>
               <div>
-                <h4 className="font-bold text-sm">{t.chatTitle || 'Mex Tanim Support'}</h4>
-                <span className="text-[10px] text-emerald-400 font-semibold flex items-center gap-1.5 mt-0.5">
-                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping inline-block" />
-                  {t.chatSubtitle || 'Online - Ready to help'}
+                <h4 className="font-bold text-sm leading-tight">{t.chatTitle || 'Gaming Support 24/7'}</h4>
+                <span className="text-[11px] text-emerald-400 font-semibold flex items-center gap-1.5 mt-0.5">
+                  <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping inline-block" />
+                  {t.chatSubtitle || 'Ask us anything about gaming gadgets'}
                 </span>
               </div>
             </div>
@@ -83,29 +181,85 @@ export const FloatingChat: React.FC = () => {
             </button>
           </div>
 
-          <form onSubmit={handleSend} className="p-4 bg-slate-50 space-y-3">
-            <textarea
-              rows={3}
-              value={message}
-              onChange={(e) => setMessage(e.target.value)}
-              placeholder={t.chatPlaceholder || 'আপনার বার্তাটি লিখুন...'}
-              className="w-full p-3 bg-white border border-gray-200 rounded-2xl text-xs sm:text-sm focus:ring-2 focus:ring-orange-500 outline-none resize-none shadow-xs text-slate-800"
+          {/* Messages Body */}
+          <div className="flex-1 p-4 overflow-y-auto space-y-3 bg-slate-50/70 scrollbar-thin">
+            {messages.map((msg) => (
+              <div
+                key={msg.id}
+                className={`flex items-end gap-2 ${msg.sender === 'user' ? 'justify-end' : 'justify-start'}`}
+              >
+                {msg.sender === 'support' && (
+                  <div className="w-7 h-7 rounded-full bg-slate-800 text-orange-400 flex items-center justify-center text-xs shrink-0 shadow-xs">
+                    <Bot className="w-4 h-4" />
+                  </div>
+                )}
+                
+                <div
+                  className={`max-w-[80%] rounded-2xl px-3.5 py-2.5 text-xs sm:text-sm shadow-xs ${
+                    msg.sender === 'user'
+                      ? 'bg-gradient-to-r from-orange-500 to-amber-500 text-white rounded-br-none'
+                      : 'bg-white border border-gray-200 text-slate-800 rounded-bl-none'
+                  }`}
+                >
+                  <p className="whitespace-pre-wrap leading-relaxed">{msg.text}</p>
+                  <div
+                    className={`text-[10px] mt-1 flex items-center gap-1 ${
+                      msg.sender === 'user' ? 'text-orange-100 justify-end' : 'text-gray-400 justify-start'
+                    }`}
+                  >
+                    <span>{msg.time}</span>
+                    {msg.sender === 'user' && <CheckCheck className="w-3 h-3 text-white/80" />}
+                  </div>
+                </div>
+
+                {msg.sender === 'user' && (
+                  <div className="w-7 h-7 rounded-full bg-orange-100 text-orange-600 flex items-center justify-center text-xs shrink-0">
+                    <User className="w-4 h-4" />
+                  </div>
+                )}
+              </div>
+            ))}
+
+            {/* Typing Indicator */}
+            {isTyping && (
+              <div className="flex items-center gap-2 text-slate-500 text-xs py-1">
+                <div className="w-7 h-7 rounded-full bg-slate-800 text-orange-400 flex items-center justify-center text-xs">
+                  <Bot className="w-4 h-4" />
+                </div>
+                <div className="bg-white border border-gray-200 rounded-2xl px-3 py-2 flex items-center gap-1">
+                  <span className="w-1.5 h-1.5 rounded-full bg-slate-400 animate-bounce" />
+                  <span className="w-1.5 h-1.5 rounded-full bg-slate-400 animate-bounce [animation-delay:200ms]" />
+                  <span className="w-1.5 h-1.5 rounded-full bg-slate-400 animate-bounce [animation-delay:400ms]" />
+                </div>
+              </div>
+            )}
+            <div ref={messagesEndRef} />
+          </div>
+
+          {/* Input Form */}
+          <form onSubmit={handleSend} className="p-3 bg-white border-t border-gray-200/80 flex items-center gap-2 shrink-0">
+            <input
+              type="text"
+              value={messageText}
+              onChange={(e) => setMessageText(e.target.value)}
+              placeholder={t.chatPlaceholder || 'Type your message...'}
+              className="flex-1 px-3.5 py-2.5 bg-slate-100 border border-gray-200 rounded-2xl text-xs sm:text-sm focus:ring-2 focus:ring-orange-500 focus:bg-white outline-none text-slate-800"
             />
             <button
               type="submit"
-              className="w-full py-2.5 bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 text-white font-bold text-xs sm:text-sm rounded-xl flex items-center justify-center space-x-2 transition shadow-md active:scale-95"
+              disabled={!messageText.trim()}
+              className="w-10 h-10 rounded-2xl bg-gradient-to-r from-orange-500 to-amber-500 disabled:opacity-40 hover:from-orange-600 hover:to-amber-600 text-white font-bold flex items-center justify-center transition shadow-md active:scale-95 shrink-0"
             >
               <Send className="w-4 h-4" />
-              <span>{language === 'bn' ? 'মেসেজ পাঠান' : 'Send Message'}</span>
             </button>
           </form>
         </div>
       )}
 
-      {/* Floating Options Menu Stack (Matching reference image vertical popup rail) */}
+      {/* Floating Options Menu Stack */}
       {isMenuOpen && (
         <div className="flex flex-col items-center gap-3 p-2 bg-white/90 backdrop-blur-md rounded-full shadow-2xl border border-white/60 animate-in fade-in slide-in-from-bottom-4 duration-200">
-          {/* 1. Messenger Option */}
+          {/* Messenger Option */}
           <button
             onClick={handleMessengerClick}
             className="group relative w-12 h-12 rounded-full bg-[#0084FF] hover:bg-[#0073E6] text-white shadow-md flex items-center justify-center transition-all duration-300 hover:scale-110 active:scale-95"
@@ -114,13 +268,12 @@ export const FloatingChat: React.FC = () => {
             <span className="absolute right-14 bg-slate-900 text-white text-xs font-semibold px-2.5 py-1 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap shadow-md pointer-events-none">
               Messenger
             </span>
-            {/* Official Messenger SVG */}
             <svg className="w-6 h-6 fill-current" viewBox="0 0 24 24">
               <path d="M12 2C6.477 2 2 6.145 2 11.258c0 2.91 1.455 5.51 3.734 7.218V22l3.37-1.85c.928.257 1.91.397 2.896.397 5.523 0 10-4.145 10-9.258C22 6.145 17.523 2 12 2zm1.18 12.396l-2.613-2.788-5.099 2.788 5.608-5.952 2.678 2.788 5.034-2.788-5.608 5.952z"/>
             </svg>
           </button>
 
-          {/* 2. WhatsApp Option */}
+          {/* WhatsApp Option */}
           <button
             onClick={handleWhatsAppClick}
             className="group relative w-12 h-12 rounded-full bg-[#25D366] hover:bg-[#20bd5a] text-white shadow-md flex items-center justify-center transition-all duration-300 hover:scale-110 active:scale-95"
@@ -129,13 +282,12 @@ export const FloatingChat: React.FC = () => {
             <span className="absolute right-14 bg-slate-900 text-white text-xs font-semibold px-2.5 py-1 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap shadow-md pointer-events-none">
               WhatsApp
             </span>
-            {/* Official WhatsApp SVG */}
             <svg className="w-6 h-6 fill-current" viewBox="0 0 24 24">
               <path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.205 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l-.999 3.648 3.742-.981zm11.387-5.464c-.074-.124-.272-.198-.57-.347-.297-.149-1.758-.868-2.031-.967-.272-.099-.47-.149-.669.149-.198.297-.768.967-.941 1.165-.173.198-.347.223-.644.074-.297-.149-1.255-.462-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.297-.347.446-.521.151-.172.2-.296.3-.495.099-.198.05-.372-.025-.521-.075-.148-.669-1.611-.916-2.206-.242-.579-.487-.501-.669-.51l-.57-.01c-.198 0-.52.074-.792.372s-1.04 1.016-1.04 2.479 1.065 2.876 1.213 3.074c.149.198 2.095 3.2 5.076 4.487.709.306 1.263.489 1.694.626.712.226 1.36.194 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.695.248-1.29.173-1.414z"/>
             </svg>
           </button>
 
-          {/* 3. Web Chat Option */}
+          {/* Web Chat Option */}
           <button
             onClick={handleWebChatClick}
             className="group relative w-12 h-12 rounded-full bg-[#0084FF] hover:bg-[#0073E6] text-white shadow-md flex items-center justify-center transition-all duration-300 hover:scale-110 active:scale-95"
@@ -144,7 +296,6 @@ export const FloatingChat: React.FC = () => {
             <span className="absolute right-14 bg-slate-900 text-white text-xs font-semibold px-2.5 py-1 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap shadow-md pointer-events-none">
               Web Chat
             </span>
-            {/* Outline Chat Bubble SVG matching reference image */}
             <svg className="w-6 h-6 text-white stroke-[2.2] fill-none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" d="M19 4H5a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h5l2.5 2.5a.7.7 0 0 0 1 0L18 16h1a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2z" />
             </svg>
@@ -154,7 +305,6 @@ export const FloatingChat: React.FC = () => {
 
       {/* Main Floating Trigger Button Container */}
       <div className="relative flex items-center justify-center">
-        {/* 3 Staggered Continuous Wave Rings (Matching reference image media_1789115835376.jpg) */}
         {!isMenuOpen && (
           <div className="absolute inset-0 pointer-events-none flex items-center justify-center">
             <span className="absolute w-14 h-14 rounded-full border-[2.5px] border-[#0084FF]/70 slow-wave-ring-1" />
@@ -163,7 +313,6 @@ export const FloatingChat: React.FC = () => {
           </div>
         )}
 
-        {/* Trigger Button */}
         <button
           onClick={() => {
             setIsMenuOpen(!isMenuOpen);
@@ -175,7 +324,6 @@ export const FloatingChat: React.FC = () => {
           {isMenuOpen ? (
             <X className="w-6 h-6" />
           ) : (
-            /* Hubhu reference image speech bubble icon */
             <svg className="w-7 h-7 text-white stroke-[2.2] fill-none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" d="M19 4H5a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h5l2.5 2.5a.7.7 0 0 0 1 0L18 16h1a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2z" />
             </svg>
