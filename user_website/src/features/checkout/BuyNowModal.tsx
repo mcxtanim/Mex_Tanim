@@ -1,7 +1,5 @@
-'use client';
-
 import React, { useState, useEffect } from 'react';
-import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import {
   X,
   CheckCircle2,
@@ -20,17 +18,18 @@ import {
   Check,
   AlertCircle,
   Sparkles,
-  Package,
+  ExternalLink,
 } from 'lucide-react';
 import { Product } from '../catalog/types';
 import { useLanguage } from '../shared/LanguageContext';
+import { useCart } from '../cart/CartContext';
+import { CustomerOrder } from '../account/types';
+import { OrderDetailsModal } from '../account/OrderDetailsModal';
 import {
   BANGLADESH_ADDRESS_DATA,
   getDistrictsByDivision,
   getUpazilasByDistrict,
 } from './bangladeshAddressData';
-
-import { useCart } from '../cart/CartContext';
 
 const ADMIN_ORDERS_KEY = 'mex_tanim_admin_orders';
 const SAVED_ADDRESS_KEY = 'mex_tanim_saved_address';
@@ -48,8 +47,9 @@ export const BuyNowModal: React.FC<BuyNowModalProps> = ({
   initialQuantity = 1,
   onClose,
 }) => {
+  const router = useRouter();
   const { language } = useLanguage();
-  const { removeFromCart } = useCart();
+  const { clearCart, removeFromCart } = useCart();
 
   // Quantity state inside modal
   const [quantity, setQuantity] = useState<number>(initialQuantity);
@@ -67,15 +67,16 @@ export const BuyNowModal: React.FC<BuyNowModalProps> = ({
   const [hasSavedAddress, setHasSavedAddress] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [completedOrderNumber, setCompletedOrderNumber] = useState<string | null>(null);
-  const [createdOrderId, setCreatedOrderId] = useState<string | null>(null);
+  const [createdOrder, setCreatedOrder] = useState<CustomerOrder | null>(null);
+  const [showDetailsModal, setShowDetailsModal] = useState(false);
 
   // Synchronize initial quantity when modal opens
   useEffect(() => {
     if (isOpen) {
       setQuantity(initialQuantity || 1);
       setErrorMsg('');
-      setCompletedOrderNumber(null);
+      setCreatedOrder(null);
+      setShowDetailsModal(false);
 
       // Lock body scroll
       document.body.style.overflow = 'hidden';
@@ -108,13 +109,13 @@ export const BuyNowModal: React.FC<BuyNowModalProps> = ({
   // ESC key listener to close modal
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Escape' && isOpen && !completedOrderNumber) {
+      if (e.key === 'Escape' && isOpen && !createdOrder) {
         onClose();
       }
     };
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [isOpen, completedOrderNumber, onClose]);
+  }, [isOpen, createdOrder, onClose]);
 
   if (!isOpen || !product) return null;
 
@@ -195,15 +196,54 @@ export const BuyNowModal: React.FC<BuyNowModalProps> = ({
       const upaLabel = selectedUpaData ? (language === 'bn' ? selectedUpaData.nameBn : selectedUpaData.nameEn) : upazila;
 
       const generatedOrderNum = `MT-${Math.floor(100000 + Math.random() * 900000)}`;
-      const orderId = `ORD-${Date.now()}`;
+      const nowIso = new Date().toISOString();
 
-      // Construct Order Object matching Admin Website Order interface
-      const newOrder = {
-        id: orderId,
+      // Full CustomerOrder Object
+      const fullOrder: CustomerOrder = {
+        id: `ORD-${Date.now()}`,
         orderNumber: `#${generatedOrderNum}`,
         customerName: name.trim(),
         customerEmail: '',
         customerPhone: phone.trim(),
+        shippingAddress: {
+          street: area.trim(),
+          upazila: upaLabel,
+          district: distLabel,
+          division: divLabel,
+          postalCode: '1200',
+        },
+        items: [
+          {
+            productId: product.id,
+            title: language === 'bn' ? product.nameBn : product.name,
+            quantity: quantity,
+            unitPrice: product.price,
+            image: product.image,
+          },
+        ],
+        subtotal: itemTotal,
+        deliveryCharge: deliveryCharge,
+        totalAmount: totalPayable,
+        status: 'Pending',
+        paymentMethod: 'Cash on Delivery',
+        paymentStatus: 'Unpaid',
+        createdAt: nowIso,
+        statusHistory: [
+          {
+            status: 'Order Placed',
+            timestamp: nowIso,
+            note: 'Order placed by customer via Cash on Delivery',
+          },
+        ],
+      };
+
+      // Construct Order Object matching Admin Website Order interface for storage
+      const adminOrderObj = {
+        id: fullOrder.id,
+        orderNumber: fullOrder.orderNumber,
+        customerName: fullOrder.customerName,
+        customerEmail: '',
+        customerPhone: fullOrder.customerPhone,
         shippingAddress: {
           street: `${area.trim()} (${upaLabel})`,
           city: upaLabel,
@@ -219,10 +259,10 @@ export const BuyNowModal: React.FC<BuyNowModalProps> = ({
           },
         ],
         totalAmount: totalPayable,
-        status: 'Order Placed',
+        status: 'Pending',
         paymentMethod: 'Cash on Delivery',
         paymentStatus: 'Unpaid',
-        createdAt: new Date().toISOString(),
+        createdAt: nowIso,
       };
 
       // Store in localStorage for Admin Website sync
@@ -236,8 +276,11 @@ export const BuyNowModal: React.FC<BuyNowModalProps> = ({
         }
       }
 
-      const updatedOrders = [newOrder, ...existingOrders];
+      const updatedOrders = [adminOrderObj, ...existingOrders];
       localStorage.setItem(ADMIN_ORDERS_KEY, JSON.stringify(updatedOrders));
+
+      // Clear product from cart if present
+      removeFromCart(product.id);
 
       // Save Address if checkbox is enabled
       if (saveAddress) {
@@ -252,12 +295,8 @@ export const BuyNowModal: React.FC<BuyNowModalProps> = ({
         localStorage.setItem(SAVED_ADDRESS_KEY, JSON.stringify(addressToSave));
       }
 
-      // Remove purchased item from cart
-      removeFromCart(product.id);
-
       setIsSubmitting(false);
-      setCompletedOrderNumber(generatedOrderNum);
-      setCreatedOrderId(orderId);
+      setCreatedOrder(fullOrder);
     } catch (err) {
       console.error('Order creation error:', err);
       setIsSubmitting(false);
@@ -277,10 +316,14 @@ export const BuyNowModal: React.FC<BuyNowModalProps> = ({
             </div>
             <div>
               <h3 className="font-extrabold text-sm sm:text-base tracking-wide">
-                {language === 'bn' ? 'ক্যাশ অন ডেলিভারি অর্ডার' : 'Cash On Delivery Order'}
+                {createdOrder
+                  ? (language === 'bn' ? 'অর্ডার কনফার্মেশন' : 'Order Confirmation')
+                  : (language === 'bn' ? 'ক্যাশ অন ডেলিভারি অর্ডার' : 'Cash On Delivery Order')}
               </h3>
               <p className="text-[11px] text-gray-300 font-medium">
-                {language === 'bn' ? 'পণ্য হাতে পেয়ে মূল্য পরিশোধ করুন' : 'Pay when you receive your product'}
+                {createdOrder
+                  ? (language === 'bn' ? 'আপনার অর্ডারটি সফলভাবে গৃহিত হয়েছে' : 'Your order has been received successfully')
+                  : (language === 'bn' ? 'পণ্য হাতে পেয়ে মূল্য পরিশোধ করুন' : 'Pay when you receive your product')}
               </p>
             </div>
           </div>
@@ -298,89 +341,144 @@ export const BuyNowModal: React.FC<BuyNowModalProps> = ({
         <div className="overflow-y-auto p-4 sm:p-6 space-y-6 flex-1 scrollbar-thin">
 
           {/* SUCCESS SCREEN VIEW */}
-          {completedOrderNumber ? (
-            <div className="py-8 px-4 text-center space-y-5 animate-in zoom-in-95 duration-300">
-              <div className="w-20 h-20 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center mx-auto shadow-lg shadow-emerald-500/20 ring-8 ring-emerald-50">
-                <CheckCircle2 className="w-12 h-12 stroke-[2.5]" />
+          {createdOrder ? (
+            <div className="py-2 px-1 text-center space-y-5 animate-in zoom-in-95 duration-300">
+              <div className="w-16 h-16 sm:w-20 sm:h-20 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center mx-auto shadow-lg shadow-emerald-500/20 ring-8 ring-emerald-50">
+                <CheckCircle2 className="w-10 h-10 sm:w-12 sm:h-12 stroke-[2.5]" />
               </div>
 
-              <div className="space-y-2">
-                <span className="bg-emerald-100 text-emerald-800 font-black text-xs px-3.5 py-1 rounded-full uppercase tracking-wider">
-                  #{completedOrderNumber}
-                </span>
-                <h2 className="text-2xl sm:text-3xl font-black text-slate-900">
+              <div className="space-y-1.5">
+                <div className="flex items-center justify-center space-x-2">
+                  <span className="bg-emerald-100 text-emerald-800 font-black text-xs px-3.5 py-1 rounded-full uppercase tracking-wider">
+                    {createdOrder.orderNumber}
+                  </span>
+                  <span className="bg-orange-100 text-orange-800 font-extrabold text-xs px-3 py-1 rounded-full">
+                    {language === 'bn' ? 'স্ট্যাটাস: অর্ডার প্লেসড' : 'Status: Order Placed'}
+                  </span>
+                </div>
+                <h2 className="text-xl sm:text-2xl font-black text-slate-900">
                   {language === 'bn' ? 'আপনার অর্ডারটি সফল হয়েছে!' : 'Order Placed Successfully!'}
                 </h2>
-                <p className="text-xs sm:text-sm text-gray-600 font-medium max-w-md mx-auto leading-relaxed">
+                <p className="text-xs text-gray-600 font-medium max-w-md mx-auto leading-relaxed">
                   {language === 'bn'
                     ? 'ধন্যবাদ! আমাদের রিপ্রেজেন্টেটিভ শীঘ্রই আপনার নম্বরে কল দিয়ে অর্ডারটি কনফার্ম করবে।'
                     : 'Thank you! Our customer support team will call your phone number shortly to confirm delivery.'}
                 </p>
               </div>
 
-              {/* Order Details Confirmation Summary Card */}
+              {/* Comprehensive Order Confirmation Summary Card */}
               <div className="bg-slate-50 border border-gray-200/80 rounded-2xl p-4 text-left space-y-3 text-xs">
-                <div className="flex items-center justify-between border-b border-gray-200 pb-2">
-                  <span className="font-extrabold text-slate-900">
-                    {language === 'bn' ? 'অর্ডার প্রোডাক্ট:' : 'Ordered Product:'}
-                  </span>
-                  <span className="font-bold text-slate-700">
-                    {language === 'bn' ? product.nameBn : product.name} (x{quantity})
-                  </span>
-                </div>
-                <div className="flex items-center justify-between border-b border-gray-200 pb-2">
-                  <span className="font-extrabold text-slate-900">
-                    {language === 'bn' ? 'পেমেন্ট পদ্ধতি:' : 'Payment Method:'}
-                  </span>
-                  <span className="font-extrabold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200">
-                    {language === 'bn' ? 'ক্যাশ অন ডেলিভারি (Unpaid)' : 'Cash On Delivery (Unpaid)'}
-                  </span>
-                </div>
-                <div className="flex items-center justify-between">
-                  <span className="font-extrabold text-slate-900">
-                    {language === 'bn' ? 'সর্বমোট প্রদেয় মূল্য:' : 'Total Payable:'}
-                  </span>
-                  <span className="font-black text-slate-900 text-base">
-                    ৳{totalPayable}
-                  </span>
-                </div>
-              </div>
-
-              {/* Action Buttons */}
-              <div className="space-y-2 pt-2">
-                {createdOrderId && (
-                  <Link
-                    href={`/account/order/${createdOrderId}`}
-                    onClick={onClose}
-                    className="w-full py-3.5 bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-500 hover:to-orange-400 text-white font-black text-xs sm:text-sm rounded-2xl shadow-lg transition flex items-center justify-center space-x-2 cursor-pointer active:scale-95"
-                  >
-                    <Package className="w-4 h-4 text-white" />
-                    <span>
-                      {language === 'bn'
-                        ? 'অর্ডার ট্র্যাকিং ও বিস্তারিত দেখুন'
-                        : 'Track Order & View Details'}
+                
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 border-b border-gray-200 pb-3">
+                  <div>
+                    <span className="text-gray-500 font-medium block text-[11px]">
+                      {language === 'bn' ? 'অর্ডার নম্বর / তারিখ:' : 'Order ID & Date:'}
                     </span>
-                  </Link>
-                )}
-
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                  <Link
-                    href="/account"
-                    onClick={onClose}
-                    className="py-3 bg-slate-900 hover:bg-slate-800 text-white font-extrabold text-xs rounded-2xl shadow-md transition flex items-center justify-center space-x-1.5 cursor-pointer active:scale-95"
-                  >
-                    <User className="w-3.5 h-3.5 text-orange-400" />
-                    <span>{language === 'bn' ? 'আমার অ্যাকাউন্ট' : 'Go to My Account'}</span>
-                  </Link>
-
-                  <button
-                    onClick={onClose}
-                    className="py-3 bg-gray-100 hover:bg-gray-200 text-slate-700 font-extrabold text-xs rounded-2xl border border-gray-200 transition cursor-pointer active:scale-95"
-                  >
-                    {language === 'bn' ? 'কেনাকাটা চালিয়ে যান' : 'Continue Shopping'}
-                  </button>
+                    <span className="font-extrabold text-slate-900">
+                      {createdOrder.orderNumber} ({new Date(createdOrder.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })})
+                    </span>
+                  </div>
+                  <div>
+                    <span className="text-gray-500 font-medium block text-[11px]">
+                      {language === 'bn' ? 'গ্রাহক ও মোবাইল:' : 'Customer & Mobile:'}
+                    </span>
+                    <span className="font-extrabold text-slate-900">
+                      {createdOrder.customerName} ({createdOrder.customerPhone})
+                    </span>
+                  </div>
                 </div>
+
+                {/* Delivery Address */}
+                <div className="border-b border-gray-200 pb-3">
+                  <span className="text-gray-500 font-medium block text-[11px] flex items-center space-x-1">
+                    <MapPin className="w-3 h-3 text-orange-500 inline" />
+                    <span>{language === 'bn' ? 'ডেলিভারি ঠিকানা:' : 'Full Delivery Address:'}</span>
+                  </span>
+                  <p className="font-bold text-slate-900 mt-0.5">
+                    {createdOrder.shippingAddress.street}, {createdOrder.shippingAddress.upazila}, {createdOrder.shippingAddress.district}, {createdOrder.shippingAddress.division}
+                  </p>
+                </div>
+
+                {/* Order Item */}
+                <div className="flex items-center justify-between border-b border-gray-200 pb-3">
+                  <div className="flex items-center space-x-3">
+                    <img
+                      src={product.image}
+                      alt={product.name}
+                      className="w-12 h-12 object-contain bg-white p-1 rounded-lg border border-gray-200"
+                    />
+                    <div>
+                      <span className="font-extrabold text-slate-900 block line-clamp-1">
+                        {language === 'bn' ? product.nameBn : product.name}
+                      </span>
+                      <span className="text-[11px] text-gray-500 font-medium">
+                        ৳{product.price} x {quantity}
+                      </span>
+                    </div>
+                  </div>
+                  <span className="font-black text-slate-900">৳{itemTotal}</span>
+                </div>
+
+                {/* Price Breakdown */}
+                <div className="space-y-1 pt-1">
+                  <div className="flex justify-between text-gray-600">
+                    <span>{language === 'bn' ? 'পণ্য মূল্য:' : 'Subtotal:'}</span>
+                    <span className="font-bold text-slate-900">৳{itemTotal}</span>
+                  </div>
+                  <div className="flex justify-between text-gray-600">
+                    <span>{language === 'bn' ? 'ডেলিভারি চার্জ:' : 'Delivery Charge:'}</span>
+                    <span className="font-bold text-slate-900">৳{deliveryCharge}</span>
+                  </div>
+                  <div className="flex justify-between items-center text-sm font-black text-slate-900 pt-2 border-t border-gray-200">
+                    <span>{language === 'bn' ? 'সর্বমোট প্রদেয়:' : 'Total Amount Payable:'}</span>
+                    <span className="text-base text-orange-600 font-black">৳{totalPayable}</span>
+                  </div>
+                </div>
+
+                {/* Payment Method Badge */}
+                <div className="pt-2 flex items-center justify-between bg-emerald-50 p-2.5 rounded-xl border border-emerald-200">
+                  <span className="text-emerald-800 font-extrabold text-[11px]">
+                    {language === 'bn' ? 'পেমেন্ট মেথড: ক্যাশ অন ডেলিভারি' : 'Payment Method: Cash on Delivery'}
+                  </span>
+                  <span className="bg-emerald-600 text-white text-[10px] font-black px-2 py-0.5 rounded">
+                    UNPAID
+                  </span>
+                </div>
+
               </div>
+
+              {/* Action Buttons Grid */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2">
+                <button
+                  type="button"
+                  onClick={() => setShowDetailsModal(true)}
+                  className="py-3 px-4 bg-orange-500 hover:bg-orange-600 text-white font-extrabold text-xs rounded-xl shadow-md transition flex items-center justify-center space-x-2 cursor-pointer"
+                >
+                  <Truck className="w-4 h-4" />
+                  <span>{language === 'bn' ? 'অর্ডার ট্র্যাক করুন (7-Stage Live)' : 'Track Order (7-Stage Live)'}</span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => {
+                    onClose();
+                    router.push('/account');
+                  }}
+                  className="py-3 px-4 bg-slate-900 hover:bg-slate-800 text-white font-extrabold text-xs rounded-xl shadow-md transition flex items-center justify-center space-x-2 cursor-pointer"
+                >
+                  <User className="w-4 h-4" />
+                  <span>{language === 'bn' ? 'মাই অ্যাকাউন্টে যান' : 'Go to My Account'}</span>
+                </button>
+              </div>
+
+              <button
+                type="button"
+                onClick={onClose}
+                className="w-full py-3 bg-gray-100 hover:bg-gray-200 text-slate-800 font-bold text-xs rounded-xl transition cursor-pointer"
+              >
+                {language === 'bn' ? 'ঠিক আছে (শপিং চালিয়ে যান)' : 'Continue Shopping'}
+              </button>
+
             </div>
           ) : (
 
@@ -666,6 +764,13 @@ export const BuyNowModal: React.FC<BuyNowModalProps> = ({
         </div>
 
       </div>
+
+      {/* Embedded 7-Stage Live Order Tracker Modal */}
+      <OrderDetailsModal
+        order={createdOrder}
+        isOpen={showDetailsModal}
+        onClose={() => setShowDetailsModal(false)}
+      />
     </div>
   );
 };

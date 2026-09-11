@@ -12,8 +12,8 @@ import { ProductGrid } from '../catalog/ProductGrid';
 import { PRODUCTS } from '../catalog/mockData';
 
 interface HeaderProps {
-  searchQuery: string;
-  setSearchQuery: (query: string) => void;
+  searchQuery?: string;
+  setSearchQuery?: (query: string) => void;
   selectedCategory?: string;
   onSelectCategory?: (category: string) => void;
 }
@@ -52,7 +52,7 @@ const CATEGORY_META: Record<string, { en: string; bn: string; badge: string }> =
 };
 
 export const Header: React.FC<HeaderProps> = ({
-  searchQuery,
+  searchQuery = '',
   setSearchQuery,
   selectedCategory = 'all',
   onSelectCategory,
@@ -187,13 +187,13 @@ export const Header: React.FC<HeaderProps> = ({
                   type="text"
                   placeholder={animatedPlaceholder}
                   value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
+                  onChange={(e) => setSearchQuery?.(e.target.value)}
                   className="w-full bg-gray-100/90 text-gray-800 placeholder-gray-500 font-medium pl-10 pr-4 py-2 sm:py-2.5 text-xs sm:text-sm rounded-full border border-transparent focus:border-orange-500 focus:bg-white focus:ring-2 focus:ring-orange-500/20 outline-none transition-all"
                 />
                 <Search className="w-4 h-4 text-gray-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
                 {searchQuery && (
                   <button
-                    onClick={() => setSearchQuery('')}
+                    onClick={() => setSearchQuery?.('')}
                     className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 text-xs bg-gray-200 rounded-full w-4 h-4 flex items-center justify-center cursor-pointer"
                   >
                     ×
@@ -205,6 +205,18 @@ export const Header: React.FC<HeaderProps> = ({
             {/* Right Action Buttons */}
             <div className="flex items-center space-x-2 sm:space-x-3">
               
+              {/* My Account & Orders Button */}
+              <Link
+                href="/account"
+                className="p-2 sm:px-3 sm:py-2 bg-slate-100 hover:bg-slate-900 hover:text-white text-slate-800 rounded-xl border border-gray-200/90 shadow-2xs transition-all active:scale-95 flex items-center gap-1.5 cursor-pointer font-extrabold text-xs shrink-0"
+                title={language === 'bn' ? 'আমার অ্যাকাউন্ট ও অর্ডার ট্র্যাকিং' : 'My Account & Orders'}
+              >
+                <UserIcon className="w-4 h-4 text-orange-500" />
+                <span className="hidden sm:inline-block">
+                  {language === 'bn' ? 'মাই অ্যাকাউন্ট' : 'My Account'}
+                </span>
+              </Link>
+
               {/* Official Add to Cart / Bag Icon Button */}
               <button
                 onClick={openCart}
@@ -219,18 +231,6 @@ export const Header: React.FC<HeaderProps> = ({
                   </span>
                 )}
               </button>
-
-              {/* Account / Order Tracking Button */}
-              <Link
-                href="/account"
-                className="flex items-center space-x-1.5 bg-slate-900 hover:bg-slate-800 text-white px-3 py-2 rounded-full text-xs font-extrabold transition shadow-2xs active:scale-95 cursor-pointer shrink-0"
-                title="My Account & Track Orders"
-              >
-                <Package className="w-3.5 h-3.5 text-orange-400" />
-                <span className="hidden sm:inline-block">
-                  {language === 'bn' ? 'আমার অ্যাকাউন্ট' : 'My Account'}
-                </span>
-              </Link>
 
               {/* Auth Buttons */}
               {isAuthenticated ? (
@@ -251,13 +251,13 @@ export const Header: React.FC<HeaderProps> = ({
                 <div className="flex items-center space-x-1 sm:space-x-2">
                   <button
                     onClick={() => openAuthModal('register')}
-                    className="hidden lg:inline-flex px-3 py-2 text-xs font-bold text-slate-800 hover:text-orange-600 rounded-full hover:bg-gray-100 transition cursor-pointer"
+                    className="hidden sm:inline-flex px-3 py-2 text-xs font-bold text-slate-800 hover:text-orange-600 rounded-full hover:bg-gray-100 transition cursor-pointer"
                   >
                     {t.register}
                   </button>
                   <button
                     onClick={() => openAuthModal('login')}
-                    className="px-3 py-2 text-xs font-bold text-slate-800 hover:text-orange-600 bg-gray-100 hover:bg-gray-200 rounded-full transition active:scale-95 cursor-pointer"
+                    className="px-3.5 py-2 text-xs font-bold text-white bg-slate-900 hover:bg-slate-800 rounded-full shadow-sm transition active:scale-95 cursor-pointer"
                   >
                     {t.login}
                   </button>
