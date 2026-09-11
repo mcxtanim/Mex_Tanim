@@ -18,12 +18,15 @@ import {
   Phone,
   Building,
   Home,
+  Star,
 } from 'lucide-react';
 import { CustomerOrder } from './types';
 import { getCustomerOrders, getSavedCustomerAddress, getOrderStageIndex, ORDER_STAGES } from './orderSyncService';
+import { hasCustomerReviewedOrderItem } from '../catalog/reviewService';
 import { useLanguage } from '../shared/LanguageContext';
 import { useCart } from '../cart/CartContext';
 import { OrderDetailsModal } from './OrderDetailsModal';
+import { ReviewSubmitModal } from '../catalog/ReviewSubmitModal';
 
 export const MyAccountView: React.FC = () => {
   const { language } = useLanguage();
@@ -33,6 +36,20 @@ export const MyAccountView: React.FC = () => {
   const [savedAddress, setSavedAddress] = useState<any>(null);
   const [selectedOrder, setSelectedOrder] = useState<CustomerOrder | null>(null);
   const [isDetailsOpen, setIsDetailsOpen] = useState(false);
+
+  // Review Modal State
+  const [reviewModalData, setReviewModalData] = useState<{
+    isOpen: boolean;
+    orderId?: string;
+    productId: string;
+    productTitle: string;
+    productImage?: string;
+    customerName?: string;
+  }>({
+    isOpen: false,
+    productId: '',
+    productTitle: '',
+  });
 
   // Sync customer data & orders live on mount and interval
   const loadCustomerData = () => {
@@ -59,6 +76,17 @@ export const MyAccountView: React.FC = () => {
   const handleViewOrder = (order: CustomerOrder) => {
     setSelectedOrder(order);
     setIsDetailsOpen(true);
+  };
+
+  const handleOpenReview = (order: CustomerOrder, item: any) => {
+    setReviewModalData({
+      isOpen: true,
+      orderId: order.id,
+      productId: item.productId,
+      productTitle: item.title,
+      productImage: item.image,
+      customerName: order.customerName || savedAddress?.name || '',
+    });
   };
 
   return (
@@ -284,23 +312,50 @@ export const MyAccountView: React.FC = () => {
                   {/* Middle Product Thumbnails & Summary */}
                   <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                     <div className="flex items-center space-x-3 overflow-x-auto scrollbar-none py-1">
-                      {order.items.map((item, idx) => (
-                        <div key={idx} className="flex items-center space-x-2.5 bg-white p-2 rounded-xl border border-gray-200 shrink-0">
-                          <img
-                            src={item.image || 'https://images.unsplash.com/photo-1546435770-a3e426bf472b?auto=format&fit=crop&w=150&q=80'}
-                            alt={item.title}
-                            className="w-10 h-10 object-contain rounded-md bg-slate-50"
-                          />
-                          <div className="max-w-[140px]">
-                            <p className="font-extrabold text-xs text-slate-900 truncate">
-                              {item.title}
-                            </p>
-                            <p className="text-[10px] text-gray-500 font-semibold">
-                              x{item.quantity} • ৳{item.unitPrice}
-                            </p>
+                      {order.items.map((item, idx) => {
+                        const isDelivered = order.status === 'Delivered';
+                        const alreadyReviewed = hasCustomerReviewedOrderItem(order.id, item.productId);
+
+                        return (
+                          <div key={idx} className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 bg-white p-2.5 rounded-xl border border-gray-200 shrink-0">
+                            <div className="flex items-center space-x-2.5">
+                              <img
+                                src={item.image || 'https://images.unsplash.com/photo-1546435770-a3e426bf472b?auto=format&fit=crop&w=150&q=80'}
+                                alt={item.title}
+                                className="w-10 h-10 object-contain rounded-md bg-slate-50 border border-gray-100"
+                              />
+                              <div className="max-w-[150px]">
+                                <p className="font-extrabold text-xs text-slate-900 truncate">
+                                  {item.title}
+                                </p>
+                                <p className="text-[10px] text-gray-500 font-semibold">
+                                  x{item.quantity} • ৳{item.unitPrice}
+                                </p>
+                              </div>
+                            </div>
+
+                            {/* Verified Buyer Review Button (ONLY when status is Delivered) */}
+                            {isDelivered && (
+                              <div className="pt-1 sm:pt-0 sm:ml-2">
+                                {alreadyReviewed ? (
+                                  <span className="text-[10px] font-black text-emerald-700 bg-emerald-50 px-2 py-1 rounded-lg border border-emerald-200 flex items-center space-x-1">
+                                    <CheckCircle2 className="w-3 h-3 text-emerald-600 shrink-0" />
+                                    <span>{language === 'bn' ? '✓ রিভিউ দেওয়া হয়েছে' : '✓ Reviewed'}</span>
+                                  </span>
+                                ) : (
+                                  <button
+                                    onClick={() => handleOpenReview(order, item)}
+                                    className="px-2.5 py-1 bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 text-white font-extrabold text-[11px] rounded-lg shadow-xs transition active:scale-95 flex items-center space-x-1 cursor-pointer"
+                                  >
+                                    <Star className="w-3 h-3 fill-white stroke-[2.5]" />
+                                    <span>{language === 'bn' ? 'Verified Review দিন' : 'Write Verified Review'}</span>
+                                  </button>
+                                )}
+                              </div>
+                            )}
                           </div>
-                        </div>
-                      ))}
+                        );
+                      })}
                     </div>
 
                     <div className="text-right shrink-0 border-t sm:border-t-0 pt-2 sm:pt-0 border-gray-200">
@@ -344,6 +399,18 @@ export const MyAccountView: React.FC = () => {
         order={selectedOrder}
         isOpen={isDetailsOpen}
         onClose={() => setIsDetailsOpen(false)}
+      />
+
+      {/* VERIFIED BUYER REVIEW SUBMIT MODAL */}
+      <ReviewSubmitModal
+        isOpen={reviewModalData.isOpen}
+        onClose={() => setReviewModalData((prev) => ({ ...prev, isOpen: false }))}
+        orderId={reviewModalData.orderId}
+        productId={reviewModalData.productId}
+        productTitle={reviewModalData.productTitle}
+        productImage={reviewModalData.productImage}
+        customerName={reviewModalData.customerName}
+        onReviewSubmitted={() => loadCustomerData()}
       />
 
     </div>
