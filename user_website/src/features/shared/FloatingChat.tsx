@@ -116,11 +116,15 @@ export const FloatingChat: React.FC = () => {
   };
 
   const handleWhatsAppClick = () => {
-    window.open('https://wa.me/8801700000000', '_blank', 'noopener,noreferrer');
+    window.open('https://wa.me/8801317170609', '_blank', 'noopener,noreferrer');
   };
 
   const handleMessengerClick = () => {
     window.open('https://m.me/mextanimstore', '_blank', 'noopener,noreferrer');
+  };
+
+  const handleTelegramClick = () => {
+    window.open('https://t.me/mextanimstore', '_blank', 'noopener,noreferrer');
   };
 
   const handleWebChatClick = () => {
@@ -256,10 +260,10 @@ export const FloatingChat: React.FC = () => {
         </div>
       )}
 
-      {/* Floating Options Menu Stack */}
+      {/* Floating Options Menu Stack (Messenger, WhatsApp, Telegram, Web Chat) */}
       {isMenuOpen && (
         <div className="flex flex-col items-center gap-3 p-2 bg-white/90 backdrop-blur-md rounded-full shadow-2xl border border-white/60 animate-in fade-in slide-in-from-bottom-4 duration-200">
-          {/* Messenger Option */}
+          {/* 1. Messenger Option */}
           <button
             onClick={handleMessengerClick}
             className="group relative w-12 h-12 rounded-full bg-[#0084FF] hover:bg-[#0073E6] text-white shadow-md flex items-center justify-center transition-all duration-300 hover:scale-110 active:scale-95"
@@ -273,7 +277,7 @@ export const FloatingChat: React.FC = () => {
             </svg>
           </button>
 
-          {/* WhatsApp Option */}
+          {/* 2. WhatsApp Option */}
           <button
             onClick={handleWhatsAppClick}
             className="group relative w-12 h-12 rounded-full bg-[#25D366] hover:bg-[#20bd5a] text-white shadow-md flex items-center justify-center transition-all duration-300 hover:scale-110 active:scale-95"
@@ -287,7 +291,21 @@ export const FloatingChat: React.FC = () => {
             </svg>
           </button>
 
-          {/* Web Chat Option */}
+          {/* 3. Telegram Option */}
+          <button
+            onClick={handleTelegramClick}
+            className="group relative w-12 h-12 rounded-full bg-[#0088cc] hover:bg-[#0077b5] text-white shadow-md flex items-center justify-center transition-all duration-300 hover:scale-110 active:scale-95"
+            title="Telegram"
+          >
+            <span className="absolute right-14 bg-slate-900 text-white text-xs font-semibold px-2.5 py-1 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap shadow-md pointer-events-none">
+              Telegram
+            </span>
+            <svg className="w-6 h-6 fill-current" viewBox="0 0 24 24">
+              <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm4.64 6.8c-.15 1.58-.8 5.42-1.13 7.19-.14.75-.42 1-.68 1.03-.58.05-1.02-.38-1.58-.75-.88-.58-1.38-.94-2.23-1.5-.99-.65-.35-1.01.22-1.59.15-.15 2.71-2.48 2.76-2.69.01-.03.01-.14-.07-.2-.08-.06-.19-.04-.27-.02-.12.03-1.99 1.27-5.62 3.72-.53.36-1.01.54-1.44.53-.47-.01-1.38-.27-2.05-.49-.83-.27-1.49-.42-1.43-.89.03-.25.38-.51 1.07-.78 4.2-1.83 7-3.04 8.4-3.63 4-.17 4.83.52 4.77 1.07z"/>
+            </svg>
+          </button>
+
+          {/* 4. Web Chat Option */}
           <button
             onClick={handleWebChatClick}
             className="group relative w-12 h-12 rounded-full bg-[#0084FF] hover:bg-[#0073E6] text-white shadow-md flex items-center justify-center transition-all duration-300 hover:scale-110 active:scale-95"
