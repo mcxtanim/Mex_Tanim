@@ -33,6 +33,32 @@ export const FloatingChat: React.FC = () => {
 
   return (
     <div className="fixed bottom-6 right-6 z-50 flex flex-col items-end gap-3">
+      {/* Inline styles for 3 continuous slow wave animations */}
+      <style>{`
+        @keyframes continuousSlowWave {
+          0% {
+            transform: scale(0.95);
+            opacity: 0.75;
+          }
+          50% {
+            opacity: 0.45;
+          }
+          100% {
+            transform: scale(2.2);
+            opacity: 0;
+          }
+        }
+        .slow-wave-ring-1 {
+          animation: continuousSlowWave 3.6s cubic-bezier(0.1, 0.4, 0.7, 1) infinite 0s;
+        }
+        .slow-wave-ring-2 {
+          animation: continuousSlowWave 3.6s cubic-bezier(0.1, 0.4, 0.7, 1) infinite 1.2s;
+        }
+        .slow-wave-ring-3 {
+          animation: continuousSlowWave 3.6s cubic-bezier(0.1, 0.4, 0.7, 1) infinite 2.4s;
+        }
+      `}</style>
+
       {/* Web Chat Interface Modal */}
       {isWebChatOpen && (
         <div className="mb-2 w-80 sm:w-96 bg-white rounded-3xl shadow-2xl border border-gray-200/80 overflow-hidden animate-in slide-in-from-bottom duration-200">
@@ -76,7 +102,7 @@ export const FloatingChat: React.FC = () => {
         </div>
       )}
 
-      {/* Floating Options Menu Stack (Matching Image 1 vertical popup rail) */}
+      {/* Floating Options Menu Stack (Matching reference image vertical popup rail) */}
       {isMenuOpen && (
         <div className="flex flex-col items-center gap-3 p-2 bg-white/90 backdrop-blur-md rounded-full shadow-2xl border border-white/60 animate-in fade-in slide-in-from-bottom-4 duration-200">
           {/* 1. Messenger Option */}
@@ -118,23 +144,23 @@ export const FloatingChat: React.FC = () => {
             <span className="absolute right-14 bg-slate-900 text-white text-xs font-semibold px-2.5 py-1 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap shadow-md pointer-events-none">
               Web Chat
             </span>
-            {/* Outline Chat Bubble SVG matching Image 2 */}
-            <svg className="w-6 h-6 stroke-current stroke-2 fill-none" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+            {/* Outline Chat Bubble SVG matching reference image */}
+            <svg className="w-6 h-6 text-white stroke-[2.2] fill-none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M19 4H5a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h5l2.5 2.5a.7.7 0 0 0 1 0L18 16h1a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2z" />
             </svg>
           </button>
         </div>
       )}
 
-      {/* Main Floating Trigger Button with Pulsing Wave Animation */}
+      {/* Main Floating Trigger Button Container */}
       <div className="relative flex items-center justify-center">
-        {/* Expanding Wave Rings (Animated ripples matching Image 2) */}
+        {/* 3 Staggered Continuous Wave Rings (Matching reference image media_1789115835376.jpg) */}
         {!isMenuOpen && (
-          <>
-            <span className="absolute w-24 h-24 rounded-full border-2 border-blue-400/40 animate-ping opacity-60 pointer-events-none" />
-            <span className="absolute w-20 h-20 rounded-full border-2 border-blue-500/50 animate-ping opacity-80 pointer-events-none [animation-delay:400ms]" />
-            <span className="absolute w-16 h-16 rounded-full bg-blue-400/20 animate-pulse pointer-events-none" />
-          </>
+          <div className="absolute inset-0 pointer-events-none flex items-center justify-center">
+            <span className="absolute w-14 h-14 rounded-full border-[2.5px] border-[#0084FF]/70 slow-wave-ring-1" />
+            <span className="absolute w-14 h-14 rounded-full border-[2.5px] border-[#0084FF]/70 slow-wave-ring-2" />
+            <span className="absolute w-14 h-14 rounded-full border-[2.5px] border-[#0084FF]/70 slow-wave-ring-3" />
+          </div>
         )}
 
         {/* Trigger Button */}
@@ -149,8 +175,9 @@ export const FloatingChat: React.FC = () => {
           {isMenuOpen ? (
             <X className="w-6 h-6" />
           ) : (
-            <svg className="w-7 h-7 stroke-current stroke-2 fill-none" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+            /* Hubhu reference image speech bubble icon */
+            <svg className="w-7 h-7 text-white stroke-[2.2] fill-none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M19 4H5a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h5l2.5 2.5a.7.7 0 0 0 1 0L18 16h1a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2z" />
             </svg>
           )}
         </button>
