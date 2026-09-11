@@ -1,7 +1,8 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { Menu, Search, ShoppingBag, User as UserIcon, LogOut, Globe, X, RotateCcw } from 'lucide-react';
+import Link from 'next/link';
+import { Menu, Search, ShoppingBag, User as UserIcon, LogOut, Globe, X, RotateCcw, Package } from 'lucide-react';
 import { useCart } from '../cart/CartContext';
 import { useAuth } from '../auth/AuthContext';
 import { useLanguage } from './LanguageContext';
@@ -219,6 +220,18 @@ export const Header: React.FC<HeaderProps> = ({
                 )}
               </button>
 
+              {/* Account / Order Tracking Button */}
+              <Link
+                href="/account"
+                className="flex items-center space-x-1.5 bg-slate-900 hover:bg-slate-800 text-white px-3 py-2 rounded-full text-xs font-extrabold transition shadow-2xs active:scale-95 cursor-pointer shrink-0"
+                title="My Account & Track Orders"
+              >
+                <Package className="w-3.5 h-3.5 text-orange-400" />
+                <span className="hidden sm:inline-block">
+                  {language === 'bn' ? 'আমার অ্যাকাউন্ট' : 'My Account'}
+                </span>
+              </Link>
+
               {/* Auth Buttons */}
               {isAuthenticated ? (
                 <div className="flex items-center space-x-2 bg-gray-100 py-1.5 px-3 rounded-full border border-gray-200">
@@ -238,13 +251,13 @@ export const Header: React.FC<HeaderProps> = ({
                 <div className="flex items-center space-x-1 sm:space-x-2">
                   <button
                     onClick={() => openAuthModal('register')}
-                    className="hidden sm:inline-flex px-3 py-2 text-xs font-bold text-slate-800 hover:text-orange-600 rounded-full hover:bg-gray-100 transition cursor-pointer"
+                    className="hidden lg:inline-flex px-3 py-2 text-xs font-bold text-slate-800 hover:text-orange-600 rounded-full hover:bg-gray-100 transition cursor-pointer"
                   >
                     {t.register}
                   </button>
                   <button
                     onClick={() => openAuthModal('login')}
-                    className="px-3.5 py-2 text-xs font-bold text-white bg-slate-900 hover:bg-slate-800 rounded-full shadow-sm transition active:scale-95 cursor-pointer"
+                    className="px-3 py-2 text-xs font-bold text-slate-800 hover:text-orange-600 bg-gray-100 hover:bg-gray-200 rounded-full transition active:scale-95 cursor-pointer"
                   >
                     {t.login}
                   </button>
