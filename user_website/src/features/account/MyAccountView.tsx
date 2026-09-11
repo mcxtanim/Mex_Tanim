@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import Link from 'next/link';
 import {
   User,
   ShoppingBag,
@@ -16,6 +17,7 @@ import {
   Sparkles,
   Phone,
   Building,
+  Home,
 } from 'lucide-react';
 import { CustomerOrder } from './types';
 import { getCustomerOrders, getSavedCustomerAddress, getOrderStageIndex, ORDER_STAGES } from './orderSyncService';
@@ -60,7 +62,30 @@ export const MyAccountView: React.FC = () => {
   };
 
   return (
-    <div className="space-y-8 animate-in fade-in duration-300">
+    <div className="space-y-6 animate-in fade-in duration-300">
+      
+      {/* Homepage Shortcut Breadcrumb Navigation Bar */}
+      <nav className="flex items-center justify-between bg-white px-4 py-3 rounded-2xl border border-gray-200/90 shadow-2xs text-xs font-semibold">
+        <div className="flex items-center space-x-2">
+          <Link
+            href="/"
+            className="flex items-center gap-1.5 text-slate-800 font-extrabold bg-slate-100 hover:bg-slate-900 hover:text-white px-3 py-1.5 rounded-xl border border-gray-200 transition cursor-pointer active:scale-95 group"
+          >
+            <Home className="w-4 h-4 text-orange-500 group-hover:text-orange-400" />
+            <span>{language === 'bn' ? 'হোম পেজে ফিরুন' : 'Back to Home'}</span>
+          </Link>
+          <ChevronRight className="w-3.5 h-3.5 text-gray-300" />
+          <span className="text-slate-900 font-black">{language === 'bn' ? 'আমার অর্ডারসমূহ' : 'My Orders'}</span>
+        </div>
+
+        <Link
+          href="/"
+          className="hidden sm:flex items-center space-x-1.5 text-xs font-bold text-orange-600 hover:text-orange-700 hover:underline cursor-pointer"
+        >
+          <span>{language === 'bn' ? 'হোম পেজ শর্টকাট' : 'Homepage Shortcut'}</span>
+          <Home className="w-3.5 h-3.5" />
+        </Link>
+      </nav>
       
       {/* Account & Orders Banner */}
       <div className="bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 rounded-3xl p-6 sm:p-8 text-white shadow-xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6 border border-slate-800">
