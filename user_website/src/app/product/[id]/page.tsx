@@ -46,7 +46,7 @@ export default function DedicatedProductPage() {
 
   const [quantity, setQuantity] = useState(1);
   const [added, setAdded] = useState(false);
-  const [activeImage, setActiveImage] = useState<string>(product.image);
+  const [activeImage, setActiveImage] = useState<string>(product.image || '');
 
   // Zoom States
   const [isZoomed, setIsZoomed] = useState(false);
@@ -64,13 +64,19 @@ export default function DedicatedProductPage() {
     }
   }, [productId]);
 
+  // Safe non-empty image source fallback
+  const displayImage =
+    activeImage ||
+    product.image ||
+    'https://images.unsplash.com/photo-1546435770-a3e426bf472b?auto=format&fit=crop&w=600&q=80';
+
   // Gallery Images (Main image + comboImages)
   const galleryImages = Array.from(
     new Set([
       product.image,
       ...(product.comboImages || []),
     ])
-  );
+  ).filter((img) => Boolean(img));
 
   // Handle Cursor-Following Zoom
   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
@@ -147,7 +153,7 @@ export default function DedicatedProductPage() {
             <X className="w-6 h-6" />
           </button>
           <img
-            src={activeImage}
+            src={displayImage}
             alt={product.name}
             className="max-h-[85vh] max-w-[90vw] object-contain rounded-2xl shadow-2xl"
           />
@@ -209,7 +215,7 @@ export default function DedicatedProductPage() {
 
                 {/* Main Image with Cursor-Following Lens Zoom */}
                 <img
-                  src={activeImage}
+                  src={displayImage}
                   alt={product.name}
                   className="w-full h-full object-contain p-4 transition-transform duration-150 ease-out"
                   style={
@@ -231,7 +237,7 @@ export default function DedicatedProductPage() {
                       key={idx}
                       onClick={() => setActiveImage(imgUrl)}
                       className={`w-18 h-18 rounded-2xl border-2 p-1.5 bg-white overflow-hidden shrink-0 transition-all cursor-pointer ${
-                        activeImage === imgUrl
+                        displayImage === imgUrl
                           ? 'border-orange-500 shadow-md scale-105'
                           : 'border-gray-200 hover:border-gray-300 opacity-70 hover:opacity-100'
                       }`}

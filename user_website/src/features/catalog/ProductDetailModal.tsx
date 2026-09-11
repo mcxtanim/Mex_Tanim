@@ -40,7 +40,7 @@ export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
   const [currentProduct, setCurrentProduct] = useState<Product | null>(initialProduct);
   const [quantity, setQuantity] = useState(1);
   const [added, setAdded] = useState(false);
-  const [activeImage, setActiveImage] = useState<string>('');
+  const [activeImage, setActiveImage] = useState<string>(initialProduct?.image || '');
   
   // Image Zoom states
   const [isZoomed, setIsZoomed] = useState(false);
@@ -72,13 +72,19 @@ export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
 
   if (!currentProduct) return null;
 
+  // Safe non-empty image source fallback
+  const displayImage =
+    activeImage ||
+    currentProduct.image ||
+    'https://images.unsplash.com/photo-1546435770-a3e426bf472b?auto=format&fit=crop&w=600&q=80';
+
   // Gallery Images List (Main image + comboImages or alternative views)
   const galleryImages = Array.from(
     new Set([
       currentProduct.image,
       ...(currentProduct.comboImages || []),
     ])
-  );
+  ).filter((img) => Boolean(img));
 
   // Handle Cursor-Following Zoom
   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
@@ -160,7 +166,7 @@ export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
             <X className="w-6 h-6" />
           </button>
           <img
-            src={activeImage}
+            src={displayImage}
             alt={currentProduct.name}
             className="max-h-[85vh] max-w-[90vw] object-contain rounded-2xl shadow-2xl"
           />
@@ -218,7 +224,7 @@ export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
 
               {/* Main Image with Smooth Cursor-Following Zoom */}
               <img
-                src={activeImage}
+                src={displayImage}
                 alt={currentProduct.name}
                 className="w-full h-full object-contain p-4 transition-transform duration-150 ease-out"
                 style={
@@ -240,7 +246,7 @@ export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
                     key={idx}
                     onClick={() => setActiveImage(imgUrl)}
                     className={`w-16 h-16 rounded-2xl border-2 p-1 bg-white overflow-hidden shrink-0 transition-all cursor-pointer ${
-                      activeImage === imgUrl
+                      displayImage === imgUrl
                         ? 'border-orange-500 shadow-md scale-105'
                         : 'border-gray-200 hover:border-gray-300 opacity-70 hover:opacity-100'
                     }`}
@@ -298,7 +304,7 @@ export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
               <div className="flex items-baseline space-x-3">
                 <span className="text-3xl font-black text-slate-900">৳{currentProduct.price}</span>
                 {currentProduct.originalPrice > currentProduct.price && (
-                  <span className="text-base text-gray-400 line-through font-bold">
+                  <span className="text-sm text-gray-400 line-through font-bold">
                     ৳{currentProduct.originalPrice}
                   </span>
                 )}
