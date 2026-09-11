@@ -21,6 +21,7 @@ import { ProductCard } from './ProductCard';
 import { useCart } from '../cart/CartContext';
 import { useLanguage } from '../shared/LanguageContext';
 import { WhatsAppIcon } from '../shared/WhatsAppIcon';
+import { BuyNowModal } from '../checkout/BuyNowModal';
 
 const DEVELOPER_WHATSAPP = '8801317170609';
 
@@ -41,6 +42,7 @@ export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
   const [quantity, setQuantity] = useState(1);
   const [added, setAdded] = useState(false);
   const [activeImage, setActiveImage] = useState<string>(initialProduct?.image || '');
+  const [isBuyNowModalOpen, setIsBuyNowModalOpen] = useState(false);
   
   // Image Zoom states
   const [isZoomed, setIsZoomed] = useState(false);
@@ -103,11 +105,7 @@ export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
   };
 
   const handleBuyNow = () => {
-    addToCart(currentProduct, quantity);
-    onClose();
-    // Smooth scroll to checkout or open cart drawer if available
-    const cartButton = document.querySelector('[aria-label="Cart"]') as HTMLElement;
-    if (cartButton) cartButton.click();
+    setIsBuyNowModalOpen(true);
   };
 
   const handleWhatsAppOrder = () => {
@@ -506,6 +504,13 @@ export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
         )}
 
       </div>
+      {/* Buy Now Checkout Modal */}
+      <BuyNowModal
+        product={currentProduct}
+        isOpen={isBuyNowModalOpen}
+        initialQuantity={quantity}
+        onClose={() => setIsBuyNowModalOpen(false)}
+      />
     </div>
   );
 };

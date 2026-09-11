@@ -27,6 +27,7 @@ import { ProductCard } from '@/features/catalog/ProductCard';
 import { useCart } from '@/features/cart/CartContext';
 import { useLanguage } from '@/features/shared/LanguageContext';
 import { WhatsAppIcon } from '@/features/shared/WhatsAppIcon';
+import { BuyNowModal } from '@/features/checkout/BuyNowModal';
 
 const DEVELOPER_WHATSAPP = '8801317170609';
 
@@ -47,6 +48,7 @@ export default function DedicatedProductPage() {
   const [quantity, setQuantity] = useState(1);
   const [added, setAdded] = useState(false);
   const [activeImage, setActiveImage] = useState<string>(product.image || '');
+  const [isBuyNowModalOpen, setIsBuyNowModalOpen] = useState(false);
 
   // Zoom States
   const [isZoomed, setIsZoomed] = useState(false);
@@ -58,9 +60,8 @@ export default function DedicatedProductPage() {
   // Sync active image when product changes
   useEffect(() => {
     if (product) {
-      setActiveImage(product.image);
+      setActiveImage(product.image || '');
       setQuantity(1);
-      window.scrollTo({ top: 0, behavior: 'smooth' });
     }
   }, [productId]);
 
@@ -95,9 +96,7 @@ export default function DedicatedProductPage() {
   };
 
   const handleBuyNow = () => {
-    addToCart(product, quantity);
-    const cartButton = document.querySelector('[aria-label="Cart"]') as HTMLElement;
-    if (cartButton) cartButton.click();
+    setIsBuyNowModalOpen(true);
   };
 
   const handleWhatsAppOrder = () => {
@@ -498,6 +497,14 @@ export default function DedicatedProductPage() {
 
         </main>
       </div>
+
+      {/* Buy Now Checkout Modal */}
+      <BuyNowModal
+        product={product}
+        isOpen={isBuyNowModalOpen}
+        initialQuantity={quantity}
+        onClose={() => setIsBuyNowModalOpen(false)}
+      />
 
       {/* Site Footer */}
       <Footer />

@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 import { X, Trash2, Plus, Minus, ShoppingBag, ArrowRight, CheckCircle2 } from 'lucide-react';
 import { useCart } from './CartContext';
 import { useLanguage } from '../shared/LanguageContext';
+import { BuyNowModal } from '../checkout/BuyNowModal';
 
 export const CartDrawer: React.FC = () => {
   const {
@@ -20,18 +21,16 @@ export const CartDrawer: React.FC = () => {
 
   const { t, language } = useLanguage();
   const [orderSuccess, setOrderSuccess] = useState(false);
+  const [isBuyNowModalOpen, setIsBuyNowModalOpen] = useState(false);
 
   if (!isCartOpen) return null;
 
   const total = subtotal + (cart.length > 0 ? deliveryFee : 0);
 
   const handleCheckout = () => {
-    setOrderSuccess(true);
-    setTimeout(() => {
-      clearCart();
-      setOrderSuccess(false);
-      closeCart();
-    }, 2500);
+    if (cart.length > 0) {
+      setIsBuyNowModalOpen(true);
+    }
   };
 
   return (
@@ -207,6 +206,18 @@ export const CartDrawer: React.FC = () => {
 
         </div>
       </div>
+
+      {/* Checkout BuyNow Modal */}
+      <BuyNowModal
+        product={cart[0]?.product || null}
+        isOpen={isBuyNowModalOpen}
+        initialQuantity={cart[0]?.quantity || 1}
+        onClose={() => {
+          setIsBuyNowModalOpen(false);
+          clearCart();
+          closeCart();
+        }}
+      />
     </div>
   );
 };
