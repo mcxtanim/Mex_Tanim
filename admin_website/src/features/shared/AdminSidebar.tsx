@@ -24,6 +24,7 @@ export function AdminSidebar() {
     { name: "Orders", href: "/orders", icon: ShoppingCart },
     { name: "Categories", href: "/categories", icon: FolderTree },
     { name: "Reviews", href: "/reviews", icon: Star },
+    { name: "Settings", href: "/settings", icon: Settings },
   ];
 
   return (
