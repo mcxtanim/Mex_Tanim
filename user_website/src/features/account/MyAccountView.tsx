@@ -106,14 +106,6 @@ export const MyAccountView: React.FC = () => {
           <ChevronRight className="w-3.5 h-3.5 text-gray-300" />
           <span className="text-slate-900 font-black">{language === 'bn' ? 'আমার অর্ডারসমূহ' : 'My Orders'}</span>
         </div>
-
-        <Link
-          href="/"
-          className="hidden sm:flex items-center space-x-1.5 text-xs font-bold text-orange-600 hover:text-orange-700 hover:underline cursor-pointer"
-        >
-          <span>{language === 'bn' ? 'হোম পেজ শর্টকাট' : 'Homepage Shortcut'}</span>
-          <Home className="w-3.5 h-3.5" />
-        </Link>
       </nav>
       
       {/* Account & Orders Banner */}
