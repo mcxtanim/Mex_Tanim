@@ -1,19 +1,28 @@
 'use client';
 
 import React from 'react';
-import { Star, ShoppingBag, Zap, ShieldCheck } from 'lucide-react';
+import { useRouter } from 'next/navigation';
+import { Star, ShoppingBag } from 'lucide-react';
 import { Product } from './types';
 import { useCart } from '../cart/CartContext';
 import { useLanguage } from '../shared/LanguageContext';
 
 interface ProductCardProps {
   product: Product;
-  onSelect: (product: Product) => void;
+  onSelect?: (product: Product) => void;
 }
 
 export const ProductCard: React.FC<ProductCardProps> = ({ product, onSelect }) => {
+  const router = useRouter();
   const { addToCart } = useCart();
   const { t, language } = useLanguage();
+
+  const handleCardClick = () => {
+    if (onSelect) {
+      onSelect(product);
+    }
+    router.push(`/product/${product.id}`);
+  };
 
   const discountPercent = product.originalPrice
     ? Math.round(((product.originalPrice - product.price) / product.originalPrice) * 100)
@@ -27,7 +36,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product, onSelect }) =
       
       {/* Product Image & Badges */}
       <div
-        onClick={() => onSelect(product)}
+        onClick={handleCardClick}
         className="relative w-full h-48 sm:h-52 bg-slate-50 overflow-hidden cursor-pointer"
       >
         <img
@@ -38,14 +47,14 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product, onSelect }) =
 
         {/* Discount Badge */}
         {discountPercent > 0 && (
-          <span className="absolute top-2.5 left-2.5 bg-orange-500 text-white text-[10px] font-black px-2 py-0.5 rounded-md shadow-sm uppercase tracking-wider">
+          <span className="absolute top-2.5 left-2.5 bg-orange-500 text-white text-[10px] font-black px-2 py-0.5 rounded-md shadow-sm uppercase tracking-wider z-10">
             -{discountPercent}% {t.discount}
           </span>
         )}
 
         {/* Stock Badge */}
         <span
-          className={`absolute top-2.5 right-2.5 text-[10px] font-bold px-2 py-0.5 rounded-md backdrop-blur-md shadow-xs ${
+          className={`absolute top-2.5 right-2.5 text-[10px] font-bold px-2 py-0.5 rounded-md backdrop-blur-md shadow-xs z-10 ${
             product.inStock
               ? 'bg-emerald-500/90 text-white'
               : 'bg-red-500/90 text-white'
@@ -60,7 +69,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product, onSelect }) =
         <div>
           <div className="flex items-center justify-between text-xs text-gray-500 mb-1">
             <span className="font-semibold text-orange-600 uppercase text-[10px] tracking-wider">
-              {product.category}
+              {product.categoryBn || product.category}
             </span>
             <div className="flex items-center space-x-1 text-amber-500 font-bold text-[11px]">
               <Star className="w-3.5 h-3.5 fill-amber-400 text-amber-400" />
@@ -69,7 +78,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product, onSelect }) =
           </div>
 
           <h3
-            onClick={() => onSelect(product)}
+            onClick={handleCardClick}
             className="font-bold text-sm text-slate-900 line-clamp-1 hover:text-orange-600 transition cursor-pointer"
           >
             {title}
@@ -98,9 +107,12 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product, onSelect }) =
 
           {/* Official Add to Cart Thumbnail Button */}
           <button
-            onClick={() => addToCart(product)}
+            onClick={(e) => {
+              e.stopPropagation();
+              addToCart(product);
+            }}
             disabled={!product.inStock}
-            className="flex items-center space-x-1.5 px-3 py-2 bg-slate-900 hover:bg-orange-500 text-white rounded-xl font-bold text-xs shadow-md transition-all active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed group/btn"
+            className="flex items-center space-x-1.5 px-3 py-2 bg-slate-900 hover:bg-orange-500 text-white rounded-xl font-bold text-xs shadow-md transition-all active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed group/btn cursor-pointer"
             title={t.addToCart}
           >
             <ShoppingBag className="w-4 h-4 text-orange-400 group-hover/btn:text-white transition-colors" />
