@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import {
   X,
@@ -48,6 +48,7 @@ export const BuyNowModal: React.FC<BuyNowModalProps> = ({
   onClose,
 }) => {
   const router = useRouter();
+  const modalBodyRef = useRef<HTMLDivElement>(null);
   const { language } = useLanguage();
   const { clearCart, removeFromCart } = useCart();
 
@@ -69,6 +70,13 @@ export const BuyNowModal: React.FC<BuyNowModalProps> = ({
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [createdOrder, setCreatedOrder] = useState<CustomerOrder | null>(null);
   const [showDetailsModal, setShowDetailsModal] = useState(false);
+
+  const triggerError = (msg: string) => {
+    setErrorMsg(msg);
+    if (modalBodyRef.current) {
+      modalBodyRef.current.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  };
 
   // Synchronize initial quantity when modal opens
   useEffect(() => {
@@ -147,12 +155,12 @@ export const BuyNowModal: React.FC<BuyNowModalProps> = ({
 
     // Validation
     if (!name.trim()) {
-      setErrorMsg(language === 'bn' ? 'অনুগ্রহ করে আপনার নাম লিখুন' : 'Please enter your name');
+      triggerError(language === 'bn' ? 'অনুগ্রহ করে আপনার নাম লিখুন' : 'Please enter your name');
       return;
     }
 
     if (!phone.trim() || phone.trim().length < 11 || !phone.trim().startsWith('01')) {
-      setErrorMsg(
+      triggerError(
         language === 'bn'
           ? 'অনুগ্রহ করে একটি সঠিক ১১ ডিজিটের মোবাইল নম্বর দিন (যেমন: 01700000000)'
           : 'Please enter a valid 11-digit mobile number (e.g. 01700000000)'
@@ -161,22 +169,22 @@ export const BuyNowModal: React.FC<BuyNowModalProps> = ({
     }
 
     if (!division) {
-      setErrorMsg(language === 'bn' ? 'অনুগ্রহ করে আপনার বিভাগ সিলেক্ট করুন' : 'Please select your Division');
+      triggerError(language === 'bn' ? 'অনুগ্রহ করে আপনার বিভাগ সিলেক্ট করুন' : 'Please select your Division');
       return;
     }
 
     if (!district) {
-      setErrorMsg(language === 'bn' ? 'অনুগ্রহ করে আপনার জেলা সিলেক্ট করুন' : 'Please select your District');
+      triggerError(language === 'bn' ? 'অনুগ্রহ করে আপনার জেলা সিলেক্ট করুন' : 'Please select your District');
       return;
     }
 
     if (!upazila) {
-      setErrorMsg(language === 'bn' ? 'অনুগ্রহ করে আপনার উপজেলা সিলেক্ট করুন' : 'Please select your Upazila');
+      triggerError(language === 'bn' ? 'অনুগ্রহ করে আপনার উপজেলা সিলেক্ট করুন' : 'Please select your Upazila');
       return;
     }
 
     if (!area.trim()) {
-      setErrorMsg(
+      triggerError(
         language === 'bn'
           ? 'অনুগ্রহ করে আপনার বিস্তারিত ঠিকানা / এলাকা লিখুন'
           : 'Please enter your exact area / street location'
@@ -279,6 +287,10 @@ export const BuyNowModal: React.FC<BuyNowModalProps> = ({
       const updatedOrders = [adminOrderObj, ...existingOrders];
       localStorage.setItem(ADMIN_ORDERS_KEY, JSON.stringify(updatedOrders));
 
+      if (typeof window !== 'undefined') {
+        window.dispatchEvent(new Event('storage'));
+      }
+
       // Clear product from cart if present
       removeFromCart(product.id);
 
@@ -297,10 +309,10 @@ export const BuyNowModal: React.FC<BuyNowModalProps> = ({
 
       setIsSubmitting(false);
       setCreatedOrder(fullOrder);
-    } catch (err) {
+    } catch (err: any) {
       console.error('Order creation error:', err);
       setIsSubmitting(false);
-      setErrorMsg(language === 'bn' ? 'অর্ডার প্রসেস করতে সমস্যা হয়েছে। আবার চেষ্টা করুন।' : 'Failed to place order. Please try again.');
+      triggerError(err?.message || (language === 'bn' ? 'অর্ডার প্রসেস করতে সমস্যা হয়েছে। আবার চেষ্টা করুন।' : 'Failed to place order. Please try again.'));
     }
   };
 
@@ -338,7 +350,7 @@ export const BuyNowModal: React.FC<BuyNowModalProps> = ({
         </div>
 
         {/* Modal Body Container */}
-        <div className="overflow-y-auto p-4 sm:p-6 space-y-6 flex-1 scrollbar-thin">
+        <div ref={modalBodyRef} className="overflow-y-auto p-4 sm:p-6 space-y-6 flex-1 scrollbar-thin">
 
           {/* SUCCESS SCREEN VIEW */}
           {createdOrder ? (
@@ -531,7 +543,7 @@ export const BuyNowModal: React.FC<BuyNowModalProps> = ({
           ) : (
 
             /* CHECKOUT FORM VIEW */
-            <form onSubmit={handleConfirmOrder} className="space-y-6">
+            <form onSubmit={handleConfirmOrder} noValidate className="space-y-6">
 
               {/* 1. ORDER SUMMARY SECTION */}
               <div className="bg-gradient-to-br from-slate-50 to-orange-50/40 border border-gray-200/90 rounded-2xl p-3.5 sm:p-4 space-y-3">
@@ -791,6 +803,14 @@ export const BuyNowModal: React.FC<BuyNowModalProps> = ({
                     </span>
                   </div>
                 </div>
+
+                {/* Bottom Error Banner */}
+                {errorMsg && (
+                  <div className="p-3.5 bg-red-50 border border-red-200 text-red-700 rounded-xl text-xs font-bold flex items-center space-x-2 animate-in fade-in">
+                    <AlertCircle className="w-4 h-4 shrink-0" />
+                    <span>{errorMsg}</span>
+                  </div>
+                )}
 
                 <button
                   type="submit"
