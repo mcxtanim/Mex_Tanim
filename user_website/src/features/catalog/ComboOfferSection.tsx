@@ -6,7 +6,7 @@ import { ProductDetailModal } from './ProductDetailModal';
 import { COMBO_PRODUCTS } from './mockData';
 import { Product } from './types';
 import { useLanguage } from '../shared/LanguageContext';
-import { Flame, ChevronLeft, ChevronRight, Gift, ShoppingCart, Star } from 'lucide-react';
+import { Flame, ChevronLeft, ChevronRight, Gift, ShoppingCart, Star, Plus } from 'lucide-react';
 import { useCart } from '../cart/CartContext';
 
 export const ComboOfferSection: React.FC = () => {
@@ -26,7 +26,7 @@ export const ComboOfferSection: React.FC = () => {
         if (scrollLeft + clientWidth >= scrollWidth - 10) {
           carouselRef.current.scrollTo({ left: 0, behavior: 'smooth' });
         } else {
-          carouselRef.current.scrollBy({ left: 320, behavior: 'smooth' });
+          carouselRef.current.scrollBy({ left: 330, behavior: 'smooth' });
         }
       }
     }, 3500);
@@ -36,7 +36,7 @@ export const ComboOfferSection: React.FC = () => {
 
   const handleScroll = (direction: 'left' | 'right') => {
     if (carouselRef.current) {
-      const scrollAmount = direction === 'left' ? -340 : 340;
+      const scrollAmount = direction === 'left' ? -350 : 350;
       carouselRef.current.scrollBy({ left: scrollAmount, behavior: 'smooth' });
     }
   };
@@ -97,32 +97,53 @@ export const ComboOfferSection: React.FC = () => {
         {COMBO_PRODUCTS.map((comboProduct) => (
           <div
             key={comboProduct.id}
-            className="min-w-[280px] sm:min-w-[320px] max-w-[330px] shrink-0 snap-start bg-white rounded-3xl border border-gray-200/90 shadow-2xs hover:shadow-xl hover:border-orange-400 transition-all duration-300 flex flex-col justify-between overflow-hidden group cursor-pointer"
+            className="min-w-[300px] sm:min-w-[340px] max-w-[350px] shrink-0 snap-start bg-white rounded-3xl border border-gray-200/90 shadow-2xs hover:shadow-xl hover:border-orange-400 transition-all duration-300 flex flex-col justify-between overflow-hidden group cursor-pointer"
             onClick={() => setSelectedProduct(comboProduct)}
           >
-            {/* Combo Card Header & Image */}
-            <div className="relative p-4 bg-slate-50/60 text-center overflow-hidden">
+            {/* Combo Multi-Product Image Area */}
+            <div className="relative p-3.5 bg-slate-50/70 overflow-hidden border-b border-gray-100">
               {/* Discount Badge */}
-              <span className="absolute top-3 left-3 bg-gradient-to-r from-red-600 to-orange-500 text-white text-[11px] font-black px-2.5 py-1 rounded-full shadow-md z-10 uppercase tracking-wide">
+              <span className="absolute top-3 left-3 bg-gradient-to-r from-red-600 to-orange-500 text-white text-[11px] font-black px-2.5 py-1 rounded-full shadow-md z-20 uppercase tracking-wide">
                 {comboProduct.discountBadge}
               </span>
 
               {/* Sold Count Badge */}
               {comboProduct.soldCount && (
-                <span className="absolute top-3 right-3 bg-slate-900/80 backdrop-blur-md text-orange-400 text-[10px] font-extrabold px-2.5 py-1 rounded-full border border-slate-700 flex items-center gap-1 z-10">
+                <span className="absolute top-3 right-3 bg-slate-900/80 backdrop-blur-md text-orange-400 text-[10px] font-extrabold px-2.5 py-1 rounded-full border border-slate-700 flex items-center gap-1 z-20">
                   <Flame className="w-3 h-3 fill-orange-400" />
                   {comboProduct.soldCount} {language === 'bn' ? 'বিক্রি' : 'Sold'}
                 </span>
               )}
 
-              {/* Product Image */}
-              <div className="w-full h-44 sm:h-48 flex items-center justify-center p-2">
-                <img
-                  src={comboProduct.image}
-                  alt={comboProduct.name}
-                  className="max-h-full max-w-full object-contain group-hover:scale-105 transition-transform duration-300 drop-shadow-md"
-                />
-              </div>
+              {/* Multi-Item Product Images Layout (Showing all combo items together with + symbols) */}
+              {comboProduct.comboImages && comboProduct.comboImages.length > 0 ? (
+                <div className="pt-7 pb-1 px-1 flex items-center justify-center gap-1.5 h-44 sm:h-48">
+                  {comboProduct.comboImages.map((imgSrc, idx) => (
+                    <React.Fragment key={idx}>
+                      <div className="flex-1 h-32 sm:h-36 bg-white rounded-2xl p-1.5 border border-gray-200/80 shadow-xs flex items-center justify-center group-hover:scale-105 transition-transform duration-300">
+                        <img
+                          src={imgSrc}
+                          alt={`Combo item ${idx + 1}`}
+                          className="max-h-full max-w-full object-contain drop-shadow-xs"
+                        />
+                      </div>
+                      {idx < comboProduct.comboImages!.length - 1 && (
+                        <div className="w-5 h-5 rounded-full bg-gradient-to-r from-orange-500 to-amber-500 text-white font-black text-xs flex items-center justify-center shadow-md shrink-0 z-10">
+                          +
+                        </div>
+                      )}
+                    </React.Fragment>
+                  ))}
+                </div>
+              ) : (
+                <div className="w-full h-44 sm:h-48 flex items-center justify-center p-2 pt-6">
+                  <img
+                    src={comboProduct.image}
+                    alt={comboProduct.name}
+                    className="max-h-full max-w-full object-contain group-hover:scale-105 transition-transform duration-300 drop-shadow-md"
+                  />
+                </div>
+              )}
             </div>
 
             {/* Combo Card Content */}
@@ -130,8 +151,8 @@ export const ComboOfferSection: React.FC = () => {
               <div>
                 {/* Rating & Category */}
                 <div className="flex items-center justify-between text-xs text-gray-500 mb-1.5">
-                  <span className="bg-orange-50 text-orange-600 font-extrabold text-[10px] uppercase px-2 py-0.5 rounded-md border border-orange-200">
-                    COMBO BUNDLE
+                  <span className="bg-orange-50 text-orange-600 font-extrabold text-[10px] uppercase px-2.5 py-0.5 rounded-md border border-orange-200">
+                    COMBO BUNDLE ({comboProduct.comboImages?.length || 2} ITEMS)
                   </span>
                   <div className="flex items-center space-x-1 text-amber-500 font-bold">
                     <Star className="w-3.5 h-3.5 fill-amber-400 text-amber-400" />
@@ -160,7 +181,7 @@ export const ComboOfferSection: React.FC = () => {
                     )}
                   </div>
                   <span className="text-[10px] text-emerald-600 font-extrabold block">
-                    {language === 'bn' ? 'ফ্রি ডেলিভারি সুযোগ' : 'Combo Special Deal'}
+                    {language === 'bn' ? 'কম্বো স্পেশাল ডিল' : 'Combo Special Deal'}
                   </span>
                 </div>
 

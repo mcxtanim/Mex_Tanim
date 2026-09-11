@@ -10,6 +10,7 @@ export interface Product {
   rating: number;
   reviewCount: number;
   image: string;
+  comboImages?: string[];
   inStock: boolean;
   isPopular?: boolean;
   isFeatured?: boolean;

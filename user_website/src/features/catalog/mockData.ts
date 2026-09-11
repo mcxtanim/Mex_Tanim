@@ -281,7 +281,7 @@ export const PRODUCTS: Product[] = [
   },
 ];
 
-// Exclusive COMBO OFFER Bundle Products
+// Exclusive COMBO OFFER Bundle Products with multi-product images
 export const COMBO_PRODUCTS: Product[] = [
   {
     id: 'combo-1',
@@ -294,7 +294,12 @@ export const COMBO_PRODUCTS: Product[] = [
     discountBadge: '-36% OFF',
     rating: 5.0,
     reviewCount: 185,
-    image: 'https://images.unsplash.com/photo-1547394765-185e1e68f34e?auto=format&fit=crop&w=600&q=80',
+    image: 'https://images.unsplash.com/photo-1587829741301-dc798b83add3?auto=format&fit=crop&w=600&q=80',
+    comboImages: [
+      'https://images.unsplash.com/photo-1587829741301-dc798b83add3?auto=format&fit=crop&w=400&q=80', // Keyboard
+      'https://images.unsplash.com/photo-1615663245857-ac93bb7c39e7?auto=format&fit=crop&w=400&q=80', // Mouse
+      'https://images.unsplash.com/photo-1547394765-185e1e68f34e?auto=format&fit=crop&w=400&q=80', // Mousepad
+    ],
     inStock: true,
     isPopular: true,
     isComboOffer: true,
@@ -315,6 +320,11 @@ export const COMBO_PRODUCTS: Product[] = [
     rating: 4.9,
     reviewCount: 320,
     image: 'https://images.unsplash.com/photo-1592840496694-26d035b52b48?auto=format&fit=crop&w=600&q=80',
+    comboImages: [
+      'https://images.unsplash.com/photo-1592840496694-26d035b52b48?auto=format&fit=crop&w=400&q=80', // Finger sleeves
+      'https://images.unsplash.com/photo-1583863788434-e58a36330cf0?auto=format&fit=crop&w=400&q=80', // Fast charger
+      'https://images.unsplash.com/photo-1544816155-12df9643f363?auto=format&fit=crop&w=400&q=80', // Braided cable
+    ],
     inStock: true,
     isPopular: true,
     isComboOffer: true,
@@ -334,7 +344,11 @@ export const COMBO_PRODUCTS: Product[] = [
     discountBadge: '-34% OFF',
     rating: 4.9,
     reviewCount: 142,
-    image: 'https://images.unsplash.com/photo-1545454675-3531b543be5d?auto=format&fit=crop&w=600&q=80',
+    image: 'https://images.unsplash.com/photo-1546435770-a3e426bf472b?auto=format&fit=crop&w=600&q=80',
+    comboImages: [
+      'https://images.unsplash.com/photo-1546435770-a3e426bf472b?auto=format&fit=crop&w=400&q=80', // Headset
+      'https://images.unsplash.com/photo-1545454675-3531b543be5d?auto=format&fit=crop&w=400&q=80', // Speaker
+    ],
     inStock: true,
     isPopular: true,
     isComboOffer: true,
@@ -345,7 +359,7 @@ export const COMBO_PRODUCTS: Product[] = [
   },
   {
     id: 'combo-4',
-    name: 'Streamer Pro Bundle: Tri-Mode Wireless Keyboard + Lightweight Mouse',
+    name: 'Streamer Pro Bundle: Tri-Mode Wireless Keyboard + Lightweight RGB Mouse',
     nameBn: 'স্ট্রিমার প্রো বান্ডেল: ওয়্যারলেস মেকানিক্যাল কীবোর্ড + আরজিবি মাউস',
     category: 'keyboards',
     categoryBn: 'কম্বো অফার',
@@ -355,6 +369,10 @@ export const COMBO_PRODUCTS: Product[] = [
     rating: 5.0,
     reviewCount: 96,
     image: 'https://images.unsplash.com/photo-1595225476474-87563907a212?auto=format&fit=crop&w=600&q=80',
+    comboImages: [
+      'https://images.unsplash.com/photo-1595225476474-87563907a212?auto=format&fit=crop&w=400&q=80', // Keyboard
+      'https://images.unsplash.com/photo-1527864550417-7fd91fc51a46?auto=format&fit=crop&w=400&q=80', // Mouse
+    ],
     inStock: true,
     isPopular: true,
     isComboOffer: true,
@@ -375,6 +393,10 @@ export const COMBO_PRODUCTS: Product[] = [
     rating: 4.8,
     reviewCount: 210,
     image: 'https://images.unsplash.com/photo-1621607512214-68297480165e?auto=format&fit=crop&w=600&q=80',
+    comboImages: [
+      'https://images.unsplash.com/photo-1621607512214-68297480165e?auto=format&fit=crop&w=400&q=80', // Trimmer
+      'https://images.unsplash.com/photo-1585338107529-13afc5f02586?auto=format&fit=crop&w=400&q=80', // Charger
+    ],
     inStock: true,
     isPopular: false,
     isComboOffer: true,
@@ -395,6 +417,10 @@ export const COMBO_PRODUCTS: Product[] = [
     rating: 4.9,
     reviewCount: 285,
     image: 'https://images.unsplash.com/photo-1511512578047-dfb367046420?auto=format&fit=crop&w=600&q=80',
+    comboImages: [
+      'https://images.unsplash.com/photo-1511512578047-dfb367046420?auto=format&fit=crop&w=400&q=80', // Sleeves
+      'https://images.unsplash.com/photo-1544816155-12df9643f363?auto=format&fit=crop&w=400&q=80', // Cable
+    ],
     inStock: true,
     isPopular: true,
     isComboOffer: true,
