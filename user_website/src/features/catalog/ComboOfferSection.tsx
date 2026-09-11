@@ -1,8 +1,8 @@
 'use client';
 
 import React, { useState, useEffect, useRef } from 'react';
+import { useRouter } from 'next/navigation';
 import { ProductCard } from './ProductCard';
-import { ProductDetailModal } from './ProductDetailModal';
 import { COMBO_PRODUCTS } from './mockData';
 import { Product } from './types';
 import { useLanguage } from '../shared/LanguageContext';
@@ -10,7 +10,7 @@ import { Flame, ChevronLeft, ChevronRight, Gift, ShoppingCart, Star, Plus } from
 import { useCart } from '../cart/CartContext';
 
 export const ComboOfferSection: React.FC = () => {
-  const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
+  const router = useRouter();
   const [isHovered, setIsHovered] = useState(false);
   const { language } = useLanguage();
   const { addToCart } = useCart();
@@ -98,7 +98,7 @@ export const ComboOfferSection: React.FC = () => {
           <div
             key={comboProduct.id}
             className="min-w-[300px] sm:min-w-[340px] max-w-[350px] shrink-0 snap-start bg-white rounded-3xl border border-gray-200/90 shadow-2xs hover:shadow-xl hover:border-orange-400 transition-all duration-300 flex flex-col justify-between overflow-hidden group cursor-pointer"
-            onClick={() => setSelectedProduct(comboProduct)}
+            onClick={() => router.push(`/product/${comboProduct.id}`)}
           >
             {/* Combo Multi-Product Image Area */}
             <div className="relative p-3.5 bg-slate-50/70 overflow-hidden border-b border-gray-100">
@@ -201,14 +201,6 @@ export const ComboOfferSection: React.FC = () => {
           </div>
         ))}
       </div>
-
-      {/* Product Detail Popup Modal */}
-      {selectedProduct && (
-        <ProductDetailModal
-          product={selectedProduct}
-          onClose={() => setSelectedProduct(null)}
-        />
-      )}
     </section>
   );
 };

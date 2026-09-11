@@ -497,12 +497,7 @@ export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
                   key={relProd.id}
                   className="min-w-[240px] sm:min-w-[270px] max-w-[280px] shrink-0 snap-start transition-transform duration-200 hover:scale-[1.02]"
                 >
-                  <ProductCard
-                    product={relProd}
-                    onSelect={(p) => {
-                      setCurrentProduct(p);
-                    }}
-                  />
+                  <ProductCard product={relProd} />
                 </div>
               ))}
             </div>

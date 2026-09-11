@@ -10,18 +10,14 @@ import { useLanguage } from '../shared/LanguageContext';
 
 interface ProductCardProps {
   product: Product;
-  onSelect?: (product: Product) => void;
 }
 
-export const ProductCard: React.FC<ProductCardProps> = ({ product, onSelect }) => {
+export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
   const router = useRouter();
   const { addToCart } = useCart();
   const { t, language } = useLanguage();
 
   const handleCardClick = () => {
-    if (onSelect) {
-      onSelect(product);
-    }
     router.push(`/product/${product.id}`);
   };
 

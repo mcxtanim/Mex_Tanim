@@ -488,12 +488,7 @@ export default function DedicatedProductPage() {
                     key={relProd.id}
                     className="min-w-[240px] sm:min-w-[270px] max-w-[280px] shrink-0 snap-start"
                   >
-                    <ProductCard
-                      product={relProd}
-                      onSelect={(p) => {
-                        router.push(`/product/${p.id}`);
-                      }}
-                    />
+                    <ProductCard product={relProd} />
                   </div>
                 ))}
               </div>

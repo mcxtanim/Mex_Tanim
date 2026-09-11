@@ -1,8 +1,7 @@
 'use client';
 
-import React, { useState } from 'react';
+import React from 'react';
 import { ProductCard } from './ProductCard';
-import { ProductDetailModal } from './ProductDetailModal';
 import { PRODUCTS } from './mockData';
 import { Product } from './types';
 import { useLanguage } from '../shared/LanguageContext';
@@ -48,7 +47,6 @@ export const ProductGrid: React.FC<ProductGridProps> = ({
   searchQuery,
   onSelectCategory,
 }) => {
-  const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const { t, language } = useLanguage();
 
   const filteredProducts = PRODUCTS.filter((product) => {
@@ -120,18 +118,9 @@ export const ProductGrid: React.FC<ProductGridProps> = ({
             <ProductCard
               key={product.id}
               product={product}
-              onSelect={setSelectedProduct}
             />
           ))}
         </div>
-      )}
-
-      {/* Product Detail Popup Modal */}
-      {selectedProduct && (
-        <ProductDetailModal
-          product={selectedProduct}
-          onClose={() => setSelectedProduct(null)}
-        />
       )}
 
     </section>

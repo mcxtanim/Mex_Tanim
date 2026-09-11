@@ -2,7 +2,6 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import { ProductCard } from './ProductCard';
-import { ProductDetailModal } from './ProductDetailModal';
 import { PRODUCTS, CATEGORIES } from './mockData';
 import { Product } from './types';
 import { useLanguage } from '../shared/LanguageContext';
@@ -41,7 +40,6 @@ interface CategoryRailProps {
   categoryNameBn: string;
   categoryIcon: React.ReactNode;
   products: Product[];
-  onSelectProduct: (prod: Product) => void;
 }
 
 const CategoryRailRow: React.FC<CategoryRailProps> = ({
@@ -49,7 +47,6 @@ const CategoryRailRow: React.FC<CategoryRailProps> = ({
   categoryNameBn,
   categoryIcon,
   products,
-  onSelectProduct,
 }) => {
   const { language } = useLanguage();
   const railRef = useRef<HTMLDivElement>(null);
@@ -130,7 +127,7 @@ const CategoryRailRow: React.FC<CategoryRailProps> = ({
             className="min-w-[240px] sm:min-w-[270px] max-w-[280px] shrink-0 snap-start animate-in fade-in slide-in-from-left duration-300"
             style={{ animationDelay: `${idx * 80}ms` }}
           >
-            <ProductCard product={product} onSelect={onSelectProduct} />
+            <ProductCard product={product} />
           </div>
         ))}
       </div>
@@ -141,7 +138,6 @@ const CategoryRailRow: React.FC<CategoryRailProps> = ({
 export const ProductTabsSection: React.FC = () => {
   // Default selected tab: 'featured'
   const [activeTab, setActiveTab] = useState<TabType>('featured');
-  const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const { language } = useLanguage();
 
   // Filter products by active tab
@@ -242,19 +238,11 @@ export const ProductTabsSection: React.FC = () => {
               categoryNameBn={group.category.nameBn}
               categoryIcon={CATEGORY_ICONS[group.category.id] || <Layers className="w-5 h-5" />}
               products={group.products}
-              onSelectProduct={setSelectedProduct}
             />
           ))}
         </div>
       )}
 
-      {/* Product Detail Popup Modal */}
-      {selectedProduct && (
-        <ProductDetailModal
-          product={selectedProduct}
-          onClose={() => setSelectedProduct(null)}
-        />
-      )}
     </section>
   );
 };
