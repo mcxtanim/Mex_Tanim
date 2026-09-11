@@ -5,6 +5,7 @@ import { Header } from '@/features/shared/Header';
 import { HeroBanner } from '@/features/catalog/HeroBanner';
 import { CategoryShowcase } from '@/features/catalog/CategoryShowcase';
 import { ProductGrid } from '@/features/catalog/ProductGrid';
+import { ProductTabsSection } from '@/features/catalog/ProductTabsSection';
 import { Footer } from '@/features/shared/Footer';
 import { useLanguage } from '@/features/shared/LanguageContext';
 import { PRODUCTS } from '@/features/catalog/mockData';
@@ -19,7 +20,7 @@ const CATEGORY_META: Record<string, { en: string; bn: string; badge: string }> =
   'fast-chargers': { en: 'Fast Chargers', bn: 'ফাস্ট চার্জার', badge: 'F' },
   'finger-sleeves': { en: 'Finger Sleeves', bn: 'ফিঙ্গার স্লিকস', badge: 'S' },
   sleeves: { en: 'Finger Sleeves', bn: 'ফিঙ্গার স্লিকস', badge: 'S' },
-  cables: { en: 'Cables', bn: 'केवलস', badge: 'C' },
+  cables: { en: 'Cables', bn: 'কেবলস', badge: 'C' },
   soundboxes: { en: 'Soundboxes', bn: 'সাউন্ডবক্স', badge: 'B' },
   soundbox: { en: 'Soundboxes', bn: 'সাউন্ডবক্স', badge: 'B' },
   trimmers: { en: 'Trimmers', bn: 'ট্রিমার', badge: 'T' },
@@ -71,7 +72,8 @@ export default function Home() {
                 searchQuery={searchQuery}
                 onSelectCategory={setSelectedCategory}
               />
-
+              {/* Product Tabs Section: Featured (Default), Best Sellers, New Arrivals */}
+              <ProductTabsSection />
             </>
           ) : (
             <>
@@ -113,7 +115,6 @@ export default function Home() {
                 searchQuery={searchQuery}
                 onSelectCategory={setSelectedCategory}
               />
-
             </>
           )}
         </main>

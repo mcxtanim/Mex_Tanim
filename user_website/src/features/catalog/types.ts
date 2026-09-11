@@ -12,6 +12,9 @@ export interface Product {
   image: string;
   inStock: boolean;
   isPopular?: boolean;
+  isFeatured?: boolean;
+  isBestSeller?: boolean;
+  isNewArrival?: boolean;
   description: string;
   descriptionBn: string;
   specs: string[];
