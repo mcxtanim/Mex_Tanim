@@ -353,131 +353,179 @@ export const BuyNowModal: React.FC<BuyNowModalProps> = ({
                     {createdOrder.orderNumber}
                   </span>
                   <span className="bg-orange-100 text-orange-800 font-extrabold text-xs px-3 py-1 rounded-full">
-                    {language === 'bn' ? 'স্ট্যাটাস: অর্ডার প্লেসড' : 'Status: Order Placed'}
+                    {language === 'bn' ? 'স্ট্যাটাস: অর্ডার নিশ্চিত' : 'Status: Order Confirmed'}
                   </span>
                 </div>
                 <h2 className="text-xl sm:text-2xl font-black text-slate-900">
-                  {language === 'bn' ? 'আপনার অর্ডারটি সফল হয়েছে!' : 'Order Placed Successfully!'}
+                  {language === 'bn' ? 'অর্ডার সফলভাবে নিশ্চিত করা হয়েছে!' : 'Order Confirmed Successfully!'}
                 </h2>
                 <p className="text-xs text-gray-600 font-medium max-w-md mx-auto leading-relaxed">
                   {language === 'bn'
-                    ? 'ধন্যবাদ! আমাদের রিপ্রেজেন্টেটিভ শীঘ্রই আপনার নম্বরে কল দিয়ে অর্ডারটি কনফার্ম করবে।'
-                    : 'Thank you! Our customer support team will call your phone number shortly to confirm delivery.'}
+                    ? 'ধন্যবাদ! আমাদের টিম দ্রুত আপনার ডেলিভারি প্রসেস করবে।'
+                    : 'Thank you! Our support team will process your delivery shortly.'}
                 </p>
               </div>
 
-              {/* Comprehensive Order Confirmation Summary Card */}
-              <div className="bg-slate-50 border border-gray-200/80 rounded-2xl p-4 text-left space-y-3 text-xs">
+              {/* Comprehensive Order Confirmation Card */}
+              <div className="bg-slate-50 border border-gray-200/90 rounded-2xl p-4 sm:p-5 text-left space-y-4 text-xs">
                 
+                {/* Order ID & Date Header */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 border-b border-gray-200 pb-3">
                   <div>
-                    <span className="text-gray-500 font-medium block text-[11px]">
-                      {language === 'bn' ? 'অর্ডার নম্বর / তারিখ:' : 'Order ID & Date:'}
+                    <span className="text-gray-500 font-bold block text-[11px] uppercase tracking-wider">
+                      {language === 'bn' ? 'অর্ডার আইডি:' : 'Order ID:'}
                     </span>
-                    <span className="font-extrabold text-slate-900">
-                      {createdOrder.orderNumber} ({new Date(createdOrder.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })})
+                    <span className="font-black text-slate-900 text-sm">
+                      {createdOrder.orderNumber}
                     </span>
                   </div>
                   <div>
-                    <span className="text-gray-500 font-medium block text-[11px]">
-                      {language === 'bn' ? 'গ্রাহক ও মোবাইল:' : 'Customer & Mobile:'}
+                    <span className="text-gray-500 font-bold block text-[11px] uppercase tracking-wider">
+                      {language === 'bn' ? 'অর্ডারের তারিখ:' : 'Order Date:'}
                     </span>
-                    <span className="font-extrabold text-slate-900">
-                      {createdOrder.customerName} ({createdOrder.customerPhone})
+                    <span className="font-extrabold text-slate-900 text-xs">
+                      {new Date(createdOrder.createdAt).toLocaleString(language === 'bn' ? 'bn-BD' : 'en-US', {
+                        month: 'short',
+                        day: 'numeric',
+                        year: 'numeric',
+                        hour: '2-digit',
+                        minute: '2-digit',
+                      })}
                     </span>
                   </div>
                 </div>
 
-                {/* Delivery Address */}
-                <div className="border-b border-gray-200 pb-3">
-                  <span className="text-gray-500 font-medium block text-[11px] flex items-center space-x-1">
-                    <MapPin className="w-3 h-3 text-orange-500 inline" />
-                    <span>{language === 'bn' ? 'ডেলিভারি ঠিকানা:' : 'Full Delivery Address:'}</span>
-                  </span>
-                  <p className="font-bold text-slate-900 mt-0.5">
-                    {createdOrder.shippingAddress.street}, {createdOrder.shippingAddress.upazila}, {createdOrder.shippingAddress.district}, {createdOrder.shippingAddress.division}
-                  </p>
-                </div>
+                {/* CLEARLY GROUPED DELIVERY ADDRESS & CUSTOMER INFORMATION SECTION */}
+                <div className="bg-white border border-orange-200/90 rounded-xl p-3.5 sm:p-4 space-y-2.5 shadow-2xs">
+                  <div className="flex items-center space-x-2 border-b border-orange-100 pb-2 text-slate-900 font-black text-xs uppercase tracking-wider">
+                    <MapPin className="w-4 h-4 text-orange-500 shrink-0" />
+                    <span>{language === 'bn' ? 'ডেলিভারি ঠিকানা ও গ্রাহকের তথ্য' : 'Delivery Address & Customer Info'}</span>
+                  </div>
 
-                {/* Order Item */}
-                <div className="flex items-center justify-between border-b border-gray-200 pb-3">
-                  <div className="flex items-center space-x-3">
-                    <img
-                      src={product.image}
-                      alt={product.name}
-                      className="w-12 h-12 object-contain bg-white p-1 rounded-lg border border-gray-200"
-                    />
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 text-xs">
                     <div>
-                      <span className="font-extrabold text-slate-900 block line-clamp-1">
-                        {language === 'bn' ? product.nameBn : product.name}
+                      <span className="text-gray-500 font-medium block text-[11px]">
+                        {language === 'bn' ? 'গ্রাহকের নাম:' : 'Customer Name:'}
                       </span>
-                      <span className="text-[11px] text-gray-500 font-medium">
-                        ৳{product.price} x {quantity}
+                      <span className="font-extrabold text-slate-900">{createdOrder.customerName}</span>
+                    </div>
+
+                    <div>
+                      <span className="text-gray-500 font-medium block text-[11px]">
+                        {language === 'bn' ? 'মোবাইল নম্বর:' : 'Mobile Number:'}
                       </span>
+                      <span className="font-extrabold text-slate-900">{createdOrder.customerPhone}</span>
+                    </div>
+
+                    <div>
+                      <span className="text-gray-500 font-medium block text-[11px]">
+                        {language === 'bn' ? 'বিভাগ (Division):' : 'Division:'}
+                      </span>
+                      <span className="font-bold text-slate-800">{createdOrder.shippingAddress.division}</span>
+                    </div>
+
+                    <div>
+                      <span className="text-gray-500 font-medium block text-[11px]">
+                        {language === 'bn' ? 'জেলা (District):' : 'District:'}
+                      </span>
+                      <span className="font-bold text-slate-800">{createdOrder.shippingAddress.district}</span>
+                    </div>
+
+                    <div>
+                      <span className="text-gray-500 font-medium block text-[11px]">
+                        {language === 'bn' ? 'উপজেলা (Upazila):' : 'Upazila:'}
+                      </span>
+                      <span className="font-bold text-slate-800">{createdOrder.shippingAddress.upazila}</span>
+                    </div>
+
+                    <div>
+                      <span className="text-gray-500 font-medium block text-[11px]">
+                        {language === 'bn' ? 'বিস্তারিত এলাকা / স্থান (Area/Street):' : 'Area / Specific Location:'}
+                      </span>
+                      <span className="font-bold text-slate-900">{createdOrder.shippingAddress.street}</span>
                     </div>
                   </div>
-                  <span className="font-black text-slate-900">৳{itemTotal}</span>
                 </div>
 
-                {/* Price Breakdown */}
-                <div className="space-y-1 pt-1">
-                  <div className="flex justify-between text-gray-600">
-                    <span>{language === 'bn' ? 'পণ্য মূল্য:' : 'Subtotal:'}</span>
+                {/* ORDERED PRODUCT(S) & QUANTITY */}
+                <div className="space-y-2 border-b border-gray-200 pb-3">
+                  <span className="text-gray-500 font-bold block text-[11px] uppercase tracking-wider">
+                    {language === 'bn' ? 'অর্ডারকৃত প্রোডাক্ট সমাহার:' : 'Ordered Product(s):'}
+                  </span>
+                  <div className="flex items-center justify-between bg-white p-2.5 rounded-xl border border-gray-200">
+                    <div className="flex items-center space-x-3 min-w-0">
+                      <img
+                        src={product.image}
+                        alt={product.name}
+                        className="w-12 h-12 object-contain bg-slate-50 p-1 rounded-lg border border-gray-100 shrink-0"
+                      />
+                      <div className="min-w-0">
+                        <span className="font-extrabold text-slate-900 block truncate">
+                          {language === 'bn' ? product.nameBn : product.name}
+                        </span>
+                        <span className="text-[11px] text-gray-500 font-semibold">
+                          ৳{product.price} x {quantity} {language === 'bn' ? 'টি' : 'qty'}
+                        </span>
+                      </div>
+                    </div>
+                    <span className="font-black text-slate-900 text-sm shrink-0 ml-2">৳{itemTotal}</span>
+                  </div>
+                </div>
+
+                {/* PRICE BREAKDOWN */}
+                <div className="space-y-1.5 pt-1">
+                  <div className="flex justify-between text-gray-600 font-medium">
+                    <span>{language === 'bn' ? 'পণ্য মূল্য (Item Subtotal):' : 'Item Subtotal:'}</span>
                     <span className="font-bold text-slate-900">৳{itemTotal}</span>
                   </div>
-                  <div className="flex justify-between text-gray-600">
-                    <span>{language === 'bn' ? 'ডেলিভারি চার্জ:' : 'Delivery Charge:'}</span>
+                  <div className="flex justify-between text-gray-600 font-medium">
+                    <span>{language === 'bn' ? `ডেলিভারি চার্জ (${division === 'dhaka' ? 'ঢাকার ভেতরে' : 'ঢাকার বাইরে'}):` : `Delivery Charge (${division === 'dhaka' ? 'Inside Dhaka' : 'Outside Dhaka'}):`}</span>
                     <span className="font-bold text-slate-900">৳{deliveryCharge}</span>
                   </div>
                   <div className="flex justify-between items-center text-sm font-black text-slate-900 pt-2 border-t border-gray-200">
-                    <span>{language === 'bn' ? 'সর্বমোট প্রদেয়:' : 'Total Amount Payable:'}</span>
+                    <span>{language === 'bn' ? 'সর্বমোট প্রদেয় মূল্য (Total Amount):' : 'Total Amount:'}</span>
                     <span className="text-base text-orange-600 font-black">৳{totalPayable}</span>
                   </div>
                 </div>
 
-                {/* Payment Method Badge */}
-                <div className="pt-2 flex items-center justify-between bg-emerald-50 p-2.5 rounded-xl border border-emerald-200">
-                  <span className="text-emerald-800 font-extrabold text-[11px]">
-                    {language === 'bn' ? 'পেমেন্ট মেথড: ক্যাশ অন ডেলিভারি' : 'Payment Method: Cash on Delivery'}
-                  </span>
-                  <span className="bg-emerald-600 text-white text-[10px] font-black px-2 py-0.5 rounded">
-                    UNPAID
-                  </span>
+                {/* PAYMENT METHOD & STATUS */}
+                <div className="pt-2 flex flex-wrap items-center justify-between gap-2 bg-emerald-50/90 p-3 rounded-xl border border-emerald-200">
+                  <div className="text-emerald-900 font-extrabold text-xs">
+                    <span>{language === 'bn' ? 'পেমেন্ট পদ্ধতি:' : 'Payment Method:'} </span>
+                    <span className="text-emerald-700 font-black">Cash on Delivery</span>
+                  </div>
+                  <div className="text-emerald-900 font-extrabold text-xs">
+                    <span>{language === 'bn' ? 'পেমেন্ট স্ট্যাটাস:' : 'Payment Status:'} </span>
+                    <span className="bg-emerald-600 text-white font-black text-[10px] px-2.5 py-0.5 rounded uppercase">
+                      Pay on Delivery
+                    </span>
+                  </div>
                 </div>
 
               </div>
 
-              {/* Action Buttons Grid */}
+              {/* ACTION BUTTONS GRID */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2">
-                <button
-                  type="button"
-                  onClick={() => setShowDetailsModal(true)}
-                  className="py-3 px-4 bg-orange-500 hover:bg-orange-600 text-white font-extrabold text-xs rounded-xl shadow-md transition flex items-center justify-center space-x-2 cursor-pointer"
-                >
-                  <Truck className="w-4 h-4" />
-                  <span>{language === 'bn' ? 'অর্ডার ট্র্যাক করুন (7-Stage Live)' : 'Track Order (7-Stage Live)'}</span>
-                </button>
-
                 <button
                   type="button"
                   onClick={() => {
                     onClose();
-                    router.push('/account');
+                    router.push('/orders');
                   }}
-                  className="py-3 px-4 bg-slate-900 hover:bg-slate-800 text-white font-extrabold text-xs rounded-xl shadow-md transition flex items-center justify-center space-x-2 cursor-pointer"
+                  className="py-3.5 px-4 bg-slate-900 hover:bg-slate-800 text-white font-extrabold text-xs sm:text-sm rounded-xl shadow-md transition flex items-center justify-center space-x-2 cursor-pointer active:scale-95"
                 >
-                  <User className="w-4 h-4" />
-                  <span>{language === 'bn' ? 'মাই অ্যাকাউন্টে যান' : 'Go to My Account'}</span>
+                  <ShoppingBag className="w-4 h-4 text-orange-400" />
+                  <span>{language === 'bn' ? 'আমার অর্ডার দেখুন (View My Orders)' : 'View My Orders'}</span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={onClose}
+                  className="py-3.5 px-4 bg-gray-100 hover:bg-gray-200 text-slate-800 font-extrabold text-xs sm:text-sm rounded-xl transition flex items-center justify-center space-x-2 cursor-pointer active:scale-95 border border-gray-300"
+                >
+                  <span>{language === 'bn' ? 'শপিং চালিয়ে যান (Continue Shopping)' : 'Continue Shopping'}</span>
                 </button>
               </div>
-
-              <button
-                type="button"
-                onClick={onClose}
-                className="w-full py-3 bg-gray-100 hover:bg-gray-200 text-slate-800 font-bold text-xs rounded-xl transition cursor-pointer"
-              >
-                {language === 'bn' ? 'ঠিক আছে (শপিং চালিয়ে যান)' : 'Continue Shopping'}
-              </button>
 
             </div>
           ) : (
