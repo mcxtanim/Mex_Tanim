@@ -204,7 +204,7 @@ export default function DedicatedProductPage() {
 
         <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-8">
           {/* Breadcrumb Bar */}
-          <nav className="flex items-center space-x-2 text-xs text-gray-500 font-medium bg-white px-4 py-3 rounded-2xl border border-gray-200/80 shadow-2xs">
+          <nav className="flex items-center space-x-2 text-xs text-gray-500 font-medium bg-white/80 backdrop-blur-md px-4 py-3 rounded-2xl border border-white/60 shadow-lg shadow-slate-900/5">
             <Link href="/" className="hover:text-orange-600 flex items-center gap-1 transition">
               <HomeIcon className="w-3.5 h-3.5" />
               <span>{language === 'bn' ? 'হোম' : 'Home'}</span>
@@ -218,7 +218,7 @@ export default function DedicatedProductPage() {
           </nav>
 
           {/* DEDICATED PRODUCT DETAILS CONTAINER */}
-          <div className="bg-white rounded-3xl border border-gray-200/90 shadow-xl p-6 sm:p-10 grid grid-cols-1 md:grid-cols-12 gap-10 items-start">
+          <div className="bg-white/80 backdrop-blur-md rounded-3xl border border-white/60 shadow-xl p-6 sm:p-10 grid grid-cols-1 md:grid-cols-12 gap-10 items-start">
             
             {/* LEFT COLUMN — PRODUCT IMAGE GALLERY WITH CURSOR-FOLLOWING ZOOM */}
             <div className="md:col-span-6 space-y-4">

@@ -131,7 +131,7 @@ export const Header: React.FC<HeaderProps> = ({
 
   return (
     <>
-      <header className="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-gray-100 shadow-2xs transition-all">
+      <header className="sticky top-0 z-40 bg-white/80 backdrop-blur-md border-b border-white/40 shadow-xs transition-all">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-20 sm:h-24 gap-3">
             
@@ -141,7 +141,7 @@ export const Header: React.FC<HeaderProps> = ({
               {/* Round Circular Hamburger Menu Button */}
               <button
                 onClick={() => setIsCategoryDrawerOpen(true)}
-                className="relative w-10 h-10 sm:w-11 sm:h-11 rounded-full bg-gray-200/90 hover:bg-gray-300 text-black transition-all flex items-center justify-center shadow-2xs active:scale-95 border border-gray-300/50 cursor-pointer shrink-0"
+                className="relative w-10 h-10 sm:w-11 sm:h-11 rounded-full bg-gray-200/80 backdrop-blur-md hover:bg-gray-300/90 text-black transition-all flex items-center justify-center shadow-2xs active:scale-95 border border-white/60 cursor-pointer shrink-0"
                 title="Product Categories"
                 aria-label="Toggle Product Categories Menu"
               >
@@ -153,7 +153,7 @@ export const Header: React.FC<HeaderProps> = ({
 
               {/* Active Category Indicator Pill when selectedCategory !== 'all' */}
               {selectedCategory !== 'all' && (
-                <div className="hidden sm:flex items-center space-x-1.5 bg-orange-500/10 border border-orange-500/30 text-orange-600 px-2.5 py-1 rounded-full text-xs font-extrabold">
+                <div className="hidden sm:flex items-center space-x-1.5 bg-orange-500/15 backdrop-blur-md border border-orange-500/30 text-orange-600 px-2.5 py-1 rounded-full text-xs font-extrabold shadow-xs">
                   <span className="capitalize text-[11px] sm:text-xs">
                     {selectedCategory.replace('-', ' ')}
                   </span>
@@ -188,13 +188,13 @@ export const Header: React.FC<HeaderProps> = ({
                   placeholder={animatedPlaceholder}
                   value={searchQuery}
                   onChange={(e) => setSearchQuery?.(e.target.value)}
-                  className="w-full bg-gray-100/90 text-gray-800 placeholder-gray-500 font-medium pl-10 pr-4 py-2 sm:py-2.5 text-xs sm:text-sm rounded-full border border-transparent focus:border-orange-500 focus:bg-white focus:ring-2 focus:ring-orange-500/20 outline-none transition-all"
+                  className="w-full bg-gray-100/80 backdrop-blur-md text-gray-800 placeholder-gray-500 font-medium pl-10 pr-4 py-2 sm:py-2.5 text-xs sm:text-sm rounded-full border border-white/50 focus:border-orange-500 focus:bg-white/90 focus:ring-2 focus:ring-orange-500/20 outline-none transition-all shadow-inner"
                 />
                 <Search className="w-4 h-4 text-gray-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
                 {searchQuery && (
                   <button
                     onClick={() => setSearchQuery?.('')}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 text-xs bg-gray-200 rounded-full w-4 h-4 flex items-center justify-center cursor-pointer"
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 text-xs bg-gray-200/80 rounded-full w-4 h-4 flex items-center justify-center cursor-pointer"
                   >
                     ×
                   </button>
@@ -208,7 +208,7 @@ export const Header: React.FC<HeaderProps> = ({
               {/* My Orders Button */}
               <Link
                 href="/orders"
-                className="p-2 sm:px-3 sm:py-2 bg-slate-100 hover:bg-slate-900 hover:text-white text-slate-800 rounded-xl border border-gray-200/90 shadow-2xs transition-all active:scale-95 flex items-center gap-1.5 cursor-pointer font-extrabold text-xs shrink-0"
+                className="p-2 sm:px-3 sm:py-2 bg-white/80 backdrop-blur-md hover:bg-slate-900 hover:text-white text-slate-800 rounded-xl border border-white/60 shadow-2xs transition-all active:scale-95 flex items-center gap-1.5 cursor-pointer font-extrabold text-xs shrink-0"
                 title={language === 'bn' ? 'আমার অর্ডার ও ট্র্যাকিং' : 'My Orders & Tracking'}
               >
                 <Package className="w-4 h-4 text-orange-500" />
@@ -220,7 +220,7 @@ export const Header: React.FC<HeaderProps> = ({
               {/* Official Add to Cart / Bag Icon Button */}
               <button
                 onClick={openCart}
-                className="relative p-2.5 bg-slate-900 hover:bg-orange-600 text-white rounded-xl shadow-md transition-all active:scale-95 flex items-center gap-1.5 cursor-pointer"
+                className="relative p-2.5 bg-slate-900/90 hover:bg-orange-600/90 backdrop-blur-md text-white rounded-xl shadow-md border border-white/20 transition-all active:scale-95 flex items-center gap-1.5 cursor-pointer"
                 title={t.cart}
               >
                 <ShoppingBag className="w-5 h-5 sm:w-5 sm:h-5 text-orange-400 group-hover:text-white" />
@@ -233,10 +233,10 @@ export const Header: React.FC<HeaderProps> = ({
               </button>
 
               {/* LANGUAGE TOGGLE BUTTON */}
-              <div className="pl-1 border-l border-gray-200">
+              <div className="pl-1 border-l border-gray-200/60">
                 <button
                   onClick={() => setLanguage(language === 'en' ? 'bn' : 'en')}
-                  className="flex items-center space-x-1 bg-gray-100 hover:bg-gray-200 border border-gray-300 px-2.5 py-1.5 rounded-full text-xs font-extrabold text-slate-800 transition active:scale-95 cursor-pointer"
+                  className="flex items-center space-x-1 bg-gray-100/80 backdrop-blur-md hover:bg-gray-200/90 border border-white/50 px-2.5 py-1.5 rounded-full text-xs font-extrabold text-slate-800 transition active:scale-95 cursor-pointer shadow-2xs"
                   title="Switch Language / ভাষা পরিবর্তন করুন"
                 >
                   <Globe className="w-3.5 h-3.5 text-orange-500" />

@@ -46,10 +46,10 @@ export const CategoryThumbnail: React.FC<CategoryThumbnailProps> = ({
     <button
       type="button"
       onClick={onClick}
-      className={`relative snap-start shrink-0 flex-none rounded-3xl p-5 sm:p-6 text-center flex flex-col items-center justify-between min-w-[180px] sm:min-w-[210px] md:min-w-[240px] h-[220px] sm:h-[250px] md:h-[270px] transition-all duration-300 group cursor-pointer ${
+      className={`relative snap-start shrink-0 flex-none rounded-3xl p-5 sm:p-6 text-center flex flex-col items-center justify-between min-w-[180px] sm:min-w-[210px] md:min-w-[240px] h-[220px] sm:h-[250px] md:h-[270px] backdrop-blur-md transition-all duration-300 group cursor-pointer ${
         isSelected
-          ? 'border-2 border-red-500 bg-white shadow-xl scale-105 ring-2 ring-red-500/20'
-          : 'bg-gradient-to-b from-slate-50/90 to-white border border-gray-200/80 shadow-sm hover:shadow-xl hover:border-red-500/40'
+          ? 'border-2 border-red-500 bg-white/95 shadow-xl scale-105 ring-2 ring-red-500/20'
+          : 'bg-white/80 backdrop-blur-md border border-white/60 shadow-xl shadow-slate-900/5 hover:border-red-500/40 hover:bg-white/95 hover:shadow-2xl'
       } ${className}`}
     >
       {/* Product Visual Container with Soft Red/Rose Backdrop Halo */}

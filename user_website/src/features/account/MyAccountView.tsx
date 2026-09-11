@@ -217,12 +217,12 @@ export const MyAccountView: React.FC = () => {
       </div>
 
       {/* MY ORDERS LIST SECTION */}
-      <div className="bg-white rounded-3xl border border-gray-200/90 shadow-xl p-5 sm:p-8 space-y-6">
+      <div className="bg-white/80 backdrop-blur-md rounded-3xl border border-white/60 shadow-xl p-5 sm:p-8 space-y-6">
         
         {/* Section Header */}
-        <div className="flex items-center justify-between border-b border-gray-100 pb-4">
+        <div className="flex items-center justify-between border-b border-gray-100/80 pb-4">
           <div className="flex items-center space-x-3">
-            <div className="w-11 h-11 rounded-2xl bg-slate-900 text-orange-400 flex items-center justify-center shadow-md">
+            <div className="w-11 h-11 rounded-2xl bg-slate-900 text-orange-400 flex items-center justify-center shadow-md border border-white/20">
               <Package className="w-6 h-6" />
             </div>
             <div>
@@ -237,15 +237,15 @@ export const MyAccountView: React.FC = () => {
             </div>
           </div>
 
-          <span className="bg-slate-100 text-slate-900 font-extrabold text-xs px-3 py-1 rounded-full">
+          <span className="bg-slate-100/90 backdrop-blur-xs text-slate-900 font-extrabold text-xs px-3 py-1 rounded-full border border-gray-200/80">
             {orders.length} {language === 'bn' ? 'টি অর্ডার' : 'Orders'}
           </span>
         </div>
 
-        {/* Orders List */}
+        {/* Orders List / Empty State */}
         {orders.length === 0 ? (
           <div className="py-12 px-4 text-center space-y-4">
-            <div className="w-16 h-16 rounded-full bg-slate-100 text-slate-400 flex items-center justify-center mx-auto">
+            <div className="w-16 h-16 rounded-full bg-slate-100/90 text-slate-400 flex items-center justify-center mx-auto border border-gray-200/80">
               <Package className="w-8 h-8" />
             </div>
             <div>
@@ -261,112 +261,111 @@ export const MyAccountView: React.FC = () => {
           </div>
         ) : (
           <div className="space-y-4">
-            {orders.map((order) => {
-              const formattedDate = new Date(order.createdAt).toLocaleDateString(
-                language === 'bn' ? 'bn-BD' : 'en-US',
-                { month: 'short', day: 'numeric', year: 'numeric' }
-              );
-              const stageIdx = getOrderStageIndex(order.status);
-              const isCancelled = order.status === 'Cancelled';
+          {orders.map((order) => {
+            const formattedDate = new Date(order.createdAt).toLocaleDateString(
+              language === 'bn' ? 'bn-BD' : 'en-US',
+              { month: 'short', day: 'numeric', year: 'numeric' }
+            );
+            const stageIdx = getOrderStageIndex(order.status);
+            const isCancelled = order.status === 'Cancelled';
 
-              return (
-                <div
-                  key={order.id}
-                  onClick={() => handleViewOrder(order)}
-                  className="bg-slate-50/70 hover:bg-slate-50 border border-gray-200/90 rounded-2xl p-4 sm:p-5 transition-all duration-300 space-y-4 hover:shadow-md cursor-pointer"
-                >
-                  {/* Top Info Bar */}
-                  <div className="flex flex-wrap items-center justify-between gap-2 border-b border-gray-200/80 pb-3">
-                    <div className="flex items-center space-x-2.5">
-                      <span className="font-black text-slate-900 text-sm sm:text-base">
-                        {order.orderNumber}
-                      </span>
-                      <span className="text-gray-300">•</span>
-                      <span className="text-xs text-gray-500 font-medium flex items-center space-x-1">
-                        <Clock className="w-3.5 h-3.5 text-gray-400" />
-                        <span>{formattedDate}</span>
-                      </span>
-                    </div>
-
-                    {/* Status Badge */}
-                    {isCancelled ? (
-                      <span className="bg-red-50 text-red-600 border border-red-200 text-xs font-black px-3 py-0.5 rounded-full">
-                        Cancelled
-                      </span>
-                    ) : (
-                      <span className="bg-emerald-50 text-emerald-700 border border-emerald-200 text-xs font-black px-3 py-0.5 rounded-full flex items-center space-x-1.5">
-                        <span className="w-2 h-2 rounded-full bg-emerald-500 animate-ping inline-block" />
-                        <span>
-                          {ORDER_STAGES[stageIdx]?.titleBn || order.status}
-                        </span>
-                      </span>
-                    )}
+            return (
+              <div
+                key={order.id}
+                onClick={() => handleViewOrder(order)}
+                className="bg-white/80 backdrop-blur-md hover:bg-white/95 border border-white/60 hover:border-orange-500/40 rounded-2xl p-4 sm:p-5 transition-all duration-300 space-y-4 shadow-lg shadow-slate-900/5 hover:shadow-2xl cursor-pointer"
+              >
+                {/* Top Info Bar */}
+                <div className="flex flex-wrap items-center justify-between gap-2 border-b border-gray-200/80 pb-3">
+                  <div className="flex items-center space-x-2.5">
+                    <span className="font-black text-slate-900 text-sm sm:text-base">
+                      {order.orderNumber}
+                    </span>
+                    <span className="text-gray-300">•</span>
+                    <span className="text-xs text-gray-500 font-medium flex items-center space-x-1">
+                      <Clock className="w-3.5 h-3.5 text-gray-400" />
+                      <span>{formattedDate}</span>
+                    </span>
                   </div>
 
-                  {/* Middle Product Thumbnails & Summary */}
-                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                    <div className="flex items-center space-x-3 overflow-x-auto scrollbar-none py-1">
-                      {order.items.map((item, idx) => {
-                        const isDelivered = order.status === 'Delivered';
-                        const alreadyReviewed = hasCustomerReviewedOrderItem(order.id, item.productId);
+                  {/* Status Badge */}
+                  {isCancelled ? (
+                    <span className="bg-red-50/90 text-red-600 border border-red-200 text-xs font-black px-3 py-0.5 rounded-full backdrop-blur-xs">
+                      Cancelled
+                    </span>
+                  ) : (
+                    <span className="bg-emerald-50/90 text-emerald-700 border border-emerald-200 text-xs font-black px-3 py-0.5 rounded-full flex items-center space-x-1.5 backdrop-blur-xs">
+                      <span className="w-2 h-2 rounded-full bg-emerald-500 animate-ping inline-block" />
+                      <span>
+                        {ORDER_STAGES[stageIdx]?.titleBn || order.status}
+                      </span>
+                    </span>
+                  )}
+                </div>
 
-                        return (
-                          <div key={idx} className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 bg-white p-2.5 rounded-xl border border-gray-200 shrink-0">
-                            <div className="flex items-center space-x-2.5">
-                              <img
-                                src={item.image || 'https://images.unsplash.com/photo-1546435770-a3e426bf472b?auto=format&fit=crop&w=150&q=80'}
-                                alt={item.title}
-                                className="w-10 h-10 object-contain rounded-md bg-slate-50 border border-gray-100"
-                              />
-                              <div className="max-w-[150px]">
-                                <p className="font-extrabold text-xs text-slate-900 truncate">
-                                  {item.title}
-                                </p>
-                                <p className="text-[10px] text-gray-500 font-semibold">
-                                  x{item.quantity} • ৳{item.unitPrice}
-                                </p>
-                              </div>
+                {/* Middle Product Thumbnails & Summary */}
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                  <div className="flex items-center space-x-3 overflow-x-auto scrollbar-none py-1">
+                    {order.items.map((item, idx) => {
+                      const isDelivered = order.status === 'Delivered';
+                      const alreadyReviewed = hasCustomerReviewedOrderItem(order.id, item.productId);
+
+                      return (
+                        <div key={idx} className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 bg-white/90 backdrop-blur-md p-2.5 rounded-xl border border-gray-200/80 shrink-0 shadow-xs">
+                          <div className="flex items-center space-x-2.5">
+                            <img
+                              src={item.image || 'https://images.unsplash.com/photo-1546435770-a3e426bf472b?auto=format&fit=crop&w=150&q=80'}
+                              alt={item.title}
+                              className="w-10 h-10 object-contain rounded-md bg-slate-50 border border-gray-100"
+                            />
+                            <div className="max-w-[150px]">
+                              <p className="font-extrabold text-xs text-slate-900 truncate">
+                                {item.title}
+                              </p>
+                              <p className="text-[10px] text-gray-500 font-semibold">
+                                x{item.quantity} • ৳{item.unitPrice}
+                              </p>
                             </div>
-
-                            {/* Verified Buyer Review Button (ONLY when status is Delivered) */}
-                            {isDelivered && (
-                              <div className="pt-1 sm:pt-0 sm:ml-2">
-                                {alreadyReviewed ? (
-                                  <span className="text-[10px] font-black text-emerald-700 bg-emerald-50 px-2 py-1 rounded-lg border border-emerald-200 flex items-center space-x-1">
-                                    <CheckCircle2 className="w-3 h-3 text-emerald-600 shrink-0" />
-                                    <span>{language === 'bn' ? '✓ রিভিউ দেওয়া হয়েছে' : '✓ Reviewed'}</span>
-                                  </span>
-                                ) : (
-                                  <button
-                                    onClick={(e) => handleOpenReview(order, item, e)}
-                                    className="px-2.5 py-1 bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 text-white font-extrabold text-[11px] rounded-lg shadow-xs transition active:scale-95 flex items-center space-x-1 cursor-pointer"
-                                  >
-                                    <Star className="w-3 h-3 fill-white stroke-[2.5]" />
-                                    <span>{language === 'bn' ? 'Verified Review দিন' : 'Write Verified Review'}</span>
-                                  </button>
-                                )}
-                              </div>
-                            )}
                           </div>
-                        );
-                      })}
-                    </div>
 
-                    <div className="text-right shrink-0 border-t sm:border-t-0 pt-2 sm:pt-0 border-gray-200">
-                      <span className="text-[11px] text-gray-500 font-medium block">
-                        {language === 'bn' ? 'ক্যাশ অন ডেলিভারি' : 'Cash On Delivery'}
-                      </span>
-                      <span className="text-lg sm:text-xl font-black text-slate-900">
-                        ৳{order.totalAmount}
-                      </span>
-                    </div>
+                          {/* Verified Buyer Review Button (ONLY when status is Delivered) */}
+                          {isDelivered && (
+                            <div className="pt-1 sm:pt-0 sm:ml-2">
+                              {alreadyReviewed ? (
+                                <span className="text-[10px] font-black text-emerald-700 bg-emerald-50/90 backdrop-blur-xs px-2 py-1 rounded-lg border border-emerald-200 flex items-center space-x-1">
+                                  <CheckCircle2 className="w-3 h-3 text-emerald-600 shrink-0" />
+                                  <span>{language === 'bn' ? '✓ রিভিউ দেওয়া হয়েছে' : '✓ Reviewed'}</span>
+                                </span>
+                              ) : (
+                                <button
+                                  onClick={(e) => handleOpenReview(order, item, e)}
+                                  className="px-2.5 py-1 bg-gradient-to-r from-orange-500/90 to-amber-500/90 hover:from-orange-600 hover:to-amber-600 backdrop-blur-md text-white font-extrabold text-[11px] rounded-lg shadow-xs border border-white/30 transition active:scale-95 flex items-center space-x-1 cursor-pointer"
+                                >
+                                  <Star className="w-3 h-3 fill-white stroke-[2.5]" />
+                                  <span>{language === 'bn' ? 'Verified Review দিন' : 'Write Verified Review'}</span>
+                                </button>
+                              )}
+                            </div>
+                          )}
+                        </div>
+                      );
+                    })}
+                  </div>
+
+                  <div className="text-right shrink-0 border-t sm:border-t-0 pt-2 sm:pt-0 border-gray-200/80">
+                    <span className="text-[11px] text-gray-500 font-medium block">
+                      {language === 'bn' ? 'ক্যাশ অন ডেলিভারি' : 'Cash On Delivery'}
+                    </span>
+                    <span className="text-lg sm:text-xl font-black text-slate-900">
+                      ৳{order.totalAmount}
+                    </span>
                   </div>
                 </div>
-              );
-            })}
-          </div>
-        )}
-
+              </div>
+            );
+          })}
+        </div>
+      )}
       </div>
 
       {/* DEDICATED ORDER DETAILS MODAL */}

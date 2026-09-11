@@ -29,12 +29,12 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
   const description = language === 'bn' ? (product.descriptionBn || product.description) : product.description;
 
   return (
-    <div className="bg-white border border-gray-100 rounded-2xl overflow-hidden hover:border-orange-500/40 hover:shadow-xl transition-all duration-300 group flex flex-col justify-between">
+    <div className="bg-white/80 backdrop-blur-md border border-white/60 shadow-xl shadow-slate-900/5 rounded-2xl overflow-hidden hover:border-orange-500/40 hover:bg-white/95 hover:shadow-2xl transition-all duration-300 group flex flex-col justify-between">
       
       {/* Product Image & Badges */}
       <div
         onClick={handleCardClick}
-        className="relative w-full h-48 sm:h-52 bg-slate-50 overflow-hidden cursor-pointer"
+        className="relative w-full h-48 sm:h-52 bg-slate-50/80 overflow-hidden cursor-pointer"
       >
         <img
           src={product.image}
@@ -44,14 +44,14 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
 
         {/* Discount Badge */}
         {discountPercent > 0 && (
-          <span className="absolute top-2.5 left-2.5 bg-orange-500 text-white text-[10px] font-black px-2 py-0.5 rounded-md shadow-sm uppercase tracking-wider z-10">
+          <span className="absolute top-2.5 left-2.5 bg-orange-500/90 backdrop-blur-md text-white text-[10px] font-black px-2 py-0.5 rounded-md shadow-sm uppercase tracking-wider z-10 border border-white/30">
             -{discountPercent}% {t.discount}
           </span>
         )}
 
         {/* Stock Badge */}
         <span
-          className={`absolute top-2.5 right-2.5 text-[10px] font-bold px-2 py-0.5 rounded-md backdrop-blur-md shadow-xs z-10 ${
+          className={`absolute top-2.5 right-2.5 text-[10px] font-bold px-2 py-0.5 rounded-md backdrop-blur-md shadow-xs z-10 border border-white/30 ${
             product.inStock
               ? 'bg-emerald-500/90 text-white'
               : 'bg-red-500/90 text-white'
@@ -70,7 +70,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
                 {product.categoryBn || product.category}
               </span>
               <span className="text-gray-300">•</span>
-              <span className="font-extrabold text-slate-800 text-[10px] bg-slate-100 px-1.5 py-0.5 rounded border border-slate-200/60 truncate">
+              <span className="font-extrabold text-slate-800 text-[10px] bg-slate-100/90 backdrop-blur-xs px-1.5 py-0.5 rounded border border-slate-200/80 truncate">
                 {getBrandName(product, language)}
               </span>
             </div>
@@ -93,7 +93,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
         </div>
 
         {/* Price & Official Add to Cart Button */}
-        <div className="pt-2 border-t border-gray-100 flex items-center justify-between gap-2">
+        <div className="pt-2 border-t border-gray-100/80 flex items-center justify-between gap-2">
           <div>
             <span className="text-[10px] text-gray-400 block font-medium">Price</span>
             <div className="flex items-baseline space-x-1.5">
@@ -115,7 +115,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
               addToCart(product);
             }}
             disabled={!product.inStock}
-            className="flex items-center space-x-1.5 px-3 py-2 bg-slate-900 hover:bg-orange-500 text-white rounded-xl font-bold text-xs shadow-md transition-all active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed group/btn cursor-pointer"
+            className="flex items-center space-x-1.5 px-3.5 py-2 bg-slate-900/90 hover:bg-orange-500/90 backdrop-blur-md text-white rounded-xl font-bold text-xs shadow-md border border-white/20 transition-all active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed group/btn cursor-pointer"
             title={t.addToCart}
           >
             <ShoppingBag className="w-4 h-4 text-orange-400 group-hover/btn:text-white transition-colors" />
