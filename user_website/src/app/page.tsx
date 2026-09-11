@@ -59,25 +59,20 @@ export default function Home() {
         />
         
         <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6 space-y-6">
-          {selectedCategory === 'all' && <HeroBanner />}
+          {selectedCategory === 'all' && searchQuery === '' && <HeroBanner />}
 
-          {selectedCategory === 'all' ? (
+          {selectedCategory === 'all' && searchQuery === '' ? (
             <>
               <CategoryShowcase
                 selectedCategory={selectedCategory}
                 onSelectCategory={setSelectedCategory}
               />
-              <ProductGrid
-                selectedCategory={selectedCategory}
-                searchQuery={searchQuery}
-                onSelectCategory={setSelectedCategory}
-              />
-              {/* Product Tabs Section: Featured (Default), Best Sellers, New Arrivals */}
+              {/* Main Product Showcase Tabs (Featured default, Best Sellers, New Arrivals) with Top-to-Bottom Category Rails */}
               <ProductTabsSection />
             </>
           ) : (
             <>
-              {/* Category Header Bar */}
+              {/* Category / Search Header Bar */}
               <div className="bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 text-white rounded-3xl p-5 sm:p-7 shadow-xl relative overflow-hidden flex flex-col sm:flex-row sm:items-center justify-between gap-4 border border-slate-700/60">
                 <div className="absolute -right-12 -bottom-12 w-48 h-48 bg-orange-500/15 rounded-full blur-3xl pointer-events-none" />
                 
@@ -88,20 +83,23 @@ export default function Home() {
                   <div>
                     <div className="flex items-center space-x-2">
                       <span className="text-[11px] font-black text-orange-400 uppercase tracking-widest">
-                        {language === 'bn' ? 'ক্যাটাগরি ভিউ' : 'Category View'}
+                        {searchQuery ? (language === 'bn' ? 'সার্চ রেজাল্ট' : 'Search Results') : (language === 'bn' ? 'ক্যাটাগরি ভিউ' : 'Category View')}
                       </span>
                       <span className="bg-orange-500/20 text-orange-300 text-[11px] font-extrabold px-2.5 py-0.5 rounded-full border border-orange-500/30">
                         {productCount} {language === 'bn' ? 'টি পণ্য' : 'products'}
                       </span>
                     </div>
                     <h1 className="text-xl sm:text-2xl font-black text-white capitalize mt-0.5">
-                      {language === 'bn' ? currentMeta.bn : currentMeta.en}
+                      {searchQuery ? `"${searchQuery}"` : (language === 'bn' ? currentMeta.bn : currentMeta.en)}
                     </h1>
                   </div>
                 </div>
 
                 <button
-                  onClick={() => setSelectedCategory('all')}
+                  onClick={() => {
+                    setSelectedCategory('all');
+                    setSearchQuery('');
+                  }}
                   className="relative z-10 self-start sm:self-auto bg-white/10 hover:bg-white/20 text-white border border-white/20 hover:border-orange-500/50 px-4 py-2.5 rounded-2xl text-xs sm:text-sm font-bold transition flex items-center space-x-2 active:scale-95 shadow-sm cursor-pointer"
                 >
                   <span>{language === 'bn' ? 'সকল পণ্য দেখুন' : 'Show All Products'}</span>
@@ -109,7 +107,7 @@ export default function Home() {
                 </button>
               </div>
 
-              {/* Category-Only Product Grid */}
+              {/* Category-Only or Search Product Grid */}
               <ProductGrid
                 selectedCategory={selectedCategory}
                 searchQuery={searchQuery}

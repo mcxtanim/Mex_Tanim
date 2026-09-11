@@ -117,7 +117,7 @@ const CategoryRailRow: React.FC<CategoryRailProps> = ({
         </div>
       </div>
 
-      {/* Horizontally Scrollable Rail */}
+      {/* Horizontally Scrollable Product Rail */}
       <div
         ref={railRef}
         onMouseEnter={() => setIsHovered(true)}
@@ -168,14 +168,14 @@ export const ProductTabsSection: React.FC = () => {
   }).filter((group) => group.products.length > 0);
 
   return (
-    <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
-      {/* Header & 3 Tabs Bar */}
+    <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-8">
+      {/* Header & 3 Tabs Bar (Matching reference image media_1789121440798.png) */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-gray-200/80 pb-6">
         <div>
           <div className="flex items-center space-x-2">
             <span className="w-2.5 h-6 bg-gradient-to-b from-orange-500 to-amber-500 rounded-full inline-block" />
             <h2 className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight">
-              {language === 'bn' ? 'এক্সক্লুসিভ গ্যাজেট কালেকশন' : 'Exclusive Product Showcase'}
+              {language === 'bn' ? 'ফিচার্ড প্রোডাক্টস' : 'Exclusive Product Showcase'}
             </h2>
           </div>
           <p className="text-xs sm:text-sm text-gray-500 font-medium mt-1">
