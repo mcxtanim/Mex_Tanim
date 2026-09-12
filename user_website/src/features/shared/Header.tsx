@@ -2,12 +2,13 @@
 
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { Menu, Search, ShoppingBag, Globe, X, RotateCcw, Package, Layers, ChevronRight, ArrowRight } from 'lucide-react';
+import { useRouter } from 'next/navigation';
+import { Menu, Search, ShoppingBag, Globe, X, RotateCcw, Package, Layers, ChevronRight, ArrowRight, LayoutGrid } from 'lucide-react';
 import { useCart } from '../cart/CartContext';
 import { useAuth } from '../auth/AuthContext';
 import { useLanguage } from './LanguageContext';
 import { CategorySidebar } from '../catalog/CategorySidebar';
-import { PRODUCTS } from '../catalog/mockData';
+import { CATEGORIES } from '../catalog/categoryData';
 
 interface HeaderProps {
   searchQuery?: string;
@@ -42,6 +43,7 @@ export const Header: React.FC<HeaderProps> = ({
 }) => {
   const { totalItems, openCart } = useCart();
   const { language, setLanguage, t } = useLanguage();
+  const router = useRouter();
 
   const [isCategoryDrawerOpen, setIsCategoryDrawerOpen] = useState(false);
 
@@ -225,72 +227,60 @@ export const Header: React.FC<HeaderProps> = ({
         </div>
       </header>
 
-      {/* Left Slide-Out Category Drawer Overlay */}
+      {/* Left Slide-Out Category Drawer Overlay (Matching Reference Image 1) */}
       {isCategoryDrawerOpen && (
         <div className="fixed inset-0 z-50 overflow-hidden select-none">
           {/* Dark Backdrop Overlay */}
           <div
-            className="fixed inset-0 bg-slate-950/70 backdrop-blur-sm transition-opacity duration-300"
+            className="fixed inset-0 bg-slate-950/70 backdrop-blur-xs transition-opacity duration-300"
             onClick={() => setIsCategoryDrawerOpen(false)}
             aria-hidden="true"
           />
 
           {/* Left Slide-Out Drawer Panel */}
-          <div className="relative z-10 w-80 sm:w-96 h-full bg-slate-950 text-white shadow-2xl flex flex-col overflow-hidden border-r border-slate-800 animate-in slide-in-from-left duration-300">
+          <div className="relative z-10 w-80 sm:w-96 h-full bg-white text-slate-900 shadow-2xl flex flex-col overflow-hidden animate-in slide-in-from-left duration-300">
             
-            {/* Drawer Header */}
-            <div className="p-5 border-b border-slate-800 bg-slate-900/90 flex items-center justify-between shrink-0">
+            {/* Black Drawer Header (Matching Image 1) */}
+            <div className="px-5 py-4 bg-black text-white flex items-center justify-between shrink-0 shadow-md">
               <div className="flex items-center space-x-3">
-                <div className="w-9 h-9 rounded-xl bg-orange-500 flex items-center justify-center text-white font-black text-base shadow-md">
-                  C
+                <div className="w-10 h-10 rounded-xl bg-slate-900 border border-slate-700 flex items-center justify-center text-white shrink-0 shadow-xs">
+                  <LayoutGrid className="w-5 h-5 text-white" />
                 </div>
                 <div>
                   <h3 className="font-extrabold text-white text-base leading-tight">
-                    {language === 'bn' ? 'ক্যাটাগরি মেনু' : 'Product Categories'}
+                    {language === 'bn' ? 'ক্যাটাগরি' : 'Categories'}
                   </h3>
-                  <p className="text-[11px] text-orange-400 font-semibold">Mex Tanim Store</p>
+                  <p className="text-[11px] text-gray-400 font-medium">
+                    {CATEGORIES.length}{language === 'bn' ? 'টি কালেকশন' : ' Collections'}
+                  </p>
                 </div>
               </div>
 
               <button
                 onClick={() => setIsCategoryDrawerOpen(false)}
-                className="p-2 text-slate-400 hover:text-white hover:bg-slate-800 rounded-full transition cursor-pointer"
+                className="p-1.5 text-gray-300 hover:text-white hover:bg-slate-800 rounded-full transition cursor-pointer"
                 aria-label="Close category drawer"
               >
-                <X className="w-5 h-5" />
+                <X className="w-6 h-6" />
               </button>
             </div>
 
-            {/* Dedicated Categories Page Quick Banner Link */}
-            <div className="p-3.5 bg-gradient-to-r from-orange-600 to-amber-500 text-white flex items-center justify-between shrink-0">
-              <span className="text-xs font-black uppercase tracking-wider">
-                {language === 'bn' ? 'পৃথক ক্যাটাগরি পেজে যান' : 'Go to Categories Page'}
-              </span>
-              <Link
-                href="/categories"
-                onClick={() => setIsCategoryDrawerOpen(false)}
-                className="px-3 py-1 rounded-xl bg-slate-950 text-white text-xs font-extrabold flex items-center gap-1 hover:bg-slate-900 transition shadow-xs"
-              >
-                <span>Open</span>
-                <ArrowRight className="w-3.5 h-3.5 text-orange-400" />
-              </Link>
-            </div>
-
-            {/* Drawer Navigation List */}
-            <div className="flex-1 overflow-y-auto p-4 space-y-3 scrollbar-thin">
+            {/* White Drawer Navigation List (Matching Image 1) */}
+            <div className="flex-1 overflow-y-auto bg-white scrollbar-thin">
               <CategorySidebar
                 selectedCategory={selectedCategory}
-                onSelectCategory={(cat) => {
+                onSelectCategory={(catId) => {
                   if (onSelectCategory) {
-                    onSelectCategory(cat);
+                    onSelectCategory(catId);
                   }
                   setIsCategoryDrawerOpen(false);
+                  router.push(`/categories?cat=${catId}`);
                 }}
               />
             </div>
 
             {/* Drawer Footer */}
-            <div className="p-4 border-t border-slate-800 bg-slate-950 text-center text-xs text-slate-500 shrink-0">
+            <div className="p-3 border-t border-gray-100 bg-slate-50 text-center text-xs font-semibold text-slate-500 shrink-0">
               Mex Tanim Store • 100% Authentic Gadgets
             </div>
           </div>

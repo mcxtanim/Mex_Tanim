@@ -17,6 +17,7 @@ export interface CategoryItem {
   nameEn: string;
   nameBn: string;
   badge: string;
+  badgeBg: string;
   icon: ComponentType<{ className?: string }>;
   colorClass: string;
   staticCount?: number;
@@ -28,18 +29,24 @@ export const getCategoryProductCount = (catId: string, staticCount: number = 0):
   const realCount = PRODUCTS.filter(
     (p) =>
       p.category === catId ||
-      (catId === 'finger-sleeves' && p.category === 'sleeves') ||
-      (catId === 'sleeves' && p.category === 'finger-sleeves') ||
-      (catId === 'soundboxes' && p.category === 'soundbox') ||
-      (catId === 'soundbox' && p.category === 'soundboxes') ||
-      (catId === 'chargers' && p.category === 'fast-chargers') ||
-      (catId === 'fast-chargers' && p.category === 'chargers')
+      (catId === 'gaming-cooler' && (p.category === 'cooler' || p.category === 'gaming-cooler')) ||
+      (catId === 'finger-sleeves' && (p.category === 'sleeves' || p.category === 'finger-sleeves')) ||
+      (catId === 'gaming-earphone' && (p.category === 'earphone' || p.category === 'gaming-earphone')) ||
+      (catId === 'gaming-powder' && (p.category === 'powder' || p.category === 'gaming-powder')) ||
+      (catId === 'magnetic-plates' && (p.category === 'plates' || p.category === 'magnetic-plates')) ||
+      (catId === 'gaming-triggers' && (p.category === 'triggers' || p.category === 'gaming-triggers')) ||
+      (catId === 'power-bank' && (p.category === 'powerbank' || p.category === 'power-bank')) ||
+      (catId === 'charger-adapter' && (p.category === 'chargers' || p.category === 'fast-chargers' || p.category === 'charger-adapter')) ||
+      (catId === 'soundboxes' && (p.category === 'soundbox' || p.category === 'soundboxes')) ||
+      (catId === 'chargers' && (p.category === 'fast-chargers' || p.category === 'chargers'))
   ).length;
   return realCount > 0 ? realCount : staticCount;
 };
 
 export const isCategorySelected = (selectedCategory: string, catId: string): boolean => {
   if (selectedCategory === catId) return true;
+  if (selectedCategory === 'gaming-cooler' && catId === 'cooler') return true;
+  if (selectedCategory === 'cooler' && catId === 'gaming-cooler') return true;
   if (selectedCategory === 'sleeves' && catId === 'finger-sleeves') return true;
   if (selectedCategory === 'finger-sleeves' && catId === 'sleeves') return true;
   if (selectedCategory === 'soundbox' && catId === 'soundboxes') return true;
@@ -51,22 +58,112 @@ export const isCategorySelected = (selectedCategory: string, catId: string): boo
 
 export const CATEGORIES: CategoryItem[] = [
   {
-    id: 'all',
-    nameEn: 'ALL CATEGORIES',
-    nameBn: 'সকল ক্যাটাগরি',
+    id: 'gaming-cooler',
+    nameEn: 'GAMING COOLER',
+    nameBn: 'গেমিং কুলার',
+    icon: Zap,
+    colorClass: 'bg-slate-900 text-white',
+    badge: 'G',
+    badgeBg: 'bg-black text-white',
+    staticCount: 28,
+    image: '/categories/gaming-mice.svg',
+  },
+  {
+    id: 'finger-sleeves',
+    nameEn: 'FINGER SLEEVES',
+    nameBn: 'ফিঙ্গার স্লিকস',
+    icon: Shield,
+    colorClass: 'bg-slate-900 text-white',
+    badge: 'F',
+    badgeBg: 'bg-black text-white',
+    staticCount: 16,
+    image: '/categories/finger-sleeves.svg',
+  },
+  {
+    id: 'gaming-earphone',
+    nameEn: 'GAMING EARPHONE',
+    nameBn: 'গেমিং ইয়ারফোন',
+    icon: Headphones,
+    colorClass: 'bg-blue-500 text-white',
+    badge: 'G',
+    badgeBg: 'bg-blue-500 text-white',
+    staticCount: 12,
+    image: '/categories/gaming-headsets.svg',
+  },
+  {
+    id: 'gaming-powder',
+    nameEn: 'GAMING POWDER',
+    nameBn: 'গেমিং পাউডার',
     icon: Grid,
-    colorClass: 'bg-slate-100 text-slate-800 border border-slate-200',
-    badge: 'A',
-    staticCount: PRODUCTS.length,
+    colorClass: 'bg-emerald-600 text-white',
+    badge: 'G',
+    badgeBg: 'bg-emerald-700 text-white',
+    staticCount: 4,
     image: '/categories/all.svg',
+  },
+  {
+    id: 'magnetic-plates',
+    nameEn: 'MAGNETIC PLATES',
+    nameBn: 'ম্যাগনেটিক প্লেটস',
+    icon: Grid,
+    colorClass: 'bg-slate-900 text-white',
+    badge: 'M',
+    badgeBg: 'bg-black text-white',
+    staticCount: 8,
+    image: '/categories/mechanical-keyboards.svg',
+  },
+  {
+    id: 'gaming-triggers',
+    nameEn: 'GAMING TRIGGERS',
+    nameBn: 'গেমিং ট্রিগার',
+    icon: Zap,
+    colorClass: 'bg-amber-600 text-white',
+    badge: 'G',
+    badgeBg: 'bg-amber-600 text-white',
+    staticCount: 3,
+    image: '/categories/gaming-mice.svg',
+  },
+  {
+    id: 'power-bank',
+    nameEn: 'POWER BANK',
+    nameBn: 'পাওয়ার ব্যাংক',
+    icon: Zap,
+    colorClass: 'bg-slate-900 text-white',
+    badge: 'P',
+    badgeBg: 'bg-black text-white',
+    staticCount: 4,
+    image: '/categories/fast-chargers.svg',
+  },
+  {
+    id: 'charger-adapter',
+    nameEn: 'CHARGER ADAPTER',
+    nameBn: 'চার্জার এডাপ্টার',
+    icon: Zap,
+    colorClass: 'bg-slate-900 text-white',
+    badge: 'C',
+    badgeBg: 'bg-black text-white',
+    staticCount: 3,
+    image: '/categories/fast-chargers.svg',
+  },
+  {
+    id: 'cables',
+    nameEn: 'CABLE',
+    nameBn: 'কেবলস',
+    icon: Cable,
+    colorClass: 'bg-blue-500 text-white',
+    badge: 'C',
+    badgeBg: 'bg-blue-500 text-white',
+    staticCount: 40,
+    image: '/categories/cables.svg',
   },
   {
     id: 'mice',
     nameEn: 'GAMING MICE',
     nameBn: 'গেমিং মাউস',
     icon: Mouse,
-    colorClass: 'bg-orange-500/15 text-orange-600 border border-orange-500/20',
+    colorClass: 'bg-slate-900 text-white',
     badge: 'G',
+    badgeBg: 'bg-black text-white',
     staticCount: 18,
     image: '/categories/gaming-mice.svg',
   },
@@ -75,68 +172,20 @@ export const CATEGORIES: CategoryItem[] = [
     nameEn: 'MECHANICAL KEYBOARDS',
     nameBn: 'মেকানিক্যাল কীবোর্ড',
     icon: Keyboard,
-    colorClass: 'bg-blue-500/15 text-blue-600 border border-blue-500/20',
+    colorClass: 'bg-slate-900 text-white',
     badge: 'M',
+    badgeBg: 'bg-black text-white',
     staticCount: 15,
     image: '/categories/mechanical-keyboards.svg',
-  },
-  {
-    id: 'headphones',
-    nameEn: 'GAMING HEADSETS',
-    nameBn: 'গেমিং হেডসেট',
-    icon: Headphones,
-    colorClass: 'bg-purple-500/15 text-purple-600 border border-purple-500/20',
-    badge: 'H',
-    staticCount: 24,
-    image: '/categories/gaming-headsets.svg',
-  },
-  {
-    id: 'chargers',
-    nameEn: 'FAST CHARGERS',
-    nameBn: 'ফাস্ট চার্জার',
-    icon: Zap,
-    colorClass: 'bg-amber-500/15 text-amber-600 border border-amber-500/20',
-    badge: 'F',
-    staticCount: 32,
-    image: '/categories/fast-chargers.svg',
-  },
-  {
-    id: 'finger-sleeves',
-    nameEn: 'FINGER SLEEVES',
-    nameBn: 'ফিঙ্গার স্লিকস',
-    icon: Shield,
-    colorClass: 'bg-emerald-500/15 text-emerald-600 border border-emerald-500/20',
-    badge: 'S',
-    staticCount: 12,
-    image: '/categories/finger-sleeves.svg',
-  },
-  {
-    id: 'cables',
-    nameEn: 'CABLES',
-    nameBn: 'केवलস',
-    icon: Cable,
-    colorClass: 'bg-indigo-500/15 text-indigo-600 border border-indigo-500/20',
-    badge: 'C',
-    staticCount: 40,
-    image: '/categories/cables.svg',
-  },
-  {
-    id: 'soundboxes',
-    nameEn: 'SOUNDBOXES',
-    nameBn: 'সাউন্ডবক্স',
-    icon: Speaker,
-    colorClass: 'bg-rose-500/15 text-rose-600 border border-rose-500/20',
-    badge: 'B',
-    staticCount: 16,
-    image: '/categories/soundboxes.svg',
   },
   {
     id: 'trimmers',
     nameEn: 'TRIMMERS',
     nameBn: 'ট্রিমার',
     icon: Scissors,
-    colorClass: 'bg-teal-500/15 text-teal-600 border border-teal-500/20',
+    colorClass: 'bg-slate-900 text-white',
     badge: 'T',
+    badgeBg: 'bg-black text-white',
     staticCount: 10,
     image: '/categories/trimmers.svg',
   },

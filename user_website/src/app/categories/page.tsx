@@ -1,3 +1,4 @@
+import { Suspense } from 'react';
 import { Header } from "@/features/shared/Header";
 import { Footer } from "@/features/shared/Footer";
 import { FloatingChat } from "@/features/shared/FloatingChat";
@@ -8,7 +9,13 @@ export default function CategoriesPage() {
     <div className="min-h-screen bg-slate-50 flex flex-col font-sans">
       <Header />
       <main className="flex-1">
-        <CategoriesView />
+        <Suspense fallback={
+          <div className="min-h-screen flex items-center justify-center bg-slate-50 text-slate-500 font-bold text-sm">
+            Loading Categories...
+          </div>
+        }>
+          <CategoriesView />
+        </Suspense>
       </main>
       <Footer />
       <FloatingChat />
