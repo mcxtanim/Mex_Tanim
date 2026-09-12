@@ -40,22 +40,27 @@ export function CategoryFormView({ categoryId }: CategoryFormViewProps) {
     }
   }, [categoryId]);
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleSubmit = async (e?: React.FormEvent | React.MouseEvent) => {
+    if (e) e.preventDefault();
     if (!formData.name.trim()) return;
 
     setIsSaving(true);
 
-    if (categoryId) {
-      updateCategory(categoryId, formData, categories);
-    } else {
-      createCategory(formData, categories);
+    try {
+      if (categoryId) {
+        await updateCategory(categoryId, formData, categories);
+      } else {
+        await createCategory(formData, categories);
+      }
+      setSaveSuccess(true);
+      setTimeout(() => {
+        router.push("/categories");
+      }, 600);
+    } catch (err: any) {
+      console.error("Error saving category:", err?.message || err);
+    } finally {
+      setIsSaving(false);
     }
-
-    setSaveSuccess(true);
-    setTimeout(() => {
-      router.push("/categories");
-    }, 600);
   };
 
   return (
@@ -81,7 +86,8 @@ export function CategoryFormView({ categoryId }: CategoryFormViewProps) {
         </div>
 
         <button
-          onClick={handleSubmit}
+          type="button"
+          onClick={(e) => handleSubmit(e)}
           disabled={isSaving}
           className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-extrabold text-xs shadow-lg shadow-emerald-600/20 transition-all hover:scale-[1.02] cursor-pointer disabled:opacity-50"
         >
