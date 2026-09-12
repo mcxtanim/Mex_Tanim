@@ -35,6 +35,8 @@ export function AddEditProductModal({
     imageUrl: "",
   });
 
+  const [isUploading, setIsUploading] = useState(false);
+
   useEffect(() => {
     if (productToEdit) {
       setFormData({
@@ -70,8 +72,6 @@ export function AddEditProductModal({
   }, [productToEdit, categories, isOpen]);
 
   if (!isOpen) return null;
-
-  const [isUploading, setIsUploading] = useState(false);
 
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];

@@ -24,6 +24,8 @@ export function AddEditCategoryModal({
     image: "",
   });
 
+  const [isUploading, setIsUploading] = useState(false);
+
   useEffect(() => {
     if (categoryToEdit) {
       setFormData({
@@ -41,8 +43,6 @@ export function AddEditCategoryModal({
   }, [categoryToEdit, isOpen]);
 
   if (!isOpen) return null;
-
-  const [isUploading, setIsUploading] = useState(false);
 
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
