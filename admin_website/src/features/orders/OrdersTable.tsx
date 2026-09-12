@@ -1,15 +1,16 @@
 "use client";
 
-import { Eye, ChevronDown, Truck } from "lucide-react";
+import { Eye, Printer, ChevronDown, Truck } from "lucide-react";
 import { Order, OrderStatus } from "./types";
 
 interface OrdersTableProps {
   orders: Order[];
   onViewDetails: (order: Order) => void;
+  onPrintInvoice: (order: Order) => void;
   onStatusChange: (orderId: string, newStatus: OrderStatus) => void;
 }
 
-export function OrdersTable({ orders, onViewDetails, onStatusChange }: OrdersTableProps) {
+export function OrdersTable({ orders, onViewDetails, onPrintInvoice, onStatusChange }: OrdersTableProps) {
   const getStatusBadge = (status: OrderStatus) => {
     switch (status) {
       case "Pending":
@@ -110,15 +111,24 @@ export function OrdersTable({ orders, onViewDetails, onStatusChange }: OrdersTab
                 </select>
               </td>
 
-              {/* View & Courier Actions */}
+              {/* View & Invoice Print Actions */}
               <td className="py-3.5 px-4 text-right">
                 <div className="flex items-center justify-end space-x-2">
                   <button
+                    onClick={() => onPrintInvoice(order)}
+                    title="Print Invoice / Cash Memo"
+                    className="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl text-xs font-semibold bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 transition-all cursor-pointer"
+                  >
+                    <Printer className="w-3.5 h-3.5" />
+                    <span>Memo</span>
+                  </button>
+
+                  <button
                     onClick={() => onViewDetails(order)}
-                    className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 transition-all hover:text-emerald-400 cursor-pointer"
+                    className="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl text-xs font-semibold bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 transition-all hover:text-emerald-400 cursor-pointer"
                   >
                     <Eye className="w-3.5 h-3.5" />
-                    <span>View Details</span>
+                    <span>Details</span>
                   </button>
                 </div>
               </td>

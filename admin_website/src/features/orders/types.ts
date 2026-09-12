@@ -29,6 +29,7 @@ export interface Order {
   };
   items: OrderItem[];
   totalAmount: number; // in BDT
+  deliveryCharge?: number;
   status: OrderStatus;
   paymentMethod: "Cash on Delivery" | "bKash" | "Nagad" | "Card";
   paymentStatus: "Paid" | "Unpaid";

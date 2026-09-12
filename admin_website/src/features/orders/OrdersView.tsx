@@ -5,6 +5,7 @@ import { ShoppingBag, Search, Filter } from "lucide-react";
 import { Order, OrderStatus } from "./types";
 import { OrdersTable } from "./OrdersTable";
 import { OrderDetailModal } from "./OrderDetailModal";
+import { PrintableInvoiceModal } from "./PrintableInvoiceModal";
 import { getStoredOrders, updateOrderStatus } from "./orderService";
 
 export function OrdersView() {
@@ -12,6 +13,7 @@ export function OrdersView() {
   const [activeTab, setActiveTab] = useState<"All" | OrderStatus>("All");
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
+  const [printingOrder, setPrintingOrder] = useState<Order | null>(null);
 
   useEffect(() => {
     const refresh = () => setOrders(getStoredOrders());
@@ -55,7 +57,7 @@ export function OrdersView() {
       <div className="flex items-center justify-between bg-slate-900/40 p-3.5 rounded-2xl border border-slate-800">
         <h2 className="text-base font-bold text-slate-100 flex items-center gap-2">
           <ShoppingBag className="w-5 h-5 text-emerald-400" />
-          Orders
+          Orders Management
         </h2>
       </div>
 
@@ -104,6 +106,7 @@ export function OrdersView() {
       <OrdersTable
         orders={filteredOrders}
         onViewDetails={(ord) => setSelectedOrder(ord)}
+        onPrintInvoice={(ord) => setPrintingOrder(ord)}
         onStatusChange={handleStatusChange}
       />
 
@@ -113,6 +116,13 @@ export function OrdersView() {
         isOpen={Boolean(selectedOrder)}
         onClose={() => setSelectedOrder(null)}
         onStatusChange={handleStatusChange}
+      />
+
+      {/* Printable Invoice / Cash Memo Modal */}
+      <PrintableInvoiceModal
+        order={printingOrder}
+        isOpen={Boolean(printingOrder)}
+        onClose={() => setPrintingOrder(null)}
       />
     </div>
   );
