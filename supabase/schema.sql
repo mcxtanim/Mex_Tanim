@@ -1,5 +1,5 @@
 -- ========================================================
--- MEX TANIM STORE — SUPABASE DATABASE SCHEMA & INITIAL SEED DATA
+-- MEX TANIM STORE — SUPABASE DATABASE SCHEMA & RLS POLICIES
 -- Project Reference: mbchiojrtufgmchyuxpp
 -- ========================================================
 
@@ -16,9 +16,14 @@ CREATE TABLE IF NOT EXISTS public.products (
   stock INT DEFAULT 10,
   description TEXT,
   description_bn TEXT,
-  specs TEXT,
+  specs TEXT[],
   image_url TEXT,
-  created_at TIMESTAMPTZ DEFAULT NOW()
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  is_featured BOOLEAN DEFAULT FALSE,
+  is_popular BOOLEAN DEFAULT FALSE,
+  is_bestseller BOOLEAN DEFAULT FALSE,
+  is_new_arrival BOOLEAN DEFAULT FALSE,
+  is_combo BOOLEAN DEFAULT FALSE
 );
 
 -- 2. CATEGORIES TABLE
@@ -32,12 +37,27 @@ CREATE TABLE IF NOT EXISTS public.categories (
   created_at TIMESTAMPTZ DEFAULT NOW()
 );
 
+-- FOREIGN KEY CONSTRAINT & INDEXES
+CREATE INDEX IF NOT EXISTS idx_products_category ON public.products (category);
+CREATE INDEX IF NOT EXISTS idx_categories_slug ON public.categories (slug);
+
+ALTER TABLE public.products
+  DROP CONSTRAINT IF EXISTS fk_products_category;
+
+ALTER TABLE public.products
+  ADD CONSTRAINT fk_products_category
+  FOREIGN KEY (category) REFERENCES public.categories(slug)
+  ON UPDATE CASCADE ON DELETE SET NULL;
+
 -- 3. ORDERS TABLE
 CREATE TABLE IF NOT EXISTS public.orders (
   id VARCHAR PRIMARY KEY,
+  order_number VARCHAR,
   customer_name VARCHAR NOT NULL,
+  customer_email VARCHAR,
   phone VARCHAR NOT NULL,
   address TEXT NOT NULL,
+  shipping_address JSONB,
   delivery_area VARCHAR,
   delivery_charge NUMERIC DEFAULT 70,
   items JSONB NOT NULL,
@@ -48,68 +68,39 @@ CREATE TABLE IF NOT EXISTS public.orders (
   created_at TIMESTAMPTZ DEFAULT NOW()
 );
 
--- Enable Row Level Security (RLS) and allow Public Read/Write for Store operations
+-- 4. SAVED ADDRESSES TABLE (For "save address for next order" feature)
+CREATE TABLE IF NOT EXISTS public.saved_addresses (
+  id VARCHAR PRIMARY KEY,
+  customer_name VARCHAR NOT NULL,
+  phone VARCHAR NOT NULL,
+  division VARCHAR,
+  district VARCHAR,
+  upazila VARCHAR,
+  area TEXT,
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- ENABLE ROW LEVEL SECURITY (RLS)
 ALTER TABLE public.products ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.categories ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.orders ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.saved_addresses ENABLE ROW LEVEL SECURITY;
 
--- Public Access Policies
+-- RLS POLICIES
+
+-- Products Policies (Public SELECT allowed; Public INSERT/UPDATE/DELETE blocked)
+DROP POLICY IF EXISTS "Public Write Access Products" ON public.products;
 CREATE POLICY "Public Read Access Products" ON public.products FOR SELECT USING (true);
-CREATE POLICY "Public Write Access Products" ON public.products FOR ALL USING (true);
 
+-- Categories Policies (Public SELECT allowed; Public INSERT/UPDATE/DELETE blocked)
+DROP POLICY IF EXISTS "Public Write Access Categories" ON public.categories;
 CREATE POLICY "Public Read Access Categories" ON public.categories FOR SELECT USING (true);
 
+-- Orders Policies (Public SELECT & INSERT allowed; Public UPDATE & DELETE blocked)
+DROP POLICY IF EXISTS "Public Write Access Orders" ON public.orders;
 CREATE POLICY "Public Read Access Orders" ON public.orders FOR SELECT USING (true);
-CREATE POLICY "Public Write Access Orders" ON public.orders FOR ALL USING (true);
+CREATE POLICY "Public Insert Access Orders" ON public.orders FOR INSERT WITH CHECK (true);
 
--- ========================================================
--- INITIAL SEED DATA
--- ========================================================
-
--- Categories Seed
-INSERT INTO public.categories (id, name, slug, description, image_url, product_count)
-VALUES
-  ('cat-mice', 'GAMING MICE', 'gaming-mice', 'High precision esports RGB gaming mice.', '/categories/gaming-mice.svg', 18),
-  ('cat-keyboards', 'MECHANICAL KEYBOARDS', 'mechanical-keyboards', 'Mechanical gaming keyboards with customizable switches.', '/categories/mechanical-keyboards.svg', 15),
-  ('cat-headphones', 'GAMING HEADSETS', 'gaming-headsets', 'Surround sound over-ear gaming headsets.', '/categories/gaming-headsets.svg', 24),
-  ('cat-chargers', 'FAST CHARGERS', 'fast-chargers', 'GaN fast wall charger adapters.', '/categories/fast-chargers.svg', 32),
-  ('cat-sleeves', 'FINGER SLEEVES', 'finger-sleeves', 'Sweatproof gaming finger sleeves.', '/categories/finger-sleeves.svg', 12),
-  ('cat-cables', 'CABLES', 'cables', 'Heavy-duty braided charging cables.', '/categories/cables.svg', 40),
-  ('cat-soundboxes', 'SOUNDBOXES', 'soundboxes', 'Portable Bluetooth soundbox speakers.', '/categories/soundboxes.svg', 16),
-  ('cat-trimmers', 'TRIMMERS', 'trimmers', 'Modern electric hair and beard trimmers.', '/categories/trimmers.svg', 10)
-ON CONFLICT (id) DO UPDATE SET name = EXCLUDED.name, image_url = EXCLUDED.image_url;
-
--- Products Seed
-INSERT INTO public.products (id, title, title_bn, brand, category, price, original_price, discount, stock, description, description_bn, specs, image_url)
-VALUES
-  (
-    'prod-cooler-1',
-    'MEMO CX08 PRO PHONE COOLER',
-    'মেমো CX08 প্রো ফোন কুলার',
-    'MEMO',
-    'gaming-cooler',
-    1400,
-    1600,
-    12,
-    25,
-    'Semiconductor magnetic RGB cooling fan for PUBG & Mobile Gaming.',
-    'পাবজি ও মোবাইল গেমিংয়ের জন্য আরজিবি কুলিং ফ্যান।',
-    'Semiconductor Cooling, Magnetic Attachment, RGB Light Effects',
-    'https://images.unsplash.com/photo-1592840496694-26d035b52b48?auto=format&fit=crop&w=600&q=80'
-  ),
-  (
-    'prod-headset-1',
-    'JBL Quantum 100 Gaming Headset',
-    'জেবিএল কোয়ান্টাম ১০০ গেমিং হেডসেট',
-    'JBL',
-    'gaming-headsets',
-    3950,
-    4800,
-    18,
-    15,
-    'Wired over-ear gaming headset with detachable mic.',
-    'ডিটেচেবল মাইক্রোফোন সহ প্রিমিয়াম গেমিং হেডসেট।',
-    '40mm Drivers, Memory Foam, Detachable Mic',
-    'https://images.unsplash.com/photo-1590658268037-6bf12165a8df?auto=format&fit=crop&w=600&q=80'
-  )
-ON CONFLICT (id) DO UPDATE SET title = EXCLUDED.title, price = EXCLUDED.price;
+-- Saved Addresses Policies (Public SELECT & INSERT allowed)
+CREATE POLICY "Public Read Access Saved Addresses" ON public.saved_addresses FOR SELECT USING (true);
+CREATE POLICY "Public Insert Access Saved Addresses" ON public.saved_addresses FOR INSERT WITH CHECK (true);
