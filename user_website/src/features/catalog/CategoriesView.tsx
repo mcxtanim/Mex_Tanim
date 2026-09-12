@@ -5,7 +5,8 @@ import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import { Home, ChevronRight, ShoppingBag } from 'lucide-react';
 import { CATEGORIES, getCategoryProductCount, isCategorySelected } from './categoryData';
-import { PRODUCTS } from './mockData';
+import { fetchLiveProducts } from './productService';
+import { Product } from './types';
 import { ProductCard } from './ProductCard';
 import { useLanguage } from '../shared/LanguageContext';
 
@@ -18,7 +19,12 @@ export const CategoriesView: React.FC<CategoriesViewProps> = ({ initialCategory 
   const catParam = searchParams.get('cat');
 
   const [selectedCategory, setSelectedCategory] = useState<string>(catParam || initialCategory || 'all');
+  const [products, setProducts] = useState<Product[]>([]);
   const { language } = useLanguage();
+
+  useEffect(() => {
+    fetchLiveProducts().then((data) => setProducts(data));
+  }, []);
 
   useEffect(() => {
     if (catParam) {
@@ -35,9 +41,9 @@ export const CategoriesView: React.FC<CategoriesViewProps> = ({ initialCategory 
     image: '/categories/all.svg',
   };
 
-  const productCount = getCategoryProductCount(selectedCategory, 16);
+  const productCount = getCategoryProductCount(selectedCategory, 0, products);
 
-  const filteredProducts = PRODUCTS.filter((p) => {
+  const filteredProducts = products.filter((p) => {
     if (selectedCategory === 'all') return true;
     return (
       isCategorySelected(selectedCategory, p.category) ||

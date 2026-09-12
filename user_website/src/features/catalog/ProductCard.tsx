@@ -4,7 +4,7 @@ import React from 'react';
 import { useRouter } from 'next/navigation';
 import { Star, ShoppingBag } from 'lucide-react';
 import { Product } from './types';
-import { getBrandName } from './mockData';
+import { getBrandName } from './productService';
 import { useCart } from '../cart/CartContext';
 import { useLanguage } from '../shared/LanguageContext';
 

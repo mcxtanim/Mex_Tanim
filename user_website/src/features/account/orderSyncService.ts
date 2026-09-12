@@ -1,4 +1,5 @@
-import { CustomerOrder, CustomerOrderStatus, StatusHistoryLog } from './types';
+import { CustomerOrder, CustomerOrderStatus } from './types';
+import { supabase } from '../../lib/supabase';
 
 const ADMIN_ORDERS_KEY = 'mex_tanim_admin_orders';
 const SAVED_ADDRESS_KEY = 'mex_tanim_saved_address';
@@ -55,16 +56,12 @@ export const ORDER_STAGES: { status: CustomerOrderStatus; titleBn: string; title
   },
 ];
 
-/**
- * Normalizes Admin status ("Pending", "Processing", "Delivered", "Cancelled", etc.)
- * to the customer order status.
- */
 export function normalizeOrderStatus(rawStatus: string): CustomerOrderStatus {
   if (!rawStatus) return 'Order Placed';
   const statusStr = String(rawStatus).trim();
 
   if (statusStr === 'Pending') return 'Order Placed';
-  if (statusStr === 'Order Placed' || statusStr === 'Order Confirmed') return statusStr;
+  if (statusStr === 'Order Placed' || statusStr === 'Order Confirmed') return statusStr as CustomerOrderStatus;
   if (statusStr === 'Processing' || statusStr === 'Packing' || statusStr === 'Shipped' || statusStr === 'Out for Delivery' || statusStr === 'Delivered' || statusStr === 'Cancelled') {
     return statusStr as CustomerOrderStatus;
   }
@@ -72,9 +69,6 @@ export function normalizeOrderStatus(rawStatus: string): CustomerOrderStatus {
   return 'Order Placed';
 }
 
-/**
- * Returns current 0-indexed stage number (0 to 6) or -1 if cancelled.
- */
 export function getOrderStageIndex(status: CustomerOrderStatus): number {
   const normalized = normalizeOrderStatus(status);
   if (normalized === 'Cancelled') return -1;
@@ -82,9 +76,61 @@ export function getOrderStageIndex(status: CustomerOrderStatus): number {
   return index >= 0 ? index : 0;
 }
 
-/**
- * Fetch all orders from localStorage shared with Admin Panel.
- */
+export async function fetchCustomerOrdersFromSupabase(customerPhone?: string): Promise<CustomerOrder[]> {
+  if (!supabase) return getAllOrdersFromStorage();
+  try {
+    let query = supabase.from('orders').select('*').order('created_at', { ascending: false });
+    
+    if (customerPhone) {
+      const cleanPhone = customerPhone.trim();
+      query = query.eq('phone', cleanPhone);
+    }
+
+    const { data, error } = await query;
+    if (error || !data) return getAllOrdersFromStorage();
+
+    const mapped: CustomerOrder[] = data.map((item: any) => {
+      const phoneVal = item.phone || item.customer_phone || '';
+      const shipping = item.shipping_address || {};
+      const addrStreet = item.address || shipping.street || '';
+
+      return {
+        id: String(item.id),
+        orderNumber: item.order_number || `#${item.id}`,
+        customerName: item.customer_name || 'Customer',
+        customerPhone: phoneVal,
+        customerEmail: item.customer_email || undefined,
+        shippingAddress: {
+          street: addrStreet,
+          city: shipping.city || item.delivery_area || 'Dhaka',
+          district: shipping.district || item.delivery_area || 'Dhaka',
+          postalCode: shipping.postalCode || '1200',
+        },
+        deliveryCharge: Number(item.delivery_charge) || 60,
+        totalAmount: Number(item.total_amount) || 0,
+        paymentMethod: item.payment_method || 'Cash on Delivery',
+        paymentStatus: item.payment_status || 'Unpaid',
+        status: normalizeOrderStatus(item.status),
+        createdAt: item.created_at ? new Date(item.created_at).toLocaleString('en-US', { timeZone: 'Asia/Dhaka' }) : new Date().toLocaleString(),
+        items: Array.isArray(item.items)
+          ? item.items.map((i: any) => ({
+              productId: String(i.id || i.productId || ''),
+              title: i.name || i.title || '',
+              unitPrice: Number(i.price || i.unitPrice) || 0,
+              quantity: Number(i.quantity) || 1,
+              image: i.image || i.imageUrl || '',
+            }))
+          : [],
+      };
+    });
+
+    return mapped;
+  } catch (err) {
+    console.warn('Supabase fetch customer orders error:', err);
+    return getAllOrdersFromStorage();
+  }
+}
+
 export function getAllOrdersFromStorage(): CustomerOrder[] {
   if (typeof window === 'undefined') return [];
   try {
@@ -95,6 +141,9 @@ export function getAllOrdersFromStorage(): CustomerOrder[] {
 
     return parsed.map((ord: any) => ({
       ...ord,
+      customerPhone: ord.customerPhone || ord.phone || '',
+      shippingAddress: ord.shippingAddress || { street: ord.address || '', district: 'Dhaka' },
+      paymentStatus: ord.paymentStatus || 'Unpaid',
       status: normalizeOrderStatus(ord.status),
     }));
   } catch (err) {
@@ -103,13 +152,9 @@ export function getAllOrdersFromStorage(): CustomerOrder[] {
   }
 }
 
-/**
- * Fetch orders strictly for the current customer (phone/saved address filtering for security).
- */
 export function getCustomerOrders(customerPhone?: string): CustomerOrder[] {
   const allOrders = getAllOrdersFromStorage();
   
-  // Get phone from argument or saved address
   let targetPhone = customerPhone?.trim();
   if (!targetPhone && typeof window !== 'undefined') {
     try {
@@ -122,35 +167,14 @@ export function getCustomerOrders(customerPhone?: string): CustomerOrder[] {
   }
 
   if (!targetPhone) {
-    // If no phone filter, return all orders stored in this browser session
     return allOrders;
   }
 
-  // Filter orders where customerPhone matches
   return allOrders.filter(
     (ord) => ord.customerPhone?.trim() === targetPhone || ord.customerPhone?.replaceAll('-', '') === targetPhone.replaceAll('-', '')
   );
 }
 
-/**
- * Get single order by ID with ownership check.
- */
-export function getOrderById(orderId: string, customerPhone?: string): CustomerOrder | null {
-  const allOrders = getAllOrdersFromStorage();
-  const order = allOrders.find((o) => o.id === orderId || o.orderNumber === orderId || o.orderNumber === `#${orderId}`);
-  if (!order) return null;
-
-  // Security check: if phone is provided, verify match
-  if (customerPhone && order.customerPhone && order.customerPhone.trim() !== customerPhone.trim()) {
-    return null; // Security isolation
-  }
-
-  return order;
-}
-
-/**
- * Save address helper
- */
 export function getSavedCustomerAddress() {
   if (typeof window === 'undefined') return null;
   try {

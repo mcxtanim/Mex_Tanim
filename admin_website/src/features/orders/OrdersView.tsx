@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { ShoppingBag, Search } from "lucide-react";
 import { Order, OrderStatus } from "./types";
 import { OrdersTable } from "./OrdersTable";
-import { getStoredOrders, updateOrderStatus } from "./orderService";
+import { getStoredOrders, fetchOrdersFromSupabase, updateOrderStatus } from "./orderService";
 
 export function OrdersView() {
   const [orders, setOrders] = useState<Order[]>([]);
@@ -12,18 +12,23 @@ export function OrdersView() {
   const [searchQuery, setSearchQuery] = useState("");
 
   useEffect(() => {
-    const refresh = () => setOrders(getStoredOrders());
-    refresh();
-    window.addEventListener("storage", refresh);
-    window.addEventListener("focus", refresh);
+    const loadOrders = async () => {
+      setOrders(getStoredOrders());
+      const fetched = await fetchOrdersFromSupabase();
+      if (fetched) setOrders(fetched);
+    };
+
+    loadOrders();
+    window.addEventListener("storage", loadOrders);
+    window.addEventListener("focus", loadOrders);
     return () => {
-      window.removeEventListener("storage", refresh);
-      window.removeEventListener("focus", refresh);
+      window.removeEventListener("storage", loadOrders);
+      window.removeEventListener("focus", loadOrders);
     };
   }, []);
 
-  const handleStatusChange = (orderId: string, newStatus: OrderStatus) => {
-    const updated = updateOrderStatus(orderId, newStatus, orders);
+  const handleStatusChange = async (orderId: string, newStatus: OrderStatus) => {
+    const updated = await updateOrderStatus(orderId, newStatus, orders);
     setOrders(updated);
   };
 

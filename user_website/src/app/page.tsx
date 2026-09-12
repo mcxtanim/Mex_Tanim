@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Header } from '@/features/shared/Header';
 import { HeroBanner } from '@/features/catalog/HeroBanner';
 import { CategoryShowcase } from '@/features/catalog/CategoryShowcase';
@@ -9,7 +9,8 @@ import { ProductTabsSection } from '@/features/catalog/ProductTabsSection';
 import { ComboOfferSection } from '@/features/catalog/ComboOfferSection';
 import { Footer } from '@/features/shared/Footer';
 import { useLanguage } from '@/features/shared/LanguageContext';
-import { PRODUCTS } from '@/features/catalog/mockData';
+import { fetchLiveProducts } from '@/features/catalog/productService';
+import { Product } from '@/features/catalog/types';
 import { RotateCcw } from 'lucide-react';
 
 const CATEGORY_META: Record<string, { en: string; bn: string; badge: string }> = {
@@ -30,7 +31,19 @@ const CATEGORY_META: Record<string, { en: string; bn: string; badge: string }> =
 export default function Home() {
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
   const [searchQuery, setSearchQuery] = useState<string>('');
+  const [products, setProducts] = useState<Product[]>([]);
   const { language } = useLanguage();
+
+  useEffect(() => {
+    const loadData = async () => {
+      const data = await fetchLiveProducts();
+      setProducts(data);
+    };
+    loadData();
+
+    window.addEventListener('storage', loadData);
+    return () => window.removeEventListener('storage', loadData);
+  }, []);
 
   const currentMeta = CATEGORY_META[selectedCategory] || {
     en: selectedCategory.replace('-', ' '),
@@ -38,8 +51,9 @@ export default function Home() {
     badge: selectedCategory.charAt(0).toUpperCase(),
   };
 
-  const productCount = PRODUCTS.filter(
+  const productCount = products.filter(
     (p) =>
+      selectedCategory === 'all' ||
       p.category === selectedCategory ||
       (selectedCategory === 'finger-sleeves' && p.category === 'sleeves') ||
       (selectedCategory === 'sleeves' && p.category === 'finger-sleeves') ||
@@ -68,10 +82,7 @@ export default function Home() {
                 selectedCategory={selectedCategory}
                 onSelectCategory={setSelectedCategory}
               />
-              {/* Main Product Showcase Tabs (Featured default, Best Sellers, New Arrivals) with Top-to-Bottom Category Rails */}
               <ProductTabsSection />
-
-              {/* Dedicated COMBO OFFER Section - Placed right above footer */}
               <ComboOfferSection />
             </>
           ) : (
@@ -118,7 +129,6 @@ export default function Home() {
                 onSelectCategory={setSelectedCategory}
               />
 
-              {/* Dedicated COMBO OFFER Section */}
               <ComboOfferSection />
             </>
           )}

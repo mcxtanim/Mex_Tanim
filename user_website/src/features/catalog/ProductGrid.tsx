@@ -1,8 +1,8 @@
 'use client';
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { ProductCard } from './ProductCard';
-import { PRODUCTS } from './mockData';
+import { fetchLiveProducts } from './productService';
 import { Product } from './types';
 import { useLanguage } from '../shared/LanguageContext';
 import { Flame, PackageSearch } from 'lucide-react';
@@ -48,8 +48,23 @@ export const ProductGrid: React.FC<ProductGridProps> = ({
   onSelectCategory,
 }) => {
   const { t, language } = useLanguage();
+  const [products, setProducts] = useState<Product[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  const filteredProducts = PRODUCTS.filter((product) => {
+  useEffect(() => {
+    const loadData = async () => {
+      setLoading(true);
+      const data = await fetchLiveProducts();
+      setProducts(data);
+      setLoading(false);
+    };
+    loadData();
+
+    window.addEventListener('storage', loadData);
+    return () => window.removeEventListener('storage', loadData);
+  }, []);
+
+  const filteredProducts = products.filter((product) => {
     // Category Filter with alias matching
     if (!isCategoryMatch(product.category, selectedCategory)) {
       return false;
@@ -86,7 +101,11 @@ export const ProductGrid: React.FC<ProductGridProps> = ({
       </div>
 
       {/* Grid Display */}
-      {filteredProducts.length === 0 ? (
+      {loading ? (
+        <div className="py-14 text-center text-slate-400 text-xs font-bold animate-pulse">
+          {language === 'bn' ? 'পণ্য লোড হচ্ছে...' : 'Loading Products from Database...'}
+        </div>
+      ) : filteredProducts.length === 0 ? (
         <div className="py-14 px-6 text-center bg-white/90 backdrop-blur-md border border-gray-200/80 rounded-3xl shadow-sm max-w-md mx-auto my-6 flex flex-col items-center justify-center space-y-4">
           <div className="w-16 h-16 rounded-full bg-orange-50 text-orange-600 border border-orange-200/60 flex items-center justify-center shadow-inner">
             <PackageSearch className="w-8 h-8" />
@@ -126,4 +145,3 @@ export const ProductGrid: React.FC<ProductGridProps> = ({
     </section>
   );
 };
-

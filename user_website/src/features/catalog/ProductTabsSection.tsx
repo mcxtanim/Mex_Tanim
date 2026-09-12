@@ -2,7 +2,8 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import { ProductCard } from './ProductCard';
-import { PRODUCTS, CATEGORIES } from './mockData';
+import { CATEGORIES } from './categoryData';
+import { fetchLiveProducts } from './productService';
 import { Product } from './types';
 import { useLanguage } from '../shared/LanguageContext';
 import {
@@ -52,7 +53,6 @@ const CategoryRailRow: React.FC<CategoryRailProps> = ({
   const railRef = useRef<HTMLDivElement>(null);
   const [isHovered, setIsHovered] = useState(false);
 
-  // Auto scroll rail left-to-right continuously
   useEffect(() => {
     if (isHovered || !railRef.current) return;
 
@@ -79,7 +79,6 @@ const CategoryRailRow: React.FC<CategoryRailProps> = ({
 
   return (
     <div className="bg-white/80 backdrop-blur-md rounded-3xl p-4 sm:p-6 border border-gray-200/80 shadow-xs space-y-4">
-      {/* Category Sub-Header */}
       <div className="flex items-center justify-between">
         <div className="flex items-center space-x-3">
           <div className="w-10 h-10 rounded-2xl bg-slate-900 text-orange-400 flex items-center justify-center shadow-md">
@@ -95,7 +94,6 @@ const CategoryRailRow: React.FC<CategoryRailProps> = ({
           </div>
         </div>
 
-        {/* Scroll Controls */}
         <div className="flex items-center space-x-2">
           <button
             onClick={() => handleScroll('left')}
@@ -114,7 +112,6 @@ const CategoryRailRow: React.FC<CategoryRailProps> = ({
         </div>
       </div>
 
-      {/* Horizontally Scrollable Product Rail */}
       <div
         ref={railRef}
         onMouseEnter={() => setIsHovered(true)}
@@ -136,19 +133,28 @@ const CategoryRailRow: React.FC<CategoryRailProps> = ({
 };
 
 export const ProductTabsSection: React.FC = () => {
-  // Default selected tab: 'featured'
   const [activeTab, setActiveTab] = useState<TabType>('featured');
+  const [allProducts, setAllProducts] = useState<Product[]>([]);
   const { language } = useLanguage();
 
-  // Filter products by active tab
-  const activeTabProducts = PRODUCTS.filter((p) => {
+  useEffect(() => {
+    const loadProducts = async () => {
+      const data = await fetchLiveProducts();
+      setAllProducts(data);
+    };
+    loadProducts();
+
+    window.addEventListener('storage', loadProducts);
+    return () => window.removeEventListener('storage', loadProducts);
+  }, []);
+
+  const activeTabProducts = allProducts.filter((p) => {
     if (activeTab === 'featured') return p.isFeatured === true;
     if (activeTab === 'bestsellers') return p.isBestSeller === true;
     if (activeTab === 'newarrivals') return p.isNewArrival === true;
     return true;
   });
 
-  // Group active products by Category (Top to Bottom)
   const categoryGroups = CATEGORIES.map((cat) => {
     const prods = activeTabProducts.filter(
       (p) =>
@@ -165,7 +171,6 @@ export const ProductTabsSection: React.FC = () => {
 
   return (
     <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-8">
-      {/* Header & 3 Tabs Bar (Matching reference image media_1789121440798.png) */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-gray-200/80 pb-6">
         <div>
           <div className="flex items-center space-x-2">
@@ -181,9 +186,7 @@ export const ProductTabsSection: React.FC = () => {
           </p>
         </div>
 
-        {/* 3 Responsive Pill Tabs: Featured (Default), Best Sellers, New Arrivals */}
         <div className="flex items-center p-1.5 bg-gray-100/80 backdrop-blur-md rounded-2xl border border-gray-200 shadow-inner self-start md:self-auto">
-          {/* Tab 1: Featured (Default) */}
           <button
             onClick={() => setActiveTab('featured')}
             className={`flex items-center space-x-2 px-4 py-2.5 rounded-xl text-xs sm:text-sm font-extrabold transition-all duration-300 cursor-pointer ${
@@ -196,7 +199,6 @@ export const ProductTabsSection: React.FC = () => {
             <span>{language === 'bn' ? 'ফিচার্ড (Featured)' : 'Featured'}</span>
           </button>
 
-          {/* Tab 2: Best Sellers */}
           <button
             onClick={() => setActiveTab('bestsellers')}
             className={`flex items-center space-x-2 px-4 py-2.5 rounded-xl text-xs sm:text-sm font-extrabold transition-all duration-300 cursor-pointer ${
@@ -209,7 +211,6 @@ export const ProductTabsSection: React.FC = () => {
             <span>{language === 'bn' ? 'বেস্ট সেলার (Best Sellers)' : 'Best Sellers'}</span>
           </button>
 
-          {/* Tab 3: New Arrivals */}
           <button
             onClick={() => setActiveTab('newarrivals')}
             className={`flex items-center space-x-2 px-4 py-2.5 rounded-xl text-xs sm:text-sm font-extrabold transition-all duration-300 cursor-pointer ${
@@ -224,7 +225,6 @@ export const ProductTabsSection: React.FC = () => {
         </div>
       </div>
 
-      {/* Top-to-Bottom Category Rows */}
       {categoryGroups.length === 0 ? (
         <div className="py-12 text-center bg-white rounded-3xl border border-gray-200 p-6 text-gray-500 text-sm font-bold">
           {language === 'bn' ? 'এই ট্যাবে কোনো পণ্য পাওয়া যায়নি' : 'No products available in this tab.'}
@@ -234,7 +234,7 @@ export const ProductTabsSection: React.FC = () => {
           {categoryGroups.map((group) => (
             <CategoryRailRow
               key={group.category.id}
-              categoryName={group.category.name}
+              categoryName={group.category.nameEn}
               categoryNameBn={group.category.nameBn}
               categoryIcon={CATEGORY_ICONS[group.category.id] || <Layers className="w-5 h-5" />}
               products={group.products}

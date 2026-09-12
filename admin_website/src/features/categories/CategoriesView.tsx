@@ -16,16 +16,18 @@ export function CategoriesView() {
   const [searchQuery, setSearchQuery] = useState("");
 
   useEffect(() => {
-    setCategories(getStoredCategories());
-    fetchCategoriesFromSupabase().then((data) => {
-      if (data && data.length > 0) {
+    const loadCategories = async () => {
+      setCategories(getStoredCategories());
+      const data = await fetchCategoriesFromSupabase();
+      if (data) {
         setCategories(data);
       }
-    });
+    };
+    loadCategories();
   }, []);
 
-  const handleDeleteCategory = (id: string) => {
-    const updated = deleteCategory(id, categories);
+  const handleDeleteCategory = async (id: string) => {
+    const updated = await deleteCategory(id, categories);
     setCategories(updated);
   };
 

@@ -23,7 +23,7 @@ import {
 } from 'lucide-react';
 import { Header } from '@/features/shared/Header';
 import { Footer } from '@/features/shared/Footer';
-import { PRODUCTS, COMBO_PRODUCTS, getBrandName } from '@/features/catalog/mockData';
+import { fetchLiveProducts, getBrandName } from '@/features/catalog/productService';
 import { Product } from '@/features/catalog/types';
 import { ProductCard } from '@/features/catalog/ProductCard';
 import { useCart } from '@/features/cart/CartContext';
@@ -43,14 +43,21 @@ export default function DedicatedProductPage() {
 
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('all');
+  const [allProducts, setAllProducts] = useState<Product[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
 
-  // Find product by URL id from PRODUCTS + COMBO_PRODUCTS
-  const allProducts = [...PRODUCTS, ...COMBO_PRODUCTS];
+  useEffect(() => {
+    fetchLiveProducts().then((data) => {
+      setAllProducts(data);
+      setIsLoading(false);
+    });
+  }, []);
+
   const product = allProducts.find((p) => p.id === productId) || allProducts[0];
 
   const [quantity, setQuantity] = useState(1);
   const [added, setAdded] = useState(false);
-  const [activeImage, setActiveImage] = useState<string>(product.image || '');
+  const [activeImage, setActiveImage] = useState<string>('');
   const [isBuyNowModalOpen, setIsBuyNowModalOpen] = useState(false);
 
   // Zoom States
@@ -83,10 +90,10 @@ export default function DedicatedProductPage() {
     };
   }, [product?.id]);
 
-  const totalReviewsCount = reviews.length > 0 ? reviews.length : (product.reviewCount || 0);
-  const averageRatingScore = reviews.length > 0
+  const totalReviewsCount = product ? (reviews.length > 0 ? reviews.length : (product.reviewCount || 0)) : 0;
+  const averageRatingScore = product ? (reviews.length > 0
     ? (reviews.reduce((acc, r) => acc + r.rating, 0) / reviews.length).toFixed(1)
-    : (product.rating || 5.0).toFixed(1);
+    : (product.rating || 5.0).toFixed(1)) : '5.0';
 
   // Sync active image when product changes
   useEffect(() => {
@@ -94,21 +101,21 @@ export default function DedicatedProductPage() {
       setActiveImage(product.image || '');
       setQuantity(1);
     }
-  }, [productId]);
+  }, [productId, product?.id]);
 
   // Safe non-empty image source fallback
   const displayImage =
     activeImage ||
-    product.image ||
+    product?.image ||
     'https://images.unsplash.com/photo-1546435770-a3e426bf472b?auto=format&fit=crop&w=600&q=80';
 
   // Gallery Images (Main image + comboImages)
-  const galleryImages = Array.from(
+  const galleryImages = product ? Array.from(
     new Set([
       product.image,
       ...(product.comboImages || []),
     ])
-  ).filter((img) => Boolean(img));
+  ).filter((img) => Boolean(img)) : [];
 
   // Handle Cursor-Following Zoom
   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {

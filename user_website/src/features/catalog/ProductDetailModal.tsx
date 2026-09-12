@@ -16,7 +16,7 @@ import {
   Zap,
 } from 'lucide-react';
 import { Product } from './types';
-import { PRODUCTS, COMBO_PRODUCTS, getBrandName } from './mockData';
+import { getBrandName, fetchLiveProducts } from './productService';
 import { ProductCard } from './ProductCard';
 import { useCart } from '../cart/CartContext';
 import { useLanguage } from '../shared/LanguageContext';
@@ -128,8 +128,15 @@ export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
     }
   };
 
+  const [allAvailable, setAllAvailable] = useState<Product[]>([]);
+
+  useEffect(() => {
+    fetchLiveProducts().then((prods) => {
+      if (prods) setAllAvailable(prods);
+    });
+  }, []);
+
   // Filter Related Products (Same category, excluding current product)
-  const allAvailable = [...PRODUCTS, ...COMBO_PRODUCTS];
   let relatedProducts = allAvailable.filter(
     (p) => p.id !== currentProduct.id && (p.category === currentProduct.category || p.categoryBn === currentProduct.categoryBn)
   );

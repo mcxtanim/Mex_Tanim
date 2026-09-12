@@ -4,7 +4,7 @@ import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { ArrowLeft, Printer, ShoppingBag, User, MapPin, Phone, Mail } from "lucide-react";
 import { Order, OrderStatus } from "./types";
-import { getStoredOrders, updateOrderStatus } from "./orderService";
+import { getStoredOrders, fetchOrdersFromSupabase, updateOrderStatus } from "./orderService";
 
 interface OrderDetailViewProps {
   orderId: string;
@@ -14,17 +14,24 @@ export function OrderDetailView({ orderId }: OrderDetailViewProps) {
   const [order, setOrder] = useState<Order | null>(null);
 
   useEffect(() => {
-    const orders = getStoredOrders();
-    const found = orders.find((o) => o.id === orderId || o.orderNumber === orderId);
-    if (found) {
-      setOrder(found);
-    }
+    const loadOrder = async () => {
+      const stored = getStoredOrders();
+      let found = stored.find((o) => o.id === orderId || o.orderNumber === orderId);
+      if (found) setOrder(found);
+
+      const fetched = await fetchOrdersFromSupabase();
+      if (fetched) {
+        found = fetched.find((o) => o.id === orderId || o.orderNumber === orderId);
+        if (found) setOrder(found);
+      }
+    };
+    loadOrder();
   }, [orderId]);
 
-  const handleStatusChange = (newStatus: OrderStatus) => {
+  const handleStatusChange = async (newStatus: OrderStatus) => {
     if (!order) return;
-    const orders = getStoredOrders();
-    const updated = updateOrderStatus(order.id, newStatus, orders);
+    const currentOrders = getStoredOrders();
+    const updated = await updateOrderStatus(order.id, newStatus, currentOrders);
     const refreshed = updated.find((o) => o.id === order.id);
     if (refreshed) {
       setOrder(refreshed);
@@ -72,7 +79,7 @@ export function OrderDetailView({ orderId }: OrderDetailViewProps) {
   };
 
   const deliveryFee = order.shippingCost ?? order.deliveryCharge ?? 60;
-  const addressText = order.shippingAddress.address || order.shippingAddress.street || "House #12, Road #4";
+  const addressText = order.shippingAddress.address || order.shippingAddress.street || "Delivery Address";
 
   return (
     <div className="space-y-6 max-w-4xl mx-auto pb-12">

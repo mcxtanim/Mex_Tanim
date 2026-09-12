@@ -17,18 +17,20 @@ export function ProductsView() {
   const [categoryFilter, setCategoryFilter] = useState("All");
 
   useEffect(() => {
-    setProducts(getStoredProducts());
-    fetchProductsFromSupabase().then((data) => {
-      if (data && data.length > 0) {
+    const loadProducts = async () => {
+      setProducts(getStoredProducts());
+      const data = await fetchProductsFromSupabase();
+      if (data) {
         setProducts(data);
       }
-    });
+    };
+    loadProducts();
   }, []);
 
   const categories = ["All", ...Array.from(new Set(products.map((p) => p.category)))];
 
-  const handleDeleteProduct = (id: string) => {
-    const updated = deleteProduct(id, products);
+  const handleDeleteProduct = async (id: string) => {
+    const updated = await deleteProduct(id, products);
     setProducts(updated);
   };
 

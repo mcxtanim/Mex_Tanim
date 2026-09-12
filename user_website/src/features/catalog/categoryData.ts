@@ -10,7 +10,7 @@ import {
   Speaker,
   Scissors,
 } from 'lucide-react';
-import { PRODUCTS } from './mockData';
+import { Product } from './types';
 
 export interface CategoryItem {
   id: string;
@@ -24,9 +24,10 @@ export interface CategoryItem {
   image: string;
 }
 
-export const getCategoryProductCount = (catId: string, staticCount: number = 0): number => {
-  if (catId === 'all') return PRODUCTS.length;
-  const realCount = PRODUCTS.filter(
+export const getCategoryProductCount = (catId: string, staticCount: number = 0, productsList: Product[] = []): number => {
+  if (!productsList || productsList.length === 0) return staticCount;
+  if (catId === 'all') return productsList.length;
+  const realCount = productsList.filter(
     (p) =>
       p.category === catId ||
       (catId === 'gaming-cooler' && (p.category === 'cooler' || p.category === 'gaming-cooler')) ||

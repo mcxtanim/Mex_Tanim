@@ -1,14 +1,28 @@
 import { Product } from './types';
-import { PRODUCTS as DEFAULT_PRODUCTS } from './mockData';
 import { supabase } from '../../lib/supabase';
 
 const ADMIN_STORAGE_KEY = 'mex_tanim_admin_products';
 
+export const getBrandName = (product?: Partial<Product> | null, language: string = 'en'): string => {
+  if (!product) return 'Mex Tanim';
+  if (language === 'bn' && product.brandBn) return product.brandBn;
+  if (product.brand) return product.brand;
+  if (product.name) {
+    const firstWord = product.name.trim().split(' ')[0];
+    if (firstWord && firstWord.length > 1) return firstWord;
+  }
+  return 'Mex Tanim';
+};
+
 export async function fetchLiveProducts(): Promise<Product[]> {
-  // 1. Try fetching from Supabase first
+  // 1. Fetch from Supabase database
   if (supabase) {
     try {
-      const { data, error } = await supabase.from('products').select('*');
+      const { data, error } = await supabase
+        .from('products')
+        .select('*')
+        .order('created_at', { ascending: false });
+
       if (!error && data && data.length > 0) {
         return data.map((item: any) => ({
           id: String(item.id),
@@ -23,15 +37,20 @@ export async function fetchLiveProducts(): Promise<Product[]> {
           discountBadge: item.discount ? `-${item.discount}%` : '',
           rating: 4.9,
           reviewCount: 42,
-          image: item.image_url || item.imageUrl || item.image || 'https://images.unsplash.com/photo-1592840496694-26d035b52b48?auto=format&fit=crop&w=600&q=80',
+          image: item.image_url || item.imageUrl || item.image || '',
           inStock: Number(item.stock ?? 10) > 0,
-          isPopular: true,
-          isFeatured: true,
-          isBestSeller: true,
-          isNewArrival: true,
+          isPopular: Boolean(item.is_popular ?? true),
+          isFeatured: Boolean(item.is_featured ?? true),
+          isBestSeller: Boolean(item.is_bestseller ?? true),
+          isNewArrival: Boolean(item.is_new_arrival ?? true),
+          isComboOffer: Boolean(item.is_combo ?? false),
           description: item.description || '',
           descriptionBn: item.description_bn || item.descriptionBn || item.description || '',
-          specs: typeof item.specs === 'string' ? item.specs.split(',').map((s: string) => s.trim()) : (Array.isArray(item.specs) ? item.specs : []),
+          specs: Array.isArray(item.specs)
+            ? item.specs
+            : typeof item.specs === 'string'
+            ? item.specs.split(/,|\n/).map((s: string) => s.trim()).filter(Boolean)
+            : [],
         }));
       }
     } catch (e) {
@@ -39,7 +58,7 @@ export async function fetchLiveProducts(): Promise<Product[]> {
     }
   }
 
-  // 2. Check localStorage (synced from Admin)
+  // 2. Fallback to localStorage (if offline/synced locally)
   if (typeof window !== 'undefined') {
     try {
       const localData = localStorage.getItem(ADMIN_STORAGE_KEY);
@@ -59,15 +78,20 @@ export async function fetchLiveProducts(): Promise<Product[]> {
             discountBadge: item.discount ? `-${item.discount}%` : '',
             rating: 4.9,
             reviewCount: 42,
-            image: item.imageUrl || item.image || 'https://images.unsplash.com/photo-1592840496694-26d035b52b48?auto=format&fit=crop&w=600&q=80',
+            image: item.imageUrl || item.image || '',
             inStock: Number(item.stock ?? 10) > 0,
-            isPopular: true,
-            isFeatured: true,
-            isBestSeller: true,
-            isNewArrival: true,
+            isPopular: Boolean(item.is_popular ?? true),
+            isFeatured: Boolean(item.is_featured ?? true),
+            isBestSeller: Boolean(item.is_bestseller ?? true),
+            isNewArrival: Boolean(item.is_new_arrival ?? true),
+            isComboOffer: Boolean(item.is_combo ?? false),
             description: item.description || '',
             descriptionBn: item.descriptionBn || item.description || '',
-            specs: typeof item.specs === 'string' ? item.specs.split(',').map((s: string) => s.trim()) : (Array.isArray(item.specs) ? item.specs : []),
+            specs: Array.isArray(item.specs)
+              ? item.specs
+              : typeof item.specs === 'string'
+              ? item.specs.split(/,|\n/).map((s: string) => s.trim()).filter(Boolean)
+              : [],
           }));
         }
       }
@@ -76,6 +100,5 @@ export async function fetchLiveProducts(): Promise<Product[]> {
     }
   }
 
-  // 3. Default seed products
-  return DEFAULT_PRODUCTS;
+  return [];
 }
