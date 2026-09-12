@@ -13,8 +13,7 @@ import {
   Star,
   MessageSquare,
   ChevronRight,
-  Boxes,
-  Users
+  TrendingUp,
 } from "lucide-react";
 
 interface NavSection {
@@ -34,6 +33,7 @@ export function AdminSidebar() {
       title: "OVERVIEW",
       items: [
         { name: "Dashboard", href: "/", icon: LayoutDashboard },
+        { name: "Analytics & Finance", href: "/analytics", icon: TrendingUp },
       ]
     },
     {
