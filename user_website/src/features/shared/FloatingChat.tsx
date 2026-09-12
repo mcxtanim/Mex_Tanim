@@ -77,27 +77,9 @@ export const FloatingChat: React.FC = () => {
   }, [messages, isWebChatOpen, isTyping]);
 
   const generateAutoReply = (userMsg: string): string => {
-    const lower = userMsg.toLowerCase();
-    
-    if (lower.includes('price') || lower.includes('দাম') || lower.includes('কত')) {
-      return language === 'bn'
-        ? 'আমাদের সকল প্রোডাক্টের অফিশিয়াল সেরা দাম ওয়েবসাইটে দেওয়া আছে। কোনো নির্দিষ্ট প্রোডাক্টের ডিল জানতে চাইলে নাম লিখে জানান!'
-        : 'All product prices are updated live on our website. Let us know which specific model you are interested in!';
-    }
-    if (lower.includes('delivery') || lower.includes('ডেলিভারি') || lower.includes('শিপিং')) {
-      return language === 'bn'
-        ? '🚚 ডেলিভারি চার্জ: ঢাকার ভেতরে ৳৬০ (২৪-৪৮ ঘণ্টা) এবং ঢাকার বাইরে ৳১২০ (২-৩ দিন)। ক্যাশ অন ডেলিভারি প্রযোজ্য।'
-        : '🚚 Delivery charge: Inside Dhaka ৳60 (24-48 hrs), Outside Dhaka ৳120 (2-3 days). Cash on delivery available!';
-    }
-    if (lower.includes('mouse') || lower.includes('মাউস') || lower.includes('keyboard') || lower.includes('কীবোর্ড')) {
-      return language === 'bn'
-        ? '🎮 আমাদের স্টকে ১০০% অরিজিনাল ব্র্যান্ডেড গেমিং মাউস ও মেকানিক্যাল কীবোর্ড এভেলেবল আছে। কোনো নির্দিষ্ট মডেলের পরামর্শের জন্য আমরা প্রস্তুত!'
-        : '🎮 We have 100% authentic gaming mice & mechanical keyboards in stock. Let us know if you need recommendations!';
-    }
-    
     return language === 'bn'
-      ? 'ধন্যবাদ! আপনার মেসেজটি আমাদের সাপোর্ট টিমের কাছে পৌঁছেছে। এডমিন অনলাইনেই শীঘ্রই বিস্তারিত উত্তর দেবেন। জরুরি তথ্যের জন্য কল করুন: 01700000000'
-      : 'Thank you! Your message has been received by our support team. An admin will respond shortly. For urgent help, call: 01700000000';
+      ? 'ধন্যবাদ! আপনার মেসেজটি আমাদের সাপোর্ট টিমের কাছে পৌঁছেছে। একজন এজেন্ট শীঘ্রই উত্তর দেবেন।'
+      : 'Thank you! Your message has been received by our support team. An agent will respond shortly.';
   };
 
   const handleSend = (e: React.FormEvent) => {
