@@ -114,19 +114,6 @@ export function OrdersTable({ orders, onViewDetails, onStatusChange }: OrdersTab
               <td className="py-3.5 px-4 text-right">
                 <div className="flex items-center justify-end space-x-2">
                   <button
-                    type="button"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      alert("Steadfast Courier API is ready! Once you enter your API Key & Secret Key in Settings, orders will automatically dispatch via Steadfast Courier.");
-                    }}
-                    className="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl text-xs font-semibold bg-cyan-500/10 hover:bg-cyan-500/20 text-cyan-400 border border-cyan-500/30 transition-all cursor-pointer"
-                    title="Dispatch order via Steadfast Courier"
-                  >
-                    <Truck className="w-3.5 h-3.5" />
-                    <span>Send to Steadfast</span>
-                  </button>
-
-                  <button
                     onClick={() => onViewDetails(order)}
                     className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 transition-all hover:text-emerald-400 cursor-pointer"
                   >

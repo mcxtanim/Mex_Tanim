@@ -166,27 +166,7 @@ export function OrderDetailModal({
                 <option value="Delivered">Delivered</option>
                 <option value="Cancelled">Cancelled</option>
               </select>
-            </div>
-
-            <div className="pt-2 border-t border-slate-700/50 flex items-center justify-between flex-wrap gap-2">
-              <div className="flex items-center space-x-1.5 text-xs text-slate-300 font-medium">
-                <Truck className="w-4 h-4 text-cyan-400" />
-                <span>Steadfast Courier API:</span>
-                <span className="text-[10px] text-amber-400 bg-amber-500/10 px-2 py-0.5 rounded-md border border-amber-500/20 font-mono">
-                  Ready (Pending API Key in Settings)
-                </span>
-              </div>
-
-              <button
-                type="button"
-                onClick={() => alert("Steadfast Courier API is ready! Once you enter your API Key & Secret Key in Settings, orders will automatically dispatch via Steadfast Courier.")}
-                className="px-3 py-1.5 bg-cyan-500/10 hover:bg-cyan-500/20 text-cyan-400 border border-cyan-500/30 rounded-xl text-xs font-bold transition flex items-center space-x-1.5 cursor-pointer"
-              >
-                <Truck className="w-3.5 h-3.5" />
-                <span>Send to Steadfast Courier</span>
-              </button>
-            </div>
-          </div>
+            </div>          </div>
         </div>
       </div>
     </div>
