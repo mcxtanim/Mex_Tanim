@@ -48,21 +48,10 @@ CREATE TABLE IF NOT EXISTS public.orders (
   created_at TIMESTAMPTZ DEFAULT NOW()
 );
 
--- 4. MESSAGES TABLE
-CREATE TABLE IF NOT EXISTS public.messages (
-  id VARCHAR PRIMARY KEY,
-  customer_name VARCHAR NOT NULL,
-  phone VARCHAR,
-  message TEXT NOT NULL,
-  is_read BOOLEAN DEFAULT FALSE,
-  created_at TIMESTAMPTZ DEFAULT NOW()
-);
-
 -- Enable Row Level Security (RLS) and allow Public Read/Write for Store operations
 ALTER TABLE public.products ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.categories ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.orders ENABLE ROW LEVEL SECURITY;
-ALTER TABLE public.messages ENABLE ROW LEVEL SECURITY;
 
 -- Public Access Policies
 CREATE POLICY "Public Read Access Products" ON public.products FOR SELECT USING (true);
@@ -72,9 +61,6 @@ CREATE POLICY "Public Read Access Categories" ON public.categories FOR SELECT US
 
 CREATE POLICY "Public Read Access Orders" ON public.orders FOR SELECT USING (true);
 CREATE POLICY "Public Write Access Orders" ON public.orders FOR ALL USING (true);
-
-CREATE POLICY "Public Read Access Messages" ON public.messages FOR SELECT USING (true);
-CREATE POLICY "Public Write Access Messages" ON public.messages FOR ALL USING (true);
 
 -- ========================================================
 -- INITIAL SEED DATA
