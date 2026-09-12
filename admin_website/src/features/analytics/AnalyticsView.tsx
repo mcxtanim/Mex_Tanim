@@ -3,20 +3,19 @@
 import React, { useState, useEffect } from "react";
 import { 
   TrendingUp, 
-  DollarSign, 
   Wallet, 
   BarChart2, 
   Plus, 
   Trash2, 
   Calendar, 
-  CheckCircle2, 
   Calculator,
-  LineChart as LineChartIcon,
-  Layers,
-  ArrowUpRight,
-  ChevronDown
+  X,
+  DollarSign,
+  Package,
+  FileText,
+  Tag
 } from "lucide-react";
-import { CostItem, CostFormData } from "./types";
+import { CostItem, CostFormData, CostCategory } from "./types";
 import { 
   getStoredCosts, 
   addCostItem, 
@@ -25,7 +24,8 @@ import {
 } from "./costService";
 import { getStoredOrders } from "../orders/orderService";
 import { Order } from "../orders/types";
-import { AddEditCostModal } from "./AddEditCostModal";
+import { getStoredProducts } from "../products/productService";
+import { Product } from "../products/types";
 
 interface GraphPoint {
   label: string;
@@ -48,6 +48,7 @@ const MONTH_SHORT = [
 export const AnalyticsView: React.FC = () => {
   const [costs, setCosts] = useState<CostItem[]>([]);
   const [orders, setOrders] = useState<Order[]>([]);
+  const [products, setProducts] = useState<Product[]>([]);
   
   // Date Filter Controls State
   const [dateFilter, setDateFilter] = useState<"day" | "month" | "year" | "custom">("month");
@@ -58,29 +59,81 @@ export const AnalyticsView: React.FC = () => {
   const [endDate, setEndDate] = useState<string>("2026-09-30");
 
   const [hoveredIdx, setHoveredIdx] = useState<number | null>(null);
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  
+  // Inline Expense Form State (No Modal Popup!)
+  const [showAddForm, setShowAddForm] = useState(false);
+  const [calcMode, setCalcMode] = useState<"unit" | "total">("unit");
+  const [selectedProductId, setSelectedProductId] = useState<string>("");
+  const [costTitle, setCostTitle] = useState("");
+  const [costCategory, setCostCategory] = useState<CostCategory>("Product Sourcing");
+  const [unitPrice, setUnitPrice] = useState<number | "">("");
+  const [quantity, setQuantity] = useState<number | "">("");
+  const [totalAmount, setTotalAmount] = useState<number | "">("");
+  const [costDate, setCostDate] = useState<string>(new Date().toISOString().split("T")[0]);
+  const [costNotes, setCostNotes] = useState("");
 
   useEffect(() => {
     setCosts(getStoredCosts());
     setOrders(getStoredOrders());
+    setProducts(getStoredProducts());
   }, []);
 
-  const handleAddCost = (formData: CostFormData) => {
-    const updated = addCostItem(formData, costs);
+  // Auto-calculate Total Amount when unitPrice or quantity changes in unit mode
+  useEffect(() => {
+    if (calcMode === "unit") {
+      if (typeof unitPrice === "number" && typeof quantity === "number" && unitPrice > 0 && quantity > 0) {
+        setTotalAmount(unitPrice * quantity);
+      }
+    }
+  }, [unitPrice, quantity, calcMode]);
+
+  const handleProductSelect = (prodId: string) => {
+    setSelectedProductId(prodId);
+    if (!prodId) return;
+    const prod = products.find((p) => p.id === prodId);
+    if (prod) {
+      setCostTitle(`${prod.title} (Purchase Cost Batch)`);
+      setUnitPrice(Math.round(prod.price * 0.6));
+      setQuantity(prod.stock > 0 ? prod.stock : 10);
+    }
+  };
+
+  const handleSaveCost = (e: React.FormEvent) => {
+    e.preventDefault();
+    const finalAmount = Number(totalAmount);
+    if (!costTitle.trim() || !finalAmount || finalAmount <= 0) return;
+
+    const newFormData: CostFormData = {
+      title: costTitle.trim(),
+      category: costCategory,
+      amount: finalAmount,
+      unitPrice: calcMode === "unit" && typeof unitPrice === "number" ? unitPrice : undefined,
+      quantity: calcMode === "unit" && typeof quantity === "number" ? quantity : undefined,
+      date: costDate,
+      notes: costNotes.trim() || undefined,
+    };
+
+    const updated = addCostItem(newFormData, costs);
     setCosts(updated);
+
+    // Reset Form
+    setCostTitle("");
+    setSelectedProductId("");
+    setUnitPrice("");
+    setQuantity("");
+    setTotalAmount("");
+    setCostNotes("");
+    setShowAddForm(false);
   };
 
   const handleDeleteCost = (id: string) => {
-    if (confirm("Are you sure you want to delete this expense record?")) {
-      const updated = deleteCostItem(id, costs);
-      setCosts(updated);
-    }
+    const updated = deleteCostItem(id, costs);
+    setCosts(updated);
   };
 
   // Calculate live real-time financial metrics
   const metrics = calculateFinancialMetrics(orders, costs);
 
-  // Helper to get total days in a month
   const getDaysInMonth = (year: number, month: number) => {
     return new Date(year, month + 1, 0).getDate();
   };
@@ -89,7 +142,6 @@ export const AnalyticsView: React.FC = () => {
   const getGraphData = (): GraphPoint[] => {
     switch (dateFilter) {
       case "day":
-        // Day timeline mode: Hourly intervals
         return [
           { label: "12 AM", revenue: 1200, cost: 400, profit: 800, subLabel: `${selectedDate} - 12:00 AM` },
           { label: "3 AM", revenue: 2400, cost: 900, profit: 1500, subLabel: `${selectedDate} - 3:00 AM` },
@@ -102,7 +154,6 @@ export const AnalyticsView: React.FC = () => {
         ];
 
       case "month": {
-        // Month mode: Days of the selected month (e.g. Day 1, 5, 10, 15, 20, 25, 30)
         const daysCount = getDaysInMonth(selectedYear, selectedMonth);
         const monthName = MONTH_NAMES[selectedMonth];
         const step = Math.ceil(daysCount / 6);
@@ -120,7 +171,6 @@ export const AnalyticsView: React.FC = () => {
             subLabel: `${monthName} ${d}, ${selectedYear}`,
           });
         }
-        // Always include last day
         if (points[points.length - 1].label !== `${daysCount} ${MONTH_SHORT[selectedMonth]}`) {
           points.push({
             label: `${daysCount} ${MONTH_SHORT[selectedMonth]}`,
@@ -134,9 +184,8 @@ export const AnalyticsView: React.FC = () => {
       }
 
       case "year": {
-        // Year mode: All 12 Months of the selected year
         return MONTH_SHORT.map((mShort, idx) => {
-          const isPast = idx <= 8; // Jan to Sep
+          const isPast = idx <= 8;
           const baseRev = isPast ? Math.round(45000 + (idx + 1) * 14000) : 0;
           const baseCost = isPast ? Math.round(22000 + (idx + 1) * 7000) : 0;
           const rev = idx === 8 && selectedYear === 2026 ? metrics.totalRevenue : baseRev;
@@ -152,7 +201,6 @@ export const AnalyticsView: React.FC = () => {
       }
 
       case "custom": {
-        // Custom Range mode
         return [
           { label: "Start Date", revenue: Math.round(metrics.totalRevenue * 0.25), cost: Math.round(metrics.totalCost * 0.25), profit: Math.round(metrics.netProfit * 0.25), subLabel: `Range Start: ${startDate}` },
           { label: "Mid Range 1", revenue: Math.round(metrics.totalRevenue * 0.55), cost: Math.round(metrics.totalCost * 0.55), profit: Math.round(metrics.netProfit * 0.55), subLabel: "Custom Interval 1" },
@@ -165,9 +213,8 @@ export const AnalyticsView: React.FC = () => {
 
   const currentData = getGraphData();
   const maxVal = Math.max(...currentData.map((d) => Math.max(d.revenue, d.cost, d.profit)), 200000);
-  const yAxisMax = Math.ceil(maxVal / 50000) * 50000; // e.g. 200k
+  const yAxisMax = Math.ceil(maxVal / 50000) * 50000;
 
-  // Formatting helpers (e.g. 168000 -> ৳ 168.0k)
   const formatK = (val: number) => {
     if (val >= 1000) {
       const k = val / 1000;
@@ -176,7 +223,6 @@ export const AnalyticsView: React.FC = () => {
     return `৳ ${val}`;
   };
 
-  // SVG dimensions for smooth line chart
   const svgWidth = 800;
   const svgHeight = 220;
   const paddingX = 40;
@@ -195,7 +241,6 @@ export const AnalyticsView: React.FC = () => {
     return svgHeight - paddingBottom - ratio * usableHeight;
   };
 
-  // Generate smooth cubic bezier curve SVG path string
   const createSmoothPath = (key: "revenue" | "cost" | "profit") => {
     if (currentData.length === 0) return "";
     const points = currentData.map((d, i) => ({ x: getX(i), y: getY(d[key]) }));
@@ -214,20 +259,16 @@ export const AnalyticsView: React.FC = () => {
   const revenuePath = createSmoothPath("revenue");
   const costPath = createSmoothPath("cost");
   const profitPath = createSmoothPath("profit");
-
-  // Area fill under Revenue line
   const revenueAreaPath = `${revenuePath} L ${getX(currentData.length - 1)},${svgHeight - paddingBottom} L ${getX(0)},${svgHeight - paddingBottom} Z`;
 
-  // Aggregate totals for bottom summary cards
   const totalPeriodRevenue = currentData.reduce((sum, d) => sum + d.revenue, 0);
   const totalPeriodCosts = currentData.reduce((sum, d) => sum + d.cost, 0);
   const totalPeriodProfit = totalPeriodRevenue - totalPeriodCosts;
 
   return (
     <div className="space-y-6">
-      {/* Top Main Financial Graph Container */}
+      {/* Financial Overview Container */}
       <div className="bg-slate-900/90 border border-slate-800/90 rounded-2xl p-6 shadow-2xl space-y-6 select-none">
-        {/* Header Title & Dynamic Filter Controls */}
         <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-xl bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 flex items-center justify-center shadow-md">
@@ -241,7 +282,6 @@ export const AnalyticsView: React.FC = () => {
           </div>
 
           <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3">
-            {/* Filter Pills */}
             <div className="bg-slate-950/90 border border-slate-800/90 p-1 rounded-xl flex items-center gap-1">
               {[
                 { id: "day", label: "Day" },
@@ -263,7 +303,6 @@ export const AnalyticsView: React.FC = () => {
               ))}
             </div>
 
-            {/* Legends */}
             <div className="flex items-center gap-4 text-xs font-bold pl-1">
               <div className="flex items-center gap-1.5">
                 <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 inline-block ring-2 ring-emerald-400/30" />
@@ -281,7 +320,7 @@ export const AnalyticsView: React.FC = () => {
           </div>
         </div>
 
-        {/* Dynamic Selector Bar depending on active filter mode */}
+        {/* Dynamic Selector Bar */}
         <div className="p-3 bg-slate-950/80 rounded-xl border border-slate-800 flex flex-wrap items-center justify-between gap-3 animate-in fade-in">
           {dateFilter === "day" && (
             <div className="flex items-center gap-3">
@@ -293,7 +332,6 @@ export const AnalyticsView: React.FC = () => {
                 onChange={(e) => setSelectedDate(e.target.value)}
                 className="px-3 py-1.5 bg-slate-900 border border-slate-700 rounded-lg text-xs text-slate-100 focus:outline-none focus:border-emerald-500"
               />
-              <span className="text-xs text-emerald-400 font-mono">Showing Hourly Timeline (12 AM - 9 PM)</span>
             </div>
           )}
 
@@ -323,9 +361,6 @@ export const AnalyticsView: React.FC = () => {
                   </option>
                 ))}
               </select>
-              <span className="text-xs text-emerald-400 font-mono">
-                Showing all {getDaysInMonth(selectedYear, selectedMonth)} Days of {MONTH_NAMES[selectedMonth]} {selectedYear}
-              </span>
             </div>
           )}
 
@@ -344,7 +379,6 @@ export const AnalyticsView: React.FC = () => {
                   </option>
                 ))}
               </select>
-              <span className="text-xs text-emerald-400 font-mono">Showing all 12 Months of {selectedYear}</span>
             </div>
           )}
 
@@ -369,13 +403,12 @@ export const AnalyticsView: React.FC = () => {
           )}
         </div>
 
-        {/* Main Line Chart Canvas (SVG Curves & Elevated Hover Card above graph lines) */}
+        {/* SVG Graph Plot Area */}
         <div 
           className="relative w-full overflow-x-auto scrollbar-none pt-12 pb-2"
           onMouseLeave={() => setHoveredIdx(null)}
         >
           <div className="min-w-[650px] relative">
-            {/* Interactive Hover Tooltip Card (Elevated Floating Above Lines with Arrow) */}
             {hoveredIdx !== null && currentData[hoveredIdx] && (
               <div
                 style={{
@@ -390,36 +423,25 @@ export const AnalyticsView: React.FC = () => {
               >
                 <div className="font-extrabold text-slate-100 border-b border-slate-800 pb-1.5 flex items-center justify-between">
                   <span>{currentData[hoveredIdx].subLabel || currentData[hoveredIdx].label}</span>
-                  <span className="text-[10px] px-1.5 py-0.5 rounded bg-emerald-500/20 text-emerald-400 font-mono">
-                    Point #{hoveredIdx + 1}
-                  </span>
                 </div>
                 <div className="space-y-1 font-mono text-[11px]">
                   <div className="flex items-center justify-between text-emerald-400 font-bold">
-                    <span className="flex items-center gap-1.5">
-                      <span className="w-2 h-2 rounded-full bg-emerald-400" /> Revenue
-                    </span>
+                    <span>Revenue</span>
                     <strong>{formatK(currentData[hoveredIdx].revenue)}</strong>
                   </div>
                   <div className="flex items-center justify-between text-rose-400 font-bold">
-                    <span className="flex items-center gap-1.5">
-                      <span className="w-2 h-2 rounded-full bg-rose-500" /> Costs
-                    </span>
+                    <span>Costs</span>
                     <strong>{formatK(currentData[hoveredIdx].cost)}</strong>
                   </div>
                   <div className="flex items-center justify-between text-blue-400 font-bold">
-                    <span className="flex items-center gap-1.5">
-                      <span className="w-2 h-2 rounded-full bg-blue-500" /> Net Profit
-                    </span>
+                    <span>Net Profit</span>
                     <strong>{formatK(currentData[hoveredIdx].profit)}</strong>
                   </div>
                 </div>
               </div>
             )}
 
-            {/* SVG Graph Canvas */}
             <div className="relative flex">
-              {/* Y-Axis Labels Column */}
               <div className="w-12 flex flex-col justify-between py-6 text-[11px] font-mono text-slate-500 text-right pr-3 shrink-0 h-[220px]">
                 <span>200k</span>
                 <span>150k</span>
@@ -428,9 +450,7 @@ export const AnalyticsView: React.FC = () => {
                 <span>0</span>
               </div>
 
-              {/* Chart Plot Area */}
               <div className="flex-1 relative h-[220px]">
-                {/* Full-Height Column Interactive Mouse Hover Targets */}
                 <div className="absolute inset-0 flex z-30">
                   {currentData.map((_, i) => (
                     <div
@@ -442,7 +462,6 @@ export const AnalyticsView: React.FC = () => {
                   ))}
                 </div>
 
-                {/* Horizontal Dashed Background Grid Lines */}
                 <div className="absolute inset-0 flex flex-col justify-between py-[30px] pointer-events-none opacity-20">
                   <div className="border-b border-dashed border-slate-600 w-full" />
                   <div className="border-b border-dashed border-slate-600 w-full" />
@@ -451,7 +470,6 @@ export const AnalyticsView: React.FC = () => {
                   <div className="border-b border-slate-700 w-full" />
                 </div>
 
-                {/* SVG Render Lines */}
                 <svg
                   viewBox={`0 0 ${svgWidth} ${svgHeight}`}
                   className="w-full h-full overflow-visible pointer-events-none"
@@ -464,10 +482,8 @@ export const AnalyticsView: React.FC = () => {
                     </linearGradient>
                   </defs>
 
-                  {/* Gradient Area Fill */}
                   <path d={revenueAreaPath} fill="url(#revenueGlow)" />
 
-                  {/* Vertical Guide Line on Hover */}
                   {hoveredIdx !== null && (
                     <line
                       x1={getX(hoveredIdx)}
@@ -480,12 +496,10 @@ export const AnalyticsView: React.FC = () => {
                     />
                   )}
 
-                  {/* Smooth Curved Lines */}
                   <path d={revenuePath} fill="none" stroke="#10b981" strokeWidth="3.5" strokeLinecap="round" />
                   <path d={costPath} fill="none" stroke="#f43f5e" strokeWidth="3.5" strokeLinecap="round" />
                   <path d={profitPath} fill="none" stroke="#3b82f6" strokeWidth="3.5" strokeLinecap="round" />
 
-                  {/* Node Dots on Chart Lines */}
                   {currentData.map((d, i) => {
                     const cx = getX(i);
                     const revY = getY(d.revenue);
@@ -495,15 +509,12 @@ export const AnalyticsView: React.FC = () => {
 
                     return (
                       <g key={i}>
-                        {/* Revenue Circle */}
                         <circle cx={cx} cy={revY} r={isSelected ? "7" : "5"} fill="#10b981" stroke="#022c22" strokeWidth="2" />
                         <circle cx={cx} cy={revY} r="2.5" fill="#ffffff" />
 
-                        {/* Costs Circle */}
                         <circle cx={cx} cy={costY} r={isSelected ? "7" : "5"} fill="#f43f5e" stroke="#4c0519" strokeWidth="2" />
                         <circle cx={cx} cy={costY} r="2.5" fill="#ffffff" />
 
-                        {/* Profit Circle */}
                         <circle cx={cx} cy={profitY} r={isSelected ? "7" : "5"} fill="#3b82f6" stroke="#172554" strokeWidth="2" />
                         <circle cx={cx} cy={profitY} r="2.5" fill="#ffffff" />
                       </g>
@@ -511,7 +522,6 @@ export const AnalyticsView: React.FC = () => {
                   })}
                 </svg>
 
-                {/* X-Axis Month / Date Labels */}
                 <div className="absolute bottom-0 inset-x-0 flex justify-between px-8 text-xs font-bold text-slate-300 pointer-events-none">
                   {currentData.map((d, i) => (
                     <span
@@ -529,9 +539,8 @@ export const AnalyticsView: React.FC = () => {
           </div>
         </div>
 
-        {/* 3 Bottom Summary Cards Below Graph */}
+        {/* 3 Bottom Summary Cards */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-2">
-          {/* 1. Total Revenue Card */}
           <div className="bg-slate-950/80 border border-slate-800/80 rounded-2xl p-4 flex items-center justify-between shadow-md">
             <div className="flex items-center gap-3.5">
               <div className="w-11 h-11 rounded-2xl bg-emerald-500/15 text-emerald-400 border border-emerald-500/30 flex items-center justify-center shrink-0">
@@ -544,15 +553,8 @@ export const AnalyticsView: React.FC = () => {
                 </h4>
               </div>
             </div>
-            <div className="text-right">
-              <span className="text-[11px] font-bold text-emerald-400 flex items-center gap-1">
-                ↑ 12.5%
-              </span>
-              <span className="text-[10px] text-slate-500">vs previous period</span>
-            </div>
           </div>
 
-          {/* 2. Total Costs Card */}
           <div className="bg-slate-950/80 border border-slate-800/80 rounded-2xl p-4 flex items-center justify-between shadow-md">
             <div className="flex items-center gap-3.5">
               <div className="w-11 h-11 rounded-2xl bg-rose-500/15 text-rose-400 border border-rose-500/30 flex items-center justify-center shrink-0">
@@ -565,15 +567,8 @@ export const AnalyticsView: React.FC = () => {
                 </h4>
               </div>
             </div>
-            <div className="text-right">
-              <span className="text-[11px] font-bold text-emerald-400 flex items-center gap-1">
-                ↑ 8.3%
-              </span>
-              <span className="text-[10px] text-slate-500">vs previous period</span>
-            </div>
           </div>
 
-          {/* 3. Total Net Profit Card */}
           <div className="bg-slate-950/80 border border-blue-500/30 rounded-2xl p-4 flex items-center justify-between shadow-md">
             <div className="flex items-center gap-3.5">
               <div className="w-11 h-11 rounded-2xl bg-blue-500/15 text-blue-400 border border-blue-500/30 flex items-center justify-center shrink-0">
@@ -586,17 +581,11 @@ export const AnalyticsView: React.FC = () => {
                 </h4>
               </div>
             </div>
-            <div className="text-right">
-              <span className="text-[11px] font-bold text-emerald-400 flex items-center gap-1">
-                ↑ 15.7%
-              </span>
-              <span className="text-[10px] text-slate-500">vs previous period</span>
-            </div>
           </div>
         </div>
       </div>
 
-      {/* Operational & Product Expense Table Section */}
+      {/* Operational & Product Expense Table Section with INLINE Form Expansion */}
       <div className="bg-slate-900/90 border border-slate-800/90 rounded-2xl p-5 shadow-md space-y-4">
         <div className="flex items-center justify-between">
           <div>
@@ -607,13 +596,145 @@ export const AnalyticsView: React.FC = () => {
           </div>
 
           <button
-            onClick={() => setIsModalOpen(true)}
-            className="px-3.5 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-emerald-400 border border-slate-700 text-xs font-semibold flex items-center gap-1.5 transition"
+            onClick={() => setShowAddForm((prev) => !prev)}
+            className="px-3.5 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-emerald-400 border border-slate-700 text-xs font-semibold flex items-center gap-1.5 transition cursor-pointer"
           >
-            <Plus className="w-4 h-4" /> Add Expense
+            {showAddForm ? <X className="w-4 h-4" /> : <Plus className="w-4 h-4" />}
+            <span>{showAddForm ? "Close Form" : "Add Expense"}</span>
           </button>
         </div>
 
+        {/* INLINE Add Expense Form Card (No Modal Popup!) */}
+        {showAddForm && (
+          <form onSubmit={handleSaveCost} className="p-5 bg-slate-950/90 border border-slate-800 rounded-2xl space-y-4 animate-in fade-in duration-200">
+            <h4 className="text-xs font-black uppercase text-slate-400 tracking-wider flex items-center gap-2 border-b border-slate-800 pb-2">
+              <Plus className="w-4 h-4 text-emerald-400" />
+              New Expense Entry
+            </h4>
+
+            {/* Mode Switcher */}
+            <div className="flex items-center gap-2">
+              <button
+                type="button"
+                onClick={() => setCalcMode("unit")}
+                className={`py-1.5 px-3 rounded-lg text-xs font-bold transition ${
+                  calcMode === "unit" ? "bg-emerald-600 text-white" : "bg-slate-800 text-slate-400"
+                }`}
+              >
+                Unit Price × Quantity
+              </button>
+              <button
+                type="button"
+                onClick={() => setCalcMode("total")}
+                className={`py-1.5 px-3 rounded-lg text-xs font-bold transition ${
+                  calcMode === "total" ? "bg-emerald-600 text-white" : "bg-slate-800 text-slate-400"
+                }`}
+              >
+                Direct Total Amount
+              </button>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div className="space-y-1">
+                <label className="text-xs font-semibold text-slate-300">Select Product (Optional)</label>
+                <select
+                  value={selectedProductId}
+                  onChange={(e) => handleProductSelect(e.target.value)}
+                  className="w-full px-3 py-2 bg-slate-900 border border-slate-800 rounded-xl text-xs text-slate-100"
+                >
+                  <option value="">-- Custom Expense --</option>
+                  {products.map((p) => (
+                    <option key={p.id} value={p.id}>{p.title} (৳{p.price})</option>
+                  ))}
+                </select>
+              </div>
+
+              <div className="space-y-1">
+                <label className="text-xs font-semibold text-slate-300">Expense Title *</label>
+                <input
+                  type="text"
+                  required
+                  value={costTitle}
+                  onChange={(e) => setCostTitle(e.target.value)}
+                  placeholder="e.g. Sourcing or FB Ad"
+                  className="w-full px-3 py-2 bg-slate-900 border border-slate-800 rounded-xl text-xs text-slate-100"
+                />
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+              <div className="space-y-1">
+                <label className="text-xs font-semibold text-slate-300">Category</label>
+                <select
+                  value={costCategory}
+                  onChange={(e) => setCostCategory(e.target.value as CostCategory)}
+                  className="w-full px-3 py-2 bg-slate-900 border border-slate-800 rounded-xl text-xs text-slate-100"
+                >
+                  {["Product Sourcing", "Ad Spend & Marketing", "Packaging & Delivery", "Operating Expense"].map((c) => (
+                    <option key={c} value={c}>{c}</option>
+                  ))}
+                </select>
+              </div>
+
+              {calcMode === "unit" ? (
+                <>
+                  <div className="space-y-1">
+                    <label className="text-xs font-semibold text-slate-300">Unit Price (৳)</label>
+                    <input
+                      type="number"
+                      required
+                      min="1"
+                      value={unitPrice}
+                      onChange={(e) => setUnitPrice(e.target.value ? Number(e.target.value) : "")}
+                      className="w-full px-3 py-2 bg-slate-900 border border-slate-800 rounded-xl text-xs text-slate-100 font-mono"
+                    />
+                  </div>
+                  <div className="space-y-1">
+                    <label className="text-xs font-semibold text-slate-300">Quantity</label>
+                    <input
+                      type="number"
+                      required
+                      min="1"
+                      value={quantity}
+                      onChange={(e) => setQuantity(e.target.value ? Number(e.target.value) : "")}
+                      className="w-full px-3 py-2 bg-slate-900 border border-slate-800 rounded-xl text-xs text-slate-100 font-mono"
+                    />
+                  </div>
+                </>
+              ) : (
+                <div className="space-y-1">
+                  <label className="text-xs font-semibold text-slate-300">Total Amount (৳)</label>
+                  <input
+                    type="number"
+                    required
+                    min="1"
+                    value={totalAmount}
+                    onChange={(e) => setTotalAmount(e.target.value ? Number(e.target.value) : "")}
+                    className="w-full px-3 py-2 bg-slate-900 border border-slate-800 rounded-xl text-xs text-slate-100 font-mono"
+                  />
+                </div>
+              )}
+            </div>
+
+            <div className="flex items-center justify-end gap-3 pt-2 border-t border-slate-800">
+              <button
+                type="button"
+                onClick={() => setShowAddForm(false)}
+                className="px-4 py-2 rounded-xl bg-slate-800 text-slate-300 text-xs font-semibold"
+              >
+                Cancel
+              </button>
+              <button
+                type="submit"
+                className="px-5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-extrabold text-xs shadow-md"
+              >
+                Save Expense Entry
+              </button>
+            </div>
+          </form>
+        )}
+
+        {/* Expense List Table */}
         <div className="overflow-x-auto">
           <table className="w-full text-left border-collapse">
             <thead>
@@ -677,13 +798,6 @@ export const AnalyticsView: React.FC = () => {
           </table>
         </div>
       </div>
-
-      {/* Expense Modal */}
-      <AddEditCostModal
-        isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
-        onSave={handleAddCost}
-      />
     </div>
   );
 };

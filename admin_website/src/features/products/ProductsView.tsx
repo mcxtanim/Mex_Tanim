@@ -1,16 +1,13 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import Link from "next/link";
 import { Plus, Search, Filter, PackageCheck } from "lucide-react";
-import { Product, ProductFormData } from "./types";
+import { Product } from "./types";
 import { ProductTable } from "./ProductTable";
-import { AddEditProductModal } from "./AddEditProductModal";
-import { DeleteConfirmModal } from "./DeleteConfirmModal";
 import {
   getStoredProducts,
   fetchProductsFromSupabase,
-  createProduct,
-  updateProduct,
   deleteProduct,
 } from "./productService";
 
@@ -18,11 +15,6 @@ export function ProductsView() {
   const [products, setProducts] = useState<Product[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [categoryFilter, setCategoryFilter] = useState("All");
-  
-  // Modal states
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [editingProduct, setEditingProduct] = useState<Product | null>(null);
-  const [deletingProduct, setDeletingProduct] = useState<Product | null>(null);
 
   useEffect(() => {
     setProducts(getStoredProducts());
@@ -35,22 +27,9 @@ export function ProductsView() {
 
   const categories = ["All", ...Array.from(new Set(products.map((p) => p.category)))];
 
-  const handleSaveProduct = (formData: ProductFormData, id?: string) => {
-    if (id) {
-      const updated = updateProduct(id, formData, products);
-      setProducts(updated);
-    } else {
-      const updated = createProduct(formData, products);
-      setProducts(updated);
-    }
-  };
-
-  const handleConfirmDelete = () => {
-    if (deletingProduct) {
-      const updated = deleteProduct(deletingProduct.id, products);
-      setProducts(updated);
-      setDeletingProduct(null);
-    }
+  const handleDeleteProduct = (id: string) => {
+    const updated = deleteProduct(id, products);
+    setProducts(updated);
   };
 
   // Filtered list
@@ -69,20 +48,17 @@ export function ProductsView() {
         <div>
           <h2 className="text-base font-bold text-slate-100 flex items-center gap-2">
             <PackageCheck className="w-5 h-5 text-emerald-400" />
-            Products
+            Products Management
           </h2>
         </div>
 
-        <button
-          onClick={() => {
-            setEditingProduct(null);
-            setIsModalOpen(true);
-          }}
+        <Link
+          href="/products/add"
           className="inline-flex items-center justify-center gap-1.5 px-3.5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold shadow-md transition-all hover:scale-[1.02]"
         >
           <Plus className="w-4 h-4" />
           Add Product
-        </button>
+        </Link>
       </div>
 
       {/* Filters Bar */}
@@ -119,31 +95,7 @@ export function ProductsView() {
       {/* Interactive Table */}
       <ProductTable
         products={filteredProducts}
-        onEdit={(prod) => {
-          setEditingProduct(prod);
-          setIsModalOpen(true);
-        }}
-        onDelete={(prod) => setDeletingProduct(prod)}
-      />
-
-      {/* Add / Edit Modal */}
-      <AddEditProductModal
-        isOpen={isModalOpen}
-        onClose={() => {
-          setIsModalOpen(false);
-          setEditingProduct(null);
-        }}
-        onSave={handleSaveProduct}
-        productToEdit={editingProduct}
-        categories={categories.filter((c) => c !== "All")}
-      />
-
-      {/* Delete Confirmation Modal */}
-      <DeleteConfirmModal
-        isOpen={Boolean(deletingProduct)}
-        title={deletingProduct?.title || ""}
-        onClose={() => setDeletingProduct(null)}
-        onConfirm={handleConfirmDelete}
+        onDelete={handleDeleteProduct}
       />
     </div>
   );

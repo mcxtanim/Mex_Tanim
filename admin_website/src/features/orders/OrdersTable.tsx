@@ -1,16 +1,15 @@
 "use client";
 
-import { Eye, Printer, ChevronDown, Truck } from "lucide-react";
+import Link from "next/link";
+import { Eye, Printer } from "lucide-react";
 import { Order, OrderStatus } from "./types";
 
 interface OrdersTableProps {
   orders: Order[];
-  onViewDetails: (order: Order) => void;
-  onPrintInvoice: (order: Order) => void;
   onStatusChange: (orderId: string, newStatus: OrderStatus) => void;
 }
 
-export function OrdersTable({ orders, onViewDetails, onPrintInvoice, onStatusChange }: OrdersTableProps) {
+export function OrdersTable({ orders, onStatusChange }: OrdersTableProps) {
   const getStatusBadge = (status: OrderStatus) => {
     switch (status) {
       case "Pending":
@@ -59,9 +58,12 @@ export function OrdersTable({ orders, onViewDetails, onPrintInvoice, onStatusCha
             <tr key={order.id} className="hover:bg-slate-800/40 transition-colors group">
               {/* Order Number & Date */}
               <td className="py-3.5 px-4">
-                <p className="font-bold text-slate-100 font-mono group-hover:text-emerald-400 transition-colors">
+                <Link
+                  href={`/orders/${order.id}`}
+                  className="font-bold text-slate-100 font-mono group-hover:text-emerald-400 transition-colors"
+                >
                   {order.orderNumber}
-                </p>
+                </Link>
                 <p className="text-[10px] text-slate-400 mt-0.5">{order.createdAt}</p>
               </td>
 
@@ -111,25 +113,24 @@ export function OrdersTable({ orders, onViewDetails, onPrintInvoice, onStatusCha
                 </select>
               </td>
 
-              {/* View & Invoice Print Actions */}
+              {/* View & Invoice Actions */}
               <td className="py-3.5 px-4 text-right">
                 <div className="flex items-center justify-end space-x-2">
-                  <button
-                    onClick={() => onPrintInvoice(order)}
-                    title="Print Invoice / Cash Memo"
+                  <Link
+                    href={`/orders/${order.id}`}
                     className="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl text-xs font-semibold bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 transition-all cursor-pointer"
                   >
                     <Printer className="w-3.5 h-3.5" />
                     <span>Memo</span>
-                  </button>
+                  </Link>
 
-                  <button
-                    onClick={() => onViewDetails(order)}
+                  <Link
+                    href={`/orders/${order.id}`}
                     className="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl text-xs font-semibold bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 transition-all hover:text-emerald-400 cursor-pointer"
                   >
                     <Eye className="w-3.5 h-3.5" />
                     <span>Details</span>
-                  </button>
+                  </Link>
                 </div>
               </td>
             </tr>

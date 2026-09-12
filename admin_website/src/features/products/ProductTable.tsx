@@ -1,16 +1,18 @@
 "use client";
 
 import { useState } from "react";
-import { Edit2, Trash2, Tag, CheckCircle2, AlertCircle, XCircle } from "lucide-react";
+import Link from "next/link";
+import { Edit2, Trash2, Tag, CheckCircle2, AlertCircle, XCircle, AlertTriangle, Check } from "lucide-react";
 import { Product } from "./types";
 
 interface ProductTableProps {
   products: Product[];
-  onEdit: (product: Product) => void;
-  onDelete: (product: Product) => void;
+  onDelete: (productId: string) => void;
 }
 
-export function ProductTable({ products, onEdit, onDelete }: ProductTableProps) {
+export function ProductTable({ products, onDelete }: ProductTableProps) {
+  const [confirmingDeleteId, setConfirmingDeleteId] = useState<string | null>(null);
+
   const getStockBadge = (stock: number) => {
     if (stock === 0) {
       return (
@@ -62,6 +64,8 @@ export function ProductTable({ products, onEdit, onDelete }: ProductTableProps) 
             const discountedPrice = product.discount
               ? Math.round(product.price * (1 - product.discount / 100))
               : product.price;
+
+            const isConfirming = confirmingDeleteId === product.id;
 
             return (
               <tr key={product.id} className="hover:bg-slate-800/40 transition-colors group">
@@ -129,20 +133,42 @@ export function ProductTable({ products, onEdit, onDelete }: ProductTableProps) 
                 {/* Actions */}
                 <td className="py-3 px-4 text-right">
                   <div className="flex items-center justify-end gap-1.5">
-                    <button
-                      onClick={() => onEdit(product)}
-                      className="p-1.5 rounded-lg text-slate-400 hover:text-emerald-400 hover:bg-slate-800 border border-transparent hover:border-slate-700 transition-all"
-                      title="Edit product"
+                    <Link
+                      href={`/products/edit/${product.id}`}
+                      className="p-1.5 rounded-lg text-slate-400 hover:text-emerald-400 hover:bg-slate-800 border border-transparent hover:border-slate-700 transition-all inline-flex items-center"
+                      title="Edit product page"
                     >
                       <Edit2 className="w-4 h-4" />
-                    </button>
-                    <button
-                      onClick={() => onDelete(product)}
-                      className="p-1.5 rounded-lg text-slate-400 hover:text-rose-400 hover:bg-slate-800 border border-transparent hover:border-slate-700 transition-all"
-                      title="Delete product"
-                    >
-                      <Trash2 className="w-4 h-4" />
-                    </button>
+                    </Link>
+
+                    {isConfirming ? (
+                      <div className="flex items-center gap-1">
+                        <button
+                          onClick={() => {
+                            onDelete(product.id);
+                            setConfirmingDeleteId(null);
+                          }}
+                          className="px-2 py-1 rounded-lg bg-rose-600 text-white text-[10px] font-bold hover:bg-rose-500 transition-colors"
+                          title="Confirm Delete"
+                        >
+                          Confirm
+                        </button>
+                        <button
+                          onClick={() => setConfirmingDeleteId(null)}
+                          className="px-2 py-1 rounded-lg bg-slate-800 text-slate-400 text-[10px] font-bold hover:bg-slate-700 transition-colors"
+                        >
+                          Cancel
+                        </button>
+                      </div>
+                    ) : (
+                      <button
+                        onClick={() => setConfirmingDeleteId(product.id)}
+                        className="p-1.5 rounded-lg text-slate-400 hover:text-rose-400 hover:bg-slate-800 border border-transparent hover:border-slate-700 transition-all"
+                        title="Delete product"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </button>
+                    )}
                   </div>
                 </td>
               </tr>

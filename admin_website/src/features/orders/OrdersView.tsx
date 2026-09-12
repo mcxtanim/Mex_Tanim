@@ -1,19 +1,15 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { ShoppingBag, Search, Filter } from "lucide-react";
+import { ShoppingBag, Search } from "lucide-react";
 import { Order, OrderStatus } from "./types";
 import { OrdersTable } from "./OrdersTable";
-import { OrderDetailModal } from "./OrderDetailModal";
-import { PrintableInvoiceModal } from "./PrintableInvoiceModal";
 import { getStoredOrders, updateOrderStatus } from "./orderService";
 
 export function OrdersView() {
   const [orders, setOrders] = useState<Order[]>([]);
   const [activeTab, setActiveTab] = useState<"All" | OrderStatus>("All");
   const [searchQuery, setSearchQuery] = useState("");
-  const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
-  const [printingOrder, setPrintingOrder] = useState<Order | null>(null);
 
   useEffect(() => {
     const refresh = () => setOrders(getStoredOrders());
@@ -29,9 +25,6 @@ export function OrdersView() {
   const handleStatusChange = (orderId: string, newStatus: OrderStatus) => {
     const updated = updateOrderStatus(orderId, newStatus, orders);
     setOrders(updated);
-    if (selectedOrder && selectedOrder.id === orderId) {
-      setSelectedOrder({ ...selectedOrder, status: newStatus });
-    }
   };
 
   const filteredOrders = orders.filter((ord) => {
@@ -105,24 +98,7 @@ export function OrdersView() {
       {/* Orders Table */}
       <OrdersTable
         orders={filteredOrders}
-        onViewDetails={(ord) => setSelectedOrder(ord)}
-        onPrintInvoice={(ord) => setPrintingOrder(ord)}
         onStatusChange={handleStatusChange}
-      />
-
-      {/* Details Modal */}
-      <OrderDetailModal
-        order={selectedOrder}
-        isOpen={Boolean(selectedOrder)}
-        onClose={() => setSelectedOrder(null)}
-        onStatusChange={handleStatusChange}
-      />
-
-      {/* Printable Invoice / Cash Memo Modal */}
-      <PrintableInvoiceModal
-        order={printingOrder}
-        isOpen={Boolean(printingOrder)}
-        onClose={() => setPrintingOrder(null)}
       />
     </div>
   );

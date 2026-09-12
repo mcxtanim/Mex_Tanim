@@ -13,6 +13,8 @@ export interface OrderItem {
   title: string;
   quantity: number;
   unitPrice: number; // in BDT
+  price?: number;
+  imageUrl?: string;
 }
 
 export interface Order {
@@ -22,6 +24,7 @@ export interface Order {
   customerEmail: string;
   customerPhone: string;
   shippingAddress: {
+    address?: string;
     street: string;
     city: string;
     district: string;
@@ -30,6 +33,7 @@ export interface Order {
   items: OrderItem[];
   totalAmount: number; // in BDT
   deliveryCharge?: number;
+  shippingCost?: number;
   status: OrderStatus;
   paymentMethod: "Cash on Delivery" | "bKash" | "Nagad" | "Card";
   paymentStatus: "Paid" | "Unpaid";

@@ -12,6 +12,11 @@ export interface Product {
   descriptionBn?: string;
   specs: string; // Formatting specifications details
   imageUrl: string;
+  is_featured?: boolean;
+  is_popular?: boolean;
+  is_bestseller?: boolean;
+  is_new_arrival?: boolean;
+  is_combo?: boolean;
   createdAt: string;
 }
 
@@ -30,4 +35,9 @@ export interface ProductFormData {
   descriptionBn?: string;
   specs: string;
   imageUrl: string;
+  is_featured?: boolean;
+  is_popular?: boolean;
+  is_bestseller?: boolean;
+  is_new_arrival?: boolean;
+  is_combo?: boolean;
 }
