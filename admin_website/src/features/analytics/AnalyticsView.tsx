@@ -14,9 +14,7 @@ import {
   LineChart as LineChartIcon,
   Layers,
   ArrowUpRight,
-  TrendingDown,
-  PieChart,
-  Info
+  ChevronDown
 } from "lucide-react";
 import { CostItem, CostFormData } from "./types";
 import { 
@@ -37,13 +35,29 @@ interface GraphPoint {
   subLabel?: string;
 }
 
+const MONTH_NAMES = [
+  "January", "February", "March", "April", "May", "June",
+  "July", "August", "September", "October", "November", "December"
+];
+
+const MONTH_SHORT = [
+  "Jan", "Feb", "Mar", "Apr", "May", "Jun",
+  "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
+];
+
 export const AnalyticsView: React.FC = () => {
   const [costs, setCosts] = useState<CostItem[]>([]);
   const [orders, setOrders] = useState<Order[]>([]);
-  const [dateFilter, setDateFilter] = useState<"today" | "month" | "year" | "custom">("month");
+  
+  // Date Filter Controls State
+  const [dateFilter, setDateFilter] = useState<"day" | "month" | "year" | "custom">("month");
+  const [selectedDate, setSelectedDate] = useState<string>("2026-09-12");
+  const [selectedMonth, setSelectedMonth] = useState<number>(8); // 8 = September
+  const [selectedYear, setSelectedYear] = useState<number>(2026);
   const [startDate, setStartDate] = useState<string>("2026-09-01");
   const [endDate, setEndDate] = useState<string>("2026-09-30");
-  const [hoveredIdx, setHoveredIdx] = useState<number | null>(null); // Null on load
+
+  const [hoveredIdx, setHoveredIdx] = useState<number | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   useEffect(() => {
@@ -66,40 +80,86 @@ export const AnalyticsView: React.FC = () => {
   // Calculate live real-time financial metrics
   const metrics = calculateFinancialMetrics(orders, costs);
 
-  // Dynamic Graph Datasets based on Date Filter
+  // Helper to get total days in a month
+  const getDaysInMonth = (year: number, month: number) => {
+    return new Date(year, month + 1, 0).getDate();
+  };
+
+  // Dynamic Graph Datasets Generator
   const getGraphData = (): GraphPoint[] => {
     switch (dateFilter) {
-      case "today":
+      case "day":
+        // Day timeline mode: Hourly intervals
         return [
-          { label: "9 AM", revenue: 4500, cost: 1800, profit: 2700, subLabel: "Today 9:00 AM" },
-          { label: "12 PM", revenue: 12200, cost: 4500, profit: 7700, subLabel: "Today 12:00 PM" },
-          { label: "3 PM", revenue: 19800, cost: 8100, profit: 11700, subLabel: "Today 3:00 PM" },
-          { label: "6 PM", revenue: 26400, cost: 12000, profit: 14400, subLabel: "Today 6:00 PM" },
-          { label: "9 PM (Now)", revenue: metrics.totalRevenue, cost: metrics.totalCost, profit: metrics.netProfit, subLabel: "Today 9:00 PM (Live)" },
+          { label: "12 AM", revenue: 1200, cost: 400, profit: 800, subLabel: `${selectedDate} - 12:00 AM` },
+          { label: "3 AM", revenue: 2400, cost: 900, profit: 1500, subLabel: `${selectedDate} - 3:00 AM` },
+          { label: "6 AM", revenue: 5800, cost: 2100, profit: 3700, subLabel: `${selectedDate} - 6:00 AM` },
+          { label: "9 AM", revenue: 11200, cost: 4200, profit: 7000, subLabel: `${selectedDate} - 9:00 AM` },
+          { label: "12 PM", revenue: 18400, cost: 7800, profit: 10600, subLabel: `${selectedDate} - 12:00 PM` },
+          { label: "3 PM", revenue: 24800, cost: 11200, profit: 13600, subLabel: `${selectedDate} - 3:00 PM` },
+          { label: "6 PM", revenue: 31000, cost: 14500, profit: 16500, subLabel: `${selectedDate} - 6:00 PM` },
+          { label: "9 PM", revenue: metrics.totalRevenue, cost: metrics.totalCost, profit: metrics.netProfit, subLabel: `${selectedDate} - 9:00 PM (Live)` },
         ];
-      case "year":
+
+      case "month": {
+        // Month mode: Days of the selected month (e.g. Day 1, 5, 10, 15, 20, 25, 30)
+        const daysCount = getDaysInMonth(selectedYear, selectedMonth);
+        const monthName = MONTH_NAMES[selectedMonth];
+        const step = Math.ceil(daysCount / 6);
+        const points: GraphPoint[] = [];
+
+        for (let d = 1; d <= daysCount; d += step) {
+          const ratio = d / daysCount;
+          const rev = Math.round((metrics.totalRevenue * 0.4) + ratio * (metrics.totalRevenue * 0.6));
+          const cst = Math.round((metrics.totalCost * 0.4) + ratio * (metrics.totalCost * 0.6));
+          points.push({
+            label: `${d} ${MONTH_SHORT[selectedMonth]}`,
+            revenue: rev,
+            cost: cst,
+            profit: rev - cst,
+            subLabel: `${monthName} ${d}, ${selectedYear}`,
+          });
+        }
+        // Always include last day
+        if (points[points.length - 1].label !== `${daysCount} ${MONTH_SHORT[selectedMonth]}`) {
+          points.push({
+            label: `${daysCount} ${MONTH_SHORT[selectedMonth]}`,
+            revenue: metrics.totalRevenue,
+            cost: metrics.totalCost,
+            profit: metrics.netProfit,
+            subLabel: `${monthName} ${daysCount}, ${selectedYear}`,
+          });
+        }
+        return points;
+      }
+
+      case "year": {
+        // Year mode: All 12 Months of the selected year
+        return MONTH_SHORT.map((mShort, idx) => {
+          const isPast = idx <= 8; // Jan to Sep
+          const baseRev = isPast ? Math.round(45000 + (idx + 1) * 14000) : 0;
+          const baseCost = isPast ? Math.round(22000 + (idx + 1) * 7000) : 0;
+          const rev = idx === 8 && selectedYear === 2026 ? metrics.totalRevenue : baseRev;
+          const cost = idx === 8 && selectedYear === 2026 ? metrics.totalCost : baseCost;
+          return {
+            label: mShort,
+            revenue: rev,
+            cost: cost,
+            profit: rev - cost,
+            subLabel: `${MONTH_NAMES[idx]} ${selectedYear}`,
+          };
+        });
+      }
+
+      case "custom": {
+        // Custom Range mode
         return [
-          { label: "2023", revenue: 320000, cost: 165000, profit: 155000, subLabel: "Year 2023 Total" },
-          { label: "2024", revenue: 480000, cost: 240000, profit: 240000, subLabel: "Year 2024 Total" },
-          { label: "2025", revenue: 620000, cost: 310000, profit: 310000, subLabel: "Year 2025 Total" },
-          { label: "2026 (YTD)", revenue: metrics.totalRevenue + 450000, cost: metrics.totalCost + 220000, profit: metrics.netProfit + 230000, subLabel: "Year 2026 (YTD Live)" },
+          { label: "Start Date", revenue: Math.round(metrics.totalRevenue * 0.25), cost: Math.round(metrics.totalCost * 0.25), profit: Math.round(metrics.netProfit * 0.25), subLabel: `Range Start: ${startDate}` },
+          { label: "Mid Range 1", revenue: Math.round(metrics.totalRevenue * 0.55), cost: Math.round(metrics.totalCost * 0.55), profit: Math.round(metrics.netProfit * 0.55), subLabel: "Custom Interval 1" },
+          { label: "Mid Range 2", revenue: Math.round(metrics.totalRevenue * 0.8), cost: Math.round(metrics.totalCost * 0.8), profit: Math.round(metrics.netProfit * 0.8), subLabel: "Custom Interval 2" },
+          { label: "End Date", revenue: metrics.totalRevenue, cost: metrics.totalCost, profit: metrics.netProfit, subLabel: `Range End: ${endDate}` },
         ];
-      case "custom":
-        return [
-          { label: "Week 1", revenue: 14500, cost: 6200, profit: 8300, subLabel: "Custom Range - W1" },
-          { label: "Week 2", revenue: 22800, cost: 9400, profit: 13400, subLabel: "Custom Range - W2" },
-          { label: "Week 3", revenue: 31000, cost: 14200, profit: 16800, subLabel: "Custom Range - W3" },
-          { label: "Current", revenue: metrics.totalRevenue, cost: metrics.totalCost, profit: metrics.netProfit, subLabel: "Custom Range - Current" },
-        ];
-      case "month":
-      default:
-        return [
-          { label: "May", revenue: 85000, cost: 42000, profit: 43000, subLabel: "May 2024" },
-          { label: "Jun", revenue: 110000, cost: 58000, profit: 52000, subLabel: "Jun 2024" },
-          { label: "Jul", revenue: 142000, cost: 71000, profit: 71000, subLabel: "Jul 2024" },
-          { label: "Aug", revenue: 168000, cost: 84000, profit: 84000, subLabel: "Aug 2024" },
-          { label: "Sep", revenue: metrics.totalRevenue, cost: metrics.totalCost, profit: metrics.netProfit, subLabel: "Sep 2026 (Live)" },
-        ];
+      }
     }
   };
 
@@ -120,7 +180,7 @@ export const AnalyticsView: React.FC = () => {
   const svgWidth = 800;
   const svgHeight = 220;
   const paddingX = 40;
-  const paddingTop = 35;
+  const paddingTop = 30;
   const paddingBottom = 30;
   const usableWidth = svgWidth - paddingX * 2;
   const usableHeight = svgHeight - paddingTop - paddingBottom;
@@ -166,8 +226,8 @@ export const AnalyticsView: React.FC = () => {
   return (
     <div className="space-y-6">
       {/* Top Main Financial Graph Container */}
-      <div className="bg-slate-900/90 border border-slate-800/90 rounded-2xl p-6 shadow-2xl space-y-5 select-none">
-        {/* Header Title & Date Filter Controls */}
+      <div className="bg-slate-900/90 border border-slate-800/90 rounded-2xl p-6 shadow-2xl space-y-6 select-none">
+        {/* Header Title & Dynamic Filter Controls */}
         <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-xl bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 flex items-center justify-center shadow-md">
@@ -178,7 +238,7 @@ export const AnalyticsView: React.FC = () => {
                 Revenue vs Cost vs Net Profit
               </h2>
               <p className="text-xs text-slate-400 mt-0.5">
-                Track business performance across days, months, and years. Hover over any column to inspect point details at top.
+                Track performance across custom hours, days, months, and years. Hover over any point for details.
               </p>
             </div>
           </div>
@@ -186,17 +246,22 @@ export const AnalyticsView: React.FC = () => {
           <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3">
             {/* Filter Pills */}
             <div className="bg-slate-950/90 border border-slate-800/90 p-1 rounded-xl flex items-center gap-1">
-              {(["today", "month", "year", "custom"] as const).map((filterId) => (
+              {[
+                { id: "day", label: "Day" },
+                { id: "month", label: "Month" },
+                { id: "year", label: "Year" },
+                { id: "custom", label: "Custom Range" }
+              ].map((filter) => (
                 <button
-                  key={filterId}
-                  onClick={() => setDateFilter(filterId)}
-                  className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
-                    dateFilter === filterId
+                  key={filter.id}
+                  onClick={() => setDateFilter(filter.id as any)}
+                  className={`px-3.5 py-1.5 rounded-lg text-xs font-bold transition-all ${
+                    dateFilter === filter.id
                       ? "bg-emerald-500 text-slate-950 shadow-md font-extrabold"
                       : "text-slate-400 hover:text-slate-200 hover:bg-slate-900/60"
                   }`}
                 >
-                  {filterId === "today" ? "Day (Today)" : filterId === "month" ? "This Month" : filterId === "year" ? "This Year" : "Custom Range"}
+                  {filter.label}
                 </button>
               ))}
             </div>
@@ -219,73 +284,142 @@ export const AnalyticsView: React.FC = () => {
           </div>
         </div>
 
-        {/* Custom Range Picker Input */}
-        {dateFilter === "custom" && (
-          <div className="p-3 bg-slate-950/80 rounded-xl border border-slate-800 flex items-center gap-3 animate-in fade-in">
-            <Calendar className="w-4 h-4 text-emerald-400" />
-            <span className="text-xs text-slate-300 font-semibold">Select Custom Date Range:</span>
-            <input
-              type="date"
-              value={startDate}
-              onChange={(e) => setStartDate(e.target.value)}
-              className="px-3 py-1.5 bg-slate-900 border border-slate-700 rounded-lg text-xs text-slate-100 focus:outline-none focus:border-emerald-500"
-            />
-            <span className="text-xs text-slate-500">to</span>
-            <input
-              type="date"
-              value={endDate}
-              onChange={(e) => setEndDate(e.target.value)}
-              className="px-3 py-1.5 bg-slate-900 border border-slate-700 rounded-lg text-xs text-slate-100 focus:outline-none focus:border-emerald-500"
-            />
-          </div>
-        )}
-
-        {/* Dedicated Top Details Header Bar (Positioned Above the Graph Lines to never block graph interaction) */}
-        <div className="px-4 py-2.5 bg-slate-950/90 rounded-2xl border border-slate-800/80 flex items-center justify-between min-h-[46px] transition-all">
-          {hoveredIdx !== null && currentData[hoveredIdx] ? (
-            <div className="flex flex-wrap items-center justify-between w-full gap-4 text-xs font-mono animate-in fade-in duration-150">
-              <div className="flex items-center gap-2 text-slate-200 font-bold font-sans">
-                <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping inline-block" />
-                <span>Selected Point: <strong className="text-emerald-400">{currentData[hoveredIdx].subLabel || currentData[hoveredIdx].label}</strong></span>
-              </div>
-              <div className="flex items-center gap-6">
-                <div className="flex items-center gap-1.5 text-emerald-400 font-bold">
-                  <span>Revenue:</span>
-                  <span className="text-white bg-emerald-500/20 px-2 py-0.5 rounded border border-emerald-500/40">
-                    {formatK(currentData[hoveredIdx].revenue)}
-                  </span>
-                </div>
-                <div className="flex items-center gap-1.5 text-rose-400 font-bold">
-                  <span>Costs:</span>
-                  <span className="text-white bg-rose-500/20 px-2 py-0.5 rounded border border-rose-500/40">
-                    {formatK(currentData[hoveredIdx].cost)}
-                  </span>
-                </div>
-                <div className="flex items-center gap-1.5 text-blue-400 font-bold">
-                  <span>Net Profit:</span>
-                  <span className="text-white bg-blue-500/20 px-2 py-0.5 rounded border border-blue-500/40">
-                    {formatK(currentData[hoveredIdx].profit)}
-                  </span>
-                </div>
-              </div>
+        {/* Dynamic Selector Bar depending on active filter mode */}
+        <div className="p-3 bg-slate-950/80 rounded-xl border border-slate-800 flex flex-wrap items-center justify-between gap-3 animate-in fade-in">
+          {dateFilter === "day" && (
+            <div className="flex items-center gap-3">
+              <Calendar className="w-4 h-4 text-emerald-400" />
+              <span className="text-xs text-slate-300 font-semibold">Select Day / Date:</span>
+              <input
+                type="date"
+                value={selectedDate}
+                onChange={(e) => setSelectedDate(e.target.value)}
+                className="px-3 py-1.5 bg-slate-900 border border-slate-700 rounded-lg text-xs text-slate-100 focus:outline-none focus:border-emerald-500"
+              />
+              <span className="text-xs text-emerald-400 font-mono">Showing Hourly Timeline (12 AM - 9 PM)</span>
             </div>
-          ) : (
-            <div className="flex items-center justify-between w-full text-xs text-slate-400 font-medium">
-              <span className="flex items-center gap-2">
-                <Info className="w-4 h-4 text-emerald-400" />
-                Hover or click on any point on the chart below to inspect detailed point metrics here without obscuring graph lines.
+          )}
+
+          {dateFilter === "month" && (
+            <div className="flex items-center gap-3">
+              <Calendar className="w-4 h-4 text-emerald-400" />
+              <span className="text-xs text-slate-300 font-semibold">Select Month & Year:</span>
+              <select
+                value={selectedMonth}
+                onChange={(e) => setSelectedMonth(Number(e.target.value))}
+                className="px-3 py-1.5 bg-slate-900 border border-slate-700 rounded-lg text-xs text-slate-100 focus:outline-none focus:border-emerald-500"
+              >
+                {MONTH_NAMES.map((m, idx) => (
+                  <option key={idx} value={idx} className="bg-slate-900 text-slate-200">
+                    {m}
+                  </option>
+                ))}
+              </select>
+              <select
+                value={selectedYear}
+                onChange={(e) => setSelectedYear(Number(e.target.value))}
+                className="px-3 py-1.5 bg-slate-900 border border-slate-700 rounded-lg text-xs text-slate-100 focus:outline-none focus:border-emerald-500"
+              >
+                {[2024, 2025, 2026].map((y) => (
+                  <option key={y} value={y} className="bg-slate-900 text-slate-200">
+                    {y}
+                  </option>
+                ))}
+              </select>
+              <span className="text-xs text-emerald-400 font-mono">
+                Showing all {getDaysInMonth(selectedYear, selectedMonth)} Days of {MONTH_NAMES[selectedMonth]} {selectedYear}
               </span>
-              <span className="text-[11px] font-mono text-emerald-400/80">Interactive Top Bar Active</span>
+            </div>
+          )}
+
+          {dateFilter === "year" && (
+            <div className="flex items-center gap-3">
+              <Calendar className="w-4 h-4 text-emerald-400" />
+              <span className="text-xs text-slate-300 font-semibold">Select Year:</span>
+              <select
+                value={selectedYear}
+                onChange={(e) => setSelectedYear(Number(e.target.value))}
+                className="px-3 py-1.5 bg-slate-900 border border-slate-700 rounded-lg text-xs text-slate-100 focus:outline-none focus:border-emerald-500"
+              >
+                {[2024, 2025, 2026].map((y) => (
+                  <option key={y} value={y} className="bg-slate-900 text-slate-200">
+                    {y}
+                  </option>
+                ))}
+              </select>
+              <span className="text-xs text-emerald-400 font-mono">Showing all 12 Months of {selectedYear}</span>
+            </div>
+          )}
+
+          {dateFilter === "custom" && (
+            <div className="flex items-center gap-3">
+              <Calendar className="w-4 h-4 text-emerald-400" />
+              <span className="text-xs text-slate-300 font-semibold">Select Custom Date Range:</span>
+              <input
+                type="date"
+                value={startDate}
+                onChange={(e) => setStartDate(e.target.value)}
+                className="px-3 py-1.5 bg-slate-900 border border-slate-700 rounded-lg text-xs text-slate-100 focus:outline-none focus:border-emerald-500"
+              />
+              <span className="text-xs text-slate-500">to</span>
+              <input
+                type="date"
+                value={endDate}
+                onChange={(e) => setEndDate(e.target.value)}
+                className="px-3 py-1.5 bg-slate-900 border border-slate-700 rounded-lg text-xs text-slate-100 focus:outline-none focus:border-emerald-500"
+              />
             </div>
           )}
         </div>
 
-        {/* Main Line Chart Canvas (SVG Curves Clean & Free of Overlapping Cards) */}
+        {/* Main Line Chart Canvas (SVG Curves & Elevated Hover Card above graph lines) */}
         <div 
-          className="relative w-full overflow-x-auto scrollbar-none py-1"
+          className="relative w-full overflow-x-auto scrollbar-none pt-12 pb-2"
           onMouseLeave={() => setHoveredIdx(null)}
         >
           <div className="min-w-[650px] relative">
+            {/* Interactive Hover Tooltip Card (Elevated Floating Above Lines with Arrow) */}
+            {hoveredIdx !== null && currentData[hoveredIdx] && (
+              <div
+                style={{
+                  left: `${(hoveredIdx / (currentData.length - 1)) * 82 + 9}%`,
+                  top: "-55px",
+                }}
+                className={`absolute z-40 bg-slate-950/95 border border-slate-700/90 rounded-2xl p-3.5 shadow-2xl backdrop-blur-xl w-52 text-xs space-y-2 pointer-events-none transition-all duration-150 animate-in fade-in ${
+                  hoveredIdx >= Math.floor(currentData.length / 2)
+                    ? "-translate-x-[102%]"
+                    : "translate-x-2"
+                }`}
+              >
+                <div className="font-extrabold text-slate-100 border-b border-slate-800 pb-1.5 flex items-center justify-between">
+                  <span>{currentData[hoveredIdx].subLabel || currentData[hoveredIdx].label}</span>
+                  <span className="text-[10px] px-1.5 py-0.5 rounded bg-emerald-500/20 text-emerald-400 font-mono">
+                    Point #{hoveredIdx + 1}
+                  </span>
+                </div>
+                <div className="space-y-1 font-mono text-[11px]">
+                  <div className="flex items-center justify-between text-emerald-400 font-bold">
+                    <span className="flex items-center gap-1.5">
+                      <span className="w-2 h-2 rounded-full bg-emerald-400" /> Revenue
+                    </span>
+                    <strong>{formatK(currentData[hoveredIdx].revenue)}</strong>
+                  </div>
+                  <div className="flex items-center justify-between text-rose-400 font-bold">
+                    <span className="flex items-center gap-1.5">
+                      <span className="w-2 h-2 rounded-full bg-rose-500" /> Costs
+                    </span>
+                    <strong>{formatK(currentData[hoveredIdx].cost)}</strong>
+                  </div>
+                  <div className="flex items-center justify-between text-blue-400 font-bold">
+                    <span className="flex items-center gap-1.5">
+                      <span className="w-2 h-2 rounded-full bg-blue-500" /> Net Profit
+                    </span>
+                    <strong>{formatK(currentData[hoveredIdx].profit)}</strong>
+                  </div>
+                </div>
+              </div>
+            )}
+
             {/* SVG Graph Canvas */}
             <div className="relative flex">
               {/* Y-Axis Labels Column */}
@@ -328,7 +462,7 @@ export const AnalyticsView: React.FC = () => {
                 >
                   <defs>
                     <linearGradient id="revenueGlow" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="0%" stopColor="#10b981" stopOpacity="0.22" />
+                      <stop offset="0%" stopColor="#10b981" stopOpacity="0.25" />
                       <stop offset="100%" stopColor="#10b981" stopOpacity="0" />
                     </linearGradient>
                   </defs>
