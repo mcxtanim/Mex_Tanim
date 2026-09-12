@@ -69,7 +69,6 @@ CREATE POLICY "Public Read Access Products" ON public.products FOR SELECT USING 
 CREATE POLICY "Public Write Access Products" ON public.products FOR ALL USING (true);
 
 CREATE POLICY "Public Read Access Categories" ON public.categories FOR SELECT USING (true);
-CREATE POLICY "Public Write Access Categories" ON public.categories FOR ALL USING (true);
 
 CREATE POLICY "Public Read Access Orders" ON public.orders FOR SELECT USING (true);
 CREATE POLICY "Public Write Access Orders" ON public.orders FOR ALL USING (true);
