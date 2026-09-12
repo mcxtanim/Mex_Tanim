@@ -53,7 +53,7 @@ export default function DedicatedProductPage() {
     });
   }, []);
 
-  const product = allProducts.find((p) => p.id === productId) || allProducts[0];
+  const product = allProducts.find((p) => String(p.id) === String(productId)) || allProducts[0];
 
   const [quantity, setQuantity] = useState(1);
   const [added, setAdded] = useState(false);
@@ -90,11 +90,6 @@ export default function DedicatedProductPage() {
     };
   }, [product?.id]);
 
-  const totalReviewsCount = product ? (reviews.length > 0 ? reviews.length : (product.reviewCount || 0)) : 0;
-  const averageRatingScore = product ? (reviews.length > 0
-    ? (reviews.reduce((acc, r) => acc + r.rating, 0) / reviews.length).toFixed(1)
-    : (product.rating || 5.0).toFixed(1)) : '5.0';
-
   // Sync active image when product changes
   useEffect(() => {
     if (product) {
@@ -103,19 +98,52 @@ export default function DedicatedProductPage() {
     }
   }, [productId, product?.id]);
 
+  // Early Loading / Missing Product Guard
+  if (isLoading || !product) {
+    return (
+      <div className="min-h-screen flex flex-col justify-between bg-slate-50/50 font-sans">
+        <Header
+          searchQuery={searchQuery}
+          setSearchQuery={setSearchQuery}
+          selectedCategory={selectedCategory}
+          onSelectCategory={(cat) => {
+            setSelectedCategory(cat);
+            router.push('/');
+          }}
+        />
+        <main className="max-w-7xl mx-auto px-4 py-20 text-center flex-1 flex items-center justify-center">
+          <div className="bg-white/90 backdrop-blur-md p-10 rounded-3xl border border-gray-200 shadow-xl max-w-sm mx-auto space-y-4 animate-pulse">
+            <div className="w-14 h-14 bg-orange-100 text-orange-600 rounded-2xl flex items-center justify-center mx-auto shadow-inner">
+              <ShoppingBag className="w-7 h-7 animate-bounce" />
+            </div>
+            <p className="text-sm font-extrabold text-slate-800">
+              {language === 'bn' ? 'পণ্য তথ্য লোড হচ্ছে...' : 'Loading product details...'}
+            </p>
+          </div>
+        </main>
+        <Footer />
+      </div>
+    );
+  }
+
+  const totalReviewsCount = reviews.length > 0 ? reviews.length : (product.reviewCount || 0);
+  const averageRatingScore = reviews.length > 0
+    ? (reviews.reduce((acc, r) => acc + r.rating, 0) / reviews.length).toFixed(1)
+    : (product.rating || 5.0).toFixed(1);
+
   // Safe non-empty image source fallback
   const displayImage =
     activeImage ||
-    product?.image ||
+    product.image ||
     'https://images.unsplash.com/photo-1546435770-a3e426bf472b?auto=format&fit=crop&w=600&q=80';
 
   // Gallery Images (Main image + comboImages)
-  const galleryImages = product ? Array.from(
+  const galleryImages = Array.from(
     new Set([
       product.image,
       ...(product.comboImages || []),
     ])
-  ).filter((img) => Boolean(img)) : [];
+  ).filter((img) => Boolean(img));
 
   // Handle Cursor-Following Zoom
   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
@@ -323,8 +351,6 @@ export default function DedicatedProductPage() {
                 </div>
               </div>
 
-
-
               {/* Pricing Section */}
               <div className="bg-gradient-to-r from-orange-50/80 via-amber-50/60 to-orange-50/80 p-5 rounded-3xl border border-orange-200/80 space-y-1">
                 <div className="flex items-baseline space-x-3">
@@ -461,8 +487,6 @@ export default function DedicatedProductPage() {
             </div>
 
           </div>
-
-
 
           {/* DEDICATED RELATED ITEMS SECTION ("সম্পর্কিত আইটেম") */}
           {relatedProducts.length > 0 && (
