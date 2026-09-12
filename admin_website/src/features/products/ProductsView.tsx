@@ -8,6 +8,7 @@ import { AddEditProductModal } from "./AddEditProductModal";
 import { DeleteConfirmModal } from "./DeleteConfirmModal";
 import {
   getStoredProducts,
+  fetchProductsFromSupabase,
   createProduct,
   updateProduct,
   deleteProduct,
@@ -25,6 +26,11 @@ export function ProductsView() {
 
   useEffect(() => {
     setProducts(getStoredProducts());
+    fetchProductsFromSupabase().then((data) => {
+      if (data && data.length > 0) {
+        setProducts(data);
+      }
+    });
   }, []);
 
   const categories = ["All", ...Array.from(new Set(products.map((p) => p.category)))];

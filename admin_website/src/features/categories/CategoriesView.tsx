@@ -3,12 +3,16 @@
 import { useState, useEffect } from "react";
 import { FolderTree, Plus, Search } from "lucide-react";
 import { Category, CategoryFormData } from "./types";
-import { initialCategories } from "./seedData";
 import { CategoriesTable } from "./CategoriesTable";
 import { AddEditCategoryModal } from "./AddEditCategoryModal";
 import { DeleteConfirmModal } from "../products/DeleteConfirmModal";
-
-const STORAGE_KEY = "mex_tanim_admin_categories";
+import {
+  getStoredCategories,
+  fetchCategoriesFromSupabase,
+  createCategory,
+  updateCategory,
+  deleteCategory,
+} from "./categoryService";
 
 export function CategoriesView() {
   const [categories, setCategories] = useState<Category[]>([]);
@@ -18,51 +22,28 @@ export function CategoriesView() {
   const [deletingCategory, setDeletingCategory] = useState<Category | null>(null);
 
   useEffect(() => {
-    try {
-      const data = localStorage.getItem(STORAGE_KEY);
-      if (!data) {
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(initialCategories));
-        setCategories(initialCategories);
-      } else {
-        setCategories(JSON.parse(data));
+    setCategories(getStoredCategories());
+    fetchCategoriesFromSupabase().then((data) => {
+      if (data && data.length > 0) {
+        setCategories(data);
       }
-    } catch {
-      setCategories(initialCategories);
-    }
+    });
   }, []);
 
-  const saveToStorage = (updated: Category[]) => {
-    setCategories(updated);
-    try {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
-    } catch (e) {
-      console.error(e);
-    }
-  };
-
   const handleSaveCategory = (formData: CategoryFormData, id?: string) => {
-    const slug = formData.name.toLowerCase().replace(/[^a-z0-9]+/g, "-");
     if (id) {
-      const updated = categories.map((cat) =>
-        cat.id === id ? { ...cat, name: formData.name, description: formData.description, slug } : cat
-      );
-      saveToStorage(updated);
+      const updated = updateCategory(id, formData, categories);
+      setCategories(updated);
     } else {
-      const newCat: Category = {
-        id: `cat-${Date.now()}`,
-        name: formData.name,
-        slug,
-        description: formData.description,
-        productCount: 0,
-      };
-      saveToStorage([newCat, ...categories]);
+      const updated = createCategory(formData, categories);
+      setCategories(updated);
     }
   };
 
   const handleConfirmDelete = () => {
     if (deletingCategory) {
-      const updated = categories.filter((c) => c.id !== deletingCategory.id);
-      saveToStorage(updated);
+      const updated = deleteCategory(deletingCategory.id, categories);
+      setCategories(updated);
       setDeletingCategory(null);
     }
   };
