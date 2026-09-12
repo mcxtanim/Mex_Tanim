@@ -4,7 +4,7 @@ const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://mbchiojrtuf
 const supabaseAnonKey =
   process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ||
   process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY ||
-  'sb_publishable_DROKUGcWl8Zz3oR7FL7bZg_78s0FjM5';
+  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1iY2hpb2pydHVmZ21jaHl1eHBwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODkyMTM2MTAsImV4cCI6MjEwNDc4OTYxMH0.i0RGz8eDzV9LylQ65_yMoG1OhoAmUuUZwZ4_kvAyZqs';
 
 let supabaseInstance: SupabaseClient | null = null;
 

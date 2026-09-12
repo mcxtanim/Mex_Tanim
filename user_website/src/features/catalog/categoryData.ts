@@ -54,6 +54,12 @@ export const isCategorySelected = (selectedCategory: string, catId: string): boo
   if (selectedCategory === 'soundboxes' && catId === 'soundbox') return true;
   if (selectedCategory === 'fast-chargers' && catId === 'chargers') return true;
   if (selectedCategory === 'chargers' && catId === 'fast-chargers') return true;
+  if (selectedCategory === 'keyboards' && catId === 'mechanical-keyboards') return true;
+  if (selectedCategory === 'mechanical-keyboards' && catId === 'keyboards') return true;
+  if (selectedCategory === 'headphones' && catId === 'gaming-headsets') return true;
+  if (selectedCategory === 'gaming-headsets' && catId === 'headphones') return true;
+  if (selectedCategory === 'mice' && catId === 'gaming-mice') return true;
+  if (selectedCategory === 'gaming-mice' && catId === 'mice') return true;
   return false;
 };
 
