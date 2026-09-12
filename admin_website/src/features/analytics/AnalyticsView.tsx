@@ -15,7 +15,8 @@ import {
   Layers,
   ArrowUpRight,
   TrendingDown,
-  PieChart
+  PieChart,
+  Info
 } from "lucide-react";
 import { CostItem, CostFormData } from "./types";
 import { 
@@ -42,7 +43,7 @@ export const AnalyticsView: React.FC = () => {
   const [dateFilter, setDateFilter] = useState<"today" | "month" | "year" | "custom">("month");
   const [startDate, setStartDate] = useState<string>("2026-09-01");
   const [endDate, setEndDate] = useState<string>("2026-09-30");
-  const [hoveredIdx, setHoveredIdx] = useState<number | null>(null); // Null on load so no cut-off tooltip appears until hovered
+  const [hoveredIdx, setHoveredIdx] = useState<number | null>(null); // Null on load
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   useEffect(() => {
@@ -119,7 +120,7 @@ export const AnalyticsView: React.FC = () => {
   const svgWidth = 800;
   const svgHeight = 220;
   const paddingX = 40;
-  const paddingTop = 30;
+  const paddingTop = 35;
   const paddingBottom = 30;
   const usableWidth = svgWidth - paddingX * 2;
   const usableHeight = svgHeight - paddingTop - paddingBottom;
@@ -165,7 +166,7 @@ export const AnalyticsView: React.FC = () => {
   return (
     <div className="space-y-6">
       {/* Top Main Financial Graph Container */}
-      <div className="bg-slate-900/90 border border-slate-800/90 rounded-2xl p-6 shadow-2xl space-y-6 select-none">
+      <div className="bg-slate-900/90 border border-slate-800/90 rounded-2xl p-6 shadow-2xl space-y-5 select-none">
         {/* Header Title & Date Filter Controls */}
         <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
           <div className="flex items-center gap-3">
@@ -177,7 +178,7 @@ export const AnalyticsView: React.FC = () => {
                 Revenue vs Cost vs Net Profit
               </h2>
               <p className="text-xs text-slate-400 mt-0.5">
-                Track your business performance dynamically across days, months, and years. Hover over any point to view exact details.
+                Track business performance across days, months, and years. Hover over any column to inspect point details at top.
               </p>
             </div>
           </div>
@@ -239,54 +240,52 @@ export const AnalyticsView: React.FC = () => {
           </div>
         )}
 
-        {/* Main Line Chart Canvas (SVG Curves & Interactive Hover Card) */}
+        {/* Dedicated Top Details Header Bar (Positioned Above the Graph Lines to never block graph interaction) */}
+        <div className="px-4 py-2.5 bg-slate-950/90 rounded-2xl border border-slate-800/80 flex items-center justify-between min-h-[46px] transition-all">
+          {hoveredIdx !== null && currentData[hoveredIdx] ? (
+            <div className="flex flex-wrap items-center justify-between w-full gap-4 text-xs font-mono animate-in fade-in duration-150">
+              <div className="flex items-center gap-2 text-slate-200 font-bold font-sans">
+                <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping inline-block" />
+                <span>Selected Point: <strong className="text-emerald-400">{currentData[hoveredIdx].subLabel || currentData[hoveredIdx].label}</strong></span>
+              </div>
+              <div className="flex items-center gap-6">
+                <div className="flex items-center gap-1.5 text-emerald-400 font-bold">
+                  <span>Revenue:</span>
+                  <span className="text-white bg-emerald-500/20 px-2 py-0.5 rounded border border-emerald-500/40">
+                    {formatK(currentData[hoveredIdx].revenue)}
+                  </span>
+                </div>
+                <div className="flex items-center gap-1.5 text-rose-400 font-bold">
+                  <span>Costs:</span>
+                  <span className="text-white bg-rose-500/20 px-2 py-0.5 rounded border border-rose-500/40">
+                    {formatK(currentData[hoveredIdx].cost)}
+                  </span>
+                </div>
+                <div className="flex items-center gap-1.5 text-blue-400 font-bold">
+                  <span>Net Profit:</span>
+                  <span className="text-white bg-blue-500/20 px-2 py-0.5 rounded border border-blue-500/40">
+                    {formatK(currentData[hoveredIdx].profit)}
+                  </span>
+                </div>
+              </div>
+            </div>
+          ) : (
+            <div className="flex items-center justify-between w-full text-xs text-slate-400 font-medium">
+              <span className="flex items-center gap-2">
+                <Info className="w-4 h-4 text-emerald-400" />
+                Hover or click on any point on the chart below to inspect detailed point metrics here without obscuring graph lines.
+              </span>
+              <span className="text-[11px] font-mono text-emerald-400/80">Interactive Top Bar Active</span>
+            </div>
+          )}
+        </div>
+
+        {/* Main Line Chart Canvas (SVG Curves Clean & Free of Overlapping Cards) */}
         <div 
-          className="relative w-full overflow-x-auto scrollbar-none py-2"
+          className="relative w-full overflow-x-auto scrollbar-none py-1"
           onMouseLeave={() => setHoveredIdx(null)}
         >
           <div className="min-w-[650px] relative">
-            {/* Interactive Hover Tooltip Card (Smart Alignment: Never cut off on edges) */}
-            {hoveredIdx !== null && currentData[hoveredIdx] && (
-              <div
-                style={{
-                  left: `${(hoveredIdx / (currentData.length - 1)) * 82 + 9}%`,
-                  top: "15px",
-                }}
-                className={`absolute z-40 bg-slate-950/95 border border-slate-700/90 rounded-2xl p-4 shadow-2xl backdrop-blur-xl w-52 text-xs space-y-2.5 pointer-events-none transition-all duration-150 animate-in fade-in ${
-                  hoveredIdx >= Math.floor(currentData.length / 2)
-                    ? "-translate-x-[102%]"
-                    : "translate-x-2"
-                }`}
-              >
-                <div className="font-extrabold text-slate-100 border-b border-slate-800 pb-2 flex items-center justify-between">
-                  <span>{currentData[hoveredIdx].subLabel || currentData[hoveredIdx].label}</span>
-                  <span className="text-[10px] px-1.5 py-0.5 rounded bg-emerald-500/20 text-emerald-400">
-                    Live Point
-                  </span>
-                </div>
-                <div className="space-y-1.5 font-mono text-[11px]">
-                  <div className="flex items-center justify-between text-emerald-400 font-bold">
-                    <span className="flex items-center gap-1.5">
-                      <span className="w-2 h-2 rounded-full bg-emerald-400" /> Revenue
-                    </span>
-                    <strong>{formatK(currentData[hoveredIdx].revenue)}</strong>
-                  </div>
-                  <div className="flex items-center justify-between text-rose-400 font-bold">
-                    <span className="flex items-center gap-1.5">
-                      <span className="w-2 h-2 rounded-full bg-rose-500" /> Costs
-                    </span>
-                    <strong>{formatK(currentData[hoveredIdx].cost)}</strong>
-                  </div>
-                  <div className="flex items-center justify-between text-blue-400 font-bold">
-                    <span className="flex items-center gap-1.5">
-                      <span className="w-2 h-2 rounded-full bg-blue-500" /> Net Profit
-                    </span>
-                    <strong>{formatK(currentData[hoveredIdx].profit)}</strong>
-                  </div>
-                </div>
-              </div>
-            )}
-
             {/* SVG Graph Canvas */}
             <div className="relative flex">
               {/* Y-Axis Labels Column */}
@@ -329,7 +328,7 @@ export const AnalyticsView: React.FC = () => {
                 >
                   <defs>
                     <linearGradient id="revenueGlow" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="0%" stopColor="#10b981" stopOpacity="0.25" />
+                      <stop offset="0%" stopColor="#10b981" stopOpacity="0.22" />
                       <stop offset="100%" stopColor="#10b981" stopOpacity="0" />
                     </linearGradient>
                   </defs>
