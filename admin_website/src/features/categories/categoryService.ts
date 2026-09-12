@@ -27,7 +27,17 @@ export function saveStoredCategories(categories: Category[]): void {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(categories));
     window.dispatchEvent(new Event("storage"));
   } catch (error) {
-    console.error("Error saving categories to localStorage", error);
+    console.warn("localStorage quota exceeded for categories, saving lightweight cache...", error);
+    try {
+      const lightweight = categories.map((c) => ({
+        ...c,
+        image: c.image && c.image.startsWith("data:image") ? "" : c.image,
+      }));
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(lightweight));
+    } catch (e) {
+      console.warn("Could not save categories to localStorage, skipping local cache.", e);
+    }
+    window.dispatchEvent(new Event("storage"));
   }
 }
 

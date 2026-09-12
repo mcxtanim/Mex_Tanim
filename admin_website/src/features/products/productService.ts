@@ -35,23 +35,24 @@ export function getStoredProducts(): Product[] {
   }
 }
 
-export function saveStoredCategories(products: Product[]): void {
-  if (typeof window === "undefined") return;
-  try {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(products));
-    window.dispatchEvent(new Event("storage"));
-  } catch (error) {
-    console.error("Error saving products to localStorage", error);
-  }
-}
-
 export function saveStoredProducts(products: Product[]): void {
   if (typeof window === "undefined") return;
   try {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(products));
     window.dispatchEvent(new Event("storage"));
   } catch (error) {
-    console.error("Error saving products to localStorage", error);
+    console.warn("localStorage quota exceeded, saving lightweight product cache...", error);
+    try {
+      // Strip out large base64 data URLs to stay within quota
+      const lightweight = products.map((p) => ({
+        ...p,
+        imageUrl: p.imageUrl && p.imageUrl.startsWith("data:image") ? "" : p.imageUrl,
+      }));
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(lightweight));
+    } catch (e) {
+      console.warn("Could not save to localStorage, skipping local cache.", e);
+    }
+    window.dispatchEvent(new Event("storage"));
   }
 }
 

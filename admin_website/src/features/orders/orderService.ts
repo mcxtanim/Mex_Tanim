@@ -20,7 +20,24 @@ export function saveStoredOrders(orders: Order[]): void {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(orders));
     window.dispatchEvent(new Event("storage"));
   } catch (error) {
-    console.error("Error saving orders to localStorage", error);
+    console.warn("localStorage quota exceeded for orders, saving lightweight cache...", error);
+    try {
+      const lightweight = orders.map((o) => ({
+        ...o,
+        items: Array.isArray(o.items)
+          ? o.items.map((i: any) => {
+              const img = i.image || i.imageUrl || "";
+              return img && typeof img === "string" && img.startsWith("data:image")
+                ? { ...i, image: "", imageUrl: "" }
+                : i;
+            })
+          : o.items,
+      }));
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(lightweight));
+    } catch (e) {
+      console.warn("Could not save orders to localStorage, skipping local cache.", e);
+    }
+    window.dispatchEvent(new Event("storage"));
   }
 }
 
