@@ -13,8 +13,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className="dark">
-      <body className="bg-slate-950 text-slate-100 min-h-screen flex antialiased selection:bg-emerald-500 selection:text-white">
+    <html lang="en" className="dark" suppressHydrationWarning>
+      <body className="bg-slate-950 text-slate-100 min-h-screen flex antialiased selection:bg-emerald-500 selection:text-white" suppressHydrationWarning>
         <AdminSidebar />
         <div className="flex-1 flex flex-col min-w-0">
           {children}
