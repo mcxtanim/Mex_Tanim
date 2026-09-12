@@ -100,7 +100,7 @@ export const MessagesView: React.FC = () => {
   const customerName = lastUserMsg?.customerName || "Tanvir Ahmed (Customer)";
 
   const quickReplies = [
-    "👋 Swagatom Mex Tanim Store e! Kina sahajjo korte pari?",
+    "🛒 অর্ডার কনফার্ম করতে আপনার নাম, সম্পূর্ণ ঠিকানা ও মোবাইল নম্বর লিখে পাঠান।",
     "🚚 Dhaka ৳60 (24-48 hr), Outside ৳120 (2-3 days). Cash on delivery available!",
     "✅ 100% Authentic product stock e ache!",
     "📦 Apnar order ID ta bolle amra track kore dichhi."
