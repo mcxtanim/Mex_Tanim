@@ -155,13 +155,15 @@ export const ProductTabsSection: React.FC = () => {
     return true;
   });
 
-  const categoryGroups = CATEGORIES.map((cat) => {
-    const prods = activeTabProducts.filter((p) => isCategorySelected(p.category, cat.id));
-    return {
-      category: cat,
-      products: prods,
-    };
-  }).filter((group) => group.products.length > 0);
+  const categoryGroups = CATEGORIES
+    .filter((cat) => cat.id !== 'combo-offers')
+    .map((cat) => {
+      const prods = activeTabProducts.filter((p) => isCategorySelected(p.category, cat.id));
+      return {
+        category: cat,
+        products: prods,
+      };
+    }).filter((group) => group.products.length > 0);
 
   return (
     <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-8">
