@@ -2,15 +2,16 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { Edit2, Trash2, FolderTree, Layers } from "lucide-react";
+import { Edit2, Trash2, FolderTree, Layers, AlertTriangle } from "lucide-react";
 import { Category } from "./types";
 
 interface CategoriesTableProps {
   categories: Category[];
   onDelete: (categoryId: string) => void;
+  onCautionDelete: (category: Category) => void;
 }
 
-export function CategoriesTable({ categories, onDelete }: CategoriesTableProps) {
+export function CategoriesTable({ categories, onDelete, onCautionDelete }: CategoriesTableProps) {
   const [confirmingDeleteId, setConfirmingDeleteId] = useState<string | null>(null);
 
   if (categories.length === 0) {
@@ -25,6 +26,15 @@ export function CategoriesTable({ categories, onDelete }: CategoriesTableProps) 
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
       {categories.map((cat) => {
         const isConfirming = confirmingDeleteId === cat.id;
+        const hasProducts = cat.productCount > 0;
+
+        const handleDeleteClick = () => {
+          if (hasProducts) {
+            onCautionDelete(cat);
+          } else {
+            setConfirmingDeleteId(cat.id);
+          }
+        };
 
         return (
           <div
@@ -73,9 +83,13 @@ export function CategoriesTable({ categories, onDelete }: CategoriesTableProps) 
                     </div>
                   ) : (
                     <button
-                      onClick={() => setConfirmingDeleteId(cat.id)}
-                      className="p-1.5 rounded-lg text-slate-400 hover:text-rose-400 hover:bg-slate-800 transition-colors"
-                      title="Delete category"
+                      onClick={handleDeleteClick}
+                      className={`p-1.5 rounded-lg transition-colors ${
+                        hasProducts
+                          ? "text-amber-400/80 hover:text-amber-300 hover:bg-amber-500/10"
+                          : "text-slate-400 hover:text-rose-400 hover:bg-slate-800"
+                      }`}
+                      title={hasProducts ? "Caution: Category has uploaded products" : "Delete category"}
                     >
                       <Trash2 className="w-4 h-4" />
                     </button>
@@ -93,8 +107,16 @@ export function CategoriesTable({ categories, onDelete }: CategoriesTableProps) 
 
             <div className="mt-4 pt-3 border-t border-slate-800/80 flex items-center justify-between text-xs">
               <span className="font-mono text-[11px] text-slate-500">/{cat.slug}</span>
-              <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-slate-800 text-slate-300 font-semibold text-[11px]">
-                <Layers className="w-3 h-3 text-emerald-400" />
+              
+              <span
+                className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full font-semibold text-[11px] ${
+                  hasProducts
+                    ? "bg-amber-500/15 text-amber-300 border border-amber-500/30"
+                    : "bg-slate-800 text-slate-300"
+                }`}
+              >
+                {hasProducts && <AlertTriangle className="w-3 h-3 text-amber-400 shrink-0" />}
+                <Layers className="w-3 h-3 text-emerald-400 shrink-0" />
                 {cat.productCount} Products
               </span>
             </div>

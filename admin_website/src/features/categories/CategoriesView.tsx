@@ -5,6 +5,7 @@ import Link from "next/link";
 import { FolderTree, Plus, Search } from "lucide-react";
 import { Category } from "./types";
 import { CategoriesTable } from "./CategoriesTable";
+import { CategoryDeleteCautionModal } from "./CategoryDeleteCautionModal";
 import {
   getStoredCategories,
   fetchCategoriesFromSupabase,
@@ -14,6 +15,7 @@ import {
 export function CategoriesView() {
   const [categories, setCategories] = useState<Category[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
+  const [cautionCategory, setCautionCategory] = useState<Category | null>(null);
 
   useEffect(() => {
     const loadCategories = async () => {
@@ -29,6 +31,7 @@ export function CategoriesView() {
   const handleDeleteCategory = async (id: string) => {
     const updated = await deleteCategory(id, categories);
     setCategories(updated);
+    setCautionCategory(null);
   };
 
   const filteredCategories = categories.filter(
@@ -71,6 +74,15 @@ export function CategoriesView() {
       <CategoriesTable
         categories={filteredCategories}
         onDelete={handleDeleteCategory}
+        onCautionDelete={(cat) => setCautionCategory(cat)}
+      />
+
+      {/* Category Delete Caution Warning Modal */}
+      <CategoryDeleteCautionModal
+        category={cautionCategory}
+        isOpen={Boolean(cautionCategory)}
+        onClose={() => setCautionCategory(null)}
+        onConfirmDelete={handleDeleteCategory}
       />
     </div>
   );

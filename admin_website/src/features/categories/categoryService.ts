@@ -3,6 +3,13 @@ import { supabase } from "../../lib/supabase";
 
 const STORAGE_KEY = "mex_tanim_admin_categories";
 
+export interface LinkedProduct {
+  id: string;
+  title: string;
+  price: number;
+  image: string;
+}
+
 export function getStoredCategories(): Category[] {
   if (typeof window === "undefined") return [];
   try {
@@ -24,29 +31,83 @@ export function saveStoredCategories(categories: Category[]): void {
   }
 }
 
+export async function fetchLinkedProductsForCategory(
+  categorySlug: string,
+  categoryId?: string
+): Promise<LinkedProduct[]> {
+  if (!supabase) return [];
+  try {
+    const filter = categoryId
+      ? `category.eq.${categorySlug},category.eq.${categoryId}`
+      : `category.eq.${categorySlug}`;
+
+    const { data, error } = await supabase
+      .from("products")
+      .select("id, title, price, image_url, category")
+      .or(filter);
+
+    if (error || !data) return [];
+
+    return data.map((item: any) => ({
+      id: String(item.id),
+      title: item.title || item.name || "Product",
+      price: Number(item.price) || 0,
+      image: item.image_url || item.image || "",
+    }));
+  } catch (err) {
+    console.warn("fetchLinkedProductsForCategory error:", err);
+    return [];
+  }
+}
+
 export async function fetchCategoriesFromSupabase(): Promise<Category[]> {
   if (!supabase) return getStoredCategories();
   try {
-    const { data, error } = await supabase
+    const { data: catData, error: catError } = await supabase
       .from("categories")
       .select("*")
       .order("name", { ascending: true });
 
-    if (error) {
-      console.warn("Supabase categories fetch error:", error);
+    if (catError) {
+      console.warn("Supabase categories fetch error:", catError);
       return getStoredCategories();
     }
 
-    if (!data) return [];
+    if (!catData) return [];
 
-    const mapped: Category[] = data.map((item: any) => ({
-      id: String(item.id),
-      name: item.name || "",
-      slug: item.slug || item.name.toLowerCase().replace(/[^a-z0-9]+/g, "-"),
-      description: item.description || "",
-      image: item.image_url || item.image || "",
-      productCount: Number(item.product_count || item.productCount) || 0,
-    }));
+    // Also fetch products to calculate exact real product counts per category
+    let productMap: Record<string, number> = {};
+    try {
+      const { data: prodData } = await supabase
+        .from("products")
+        .select("category");
+
+      if (prodData && Array.isArray(prodData)) {
+        prodData.forEach((p: any) => {
+          const catKey = String(p.category || "").toLowerCase();
+          if (catKey) {
+            productMap[catKey] = (productMap[catKey] || 0) + 1;
+          }
+        });
+      }
+    } catch (e) {
+      console.warn("Error fetching products for category counts:", e);
+    }
+
+    const mapped: Category[] = catData.map((item: any) => {
+      const slug = item.slug || item.name.toLowerCase().replace(/[^a-z0-9]+/g, "-");
+      const catId = String(item.id);
+      const realCount = (productMap[slug.toLowerCase()] || 0) + (productMap[catId.toLowerCase()] || 0);
+
+      return {
+        id: catId,
+        name: item.name || "",
+        slug: slug,
+        description: item.description || "",
+        image: item.image_url || item.image || "",
+        productCount: realCount > 0 ? realCount : Number(item.product_count || item.productCount) || 0,
+      };
+    });
 
     saveStoredCategories(mapped);
     return mapped;
@@ -56,7 +117,10 @@ export async function fetchCategoriesFromSupabase(): Promise<Category[]> {
   }
 }
 
-export async function createCategory(formData: CategoryFormData, existingCategories: Category[]): Promise<Category[]> {
+export async function createCategory(
+  formData: CategoryFormData,
+  existingCategories: Category[]
+): Promise<Category[]> {
   const slug = formData.name.toLowerCase().replace(/[^a-z0-9]+/g, "-");
   const newId = `cat-${Date.now()}`;
   const newCat: Category = {
@@ -90,10 +154,16 @@ export async function createCategory(formData: CategoryFormData, existingCategor
   return updated;
 }
 
-export async function updateCategory(id: string, formData: CategoryFormData, existingCategories: Category[]): Promise<Category[]> {
+export async function updateCategory(
+  id: string,
+  formData: CategoryFormData,
+  existingCategories: Category[]
+): Promise<Category[]> {
   const slug = formData.name.toLowerCase().replace(/[^a-z0-9]+/g, "-");
   const updated = existingCategories.map((cat) =>
-    cat.id === id ? { ...cat, name: formData.name, description: formData.description, image: formData.image, slug } : cat
+    cat.id === id
+      ? { ...cat, name: formData.name, description: formData.description, image: formData.image, slug }
+      : cat
   );
   saveStoredCategories(updated);
 
@@ -117,7 +187,10 @@ export async function updateCategory(id: string, formData: CategoryFormData, exi
   return updated;
 }
 
-export async function deleteCategory(id: string, existingCategories: Category[]): Promise<Category[]> {
+export async function deleteCategory(
+  id: string,
+  existingCategories: Category[]
+): Promise<Category[]> {
   const updated = existingCategories.filter((c) => c.id !== id);
   saveStoredCategories(updated);
 
