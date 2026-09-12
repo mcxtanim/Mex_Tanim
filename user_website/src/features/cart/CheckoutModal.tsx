@@ -71,16 +71,25 @@ export function CheckoutModal({ isOpen, onClose }: CheckoutModalProps) {
     // Save to Supabase if available
     if (supabase) {
       try {
-        await supabase.from('orders').upsert({
+        await supabase.from('orders').insert({
           id: orderId,
+          order_number: `#${orderId}`,
           customer_name: customerName,
           phone,
           address,
-          total_amount: grandTotal,
+          shipping_address: {
+            street: address,
+            city: deliveryArea === 'dhaka' ? 'Dhaka' : 'Outside Dhaka',
+            district: deliveryArea === 'dhaka' ? 'Dhaka' : 'Outside Dhaka',
+            postalCode: '1200',
+          },
+          delivery_area: deliveryArea === 'dhaka' ? 'Inside Dhaka' : 'Outside Dhaka',
           delivery_charge: deliveryCharge,
+          total_amount: grandTotal,
           status: 'Pending',
           items: newOrder.items,
           payment_method: newOrder.paymentMethod,
+          payment_status: 'Unpaid',
           created_at: new Date().toISOString(),
         });
       } catch (err) {

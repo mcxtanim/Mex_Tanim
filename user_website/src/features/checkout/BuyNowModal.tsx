@@ -30,6 +30,7 @@ import {
   getDistrictsByDivision,
   getUpazilasByDistrict,
 } from './bangladeshAddressData';
+import { supabase } from '../../lib/supabase';
 
 const ADMIN_ORDERS_KEY = 'mex_tanim_admin_orders';
 const SAVED_ADDRESS_KEY = 'mex_tanim_saved_address';
@@ -291,6 +292,39 @@ export const BuyNowModal: React.FC<BuyNowModalProps> = ({
         window.dispatchEvent(new Event('storage'));
       }
 
+      // Save Order to Supabase Database
+      if (supabase) {
+        supabase
+          .from('orders')
+          .insert({
+            id: fullOrder.id,
+            order_number: fullOrder.orderNumber,
+            customer_name: fullOrder.customerName,
+            customer_email: fullOrder.customerEmail || null,
+            phone: fullOrder.customerPhone,
+            address: `${area.trim()}, ${upaLabel}, ${distLabel}, ${divLabel}`,
+            shipping_address: {
+              street: area.trim(),
+              upazila: upaLabel,
+              district: distLabel,
+              division: divLabel,
+              postalCode: '1200',
+            },
+            delivery_area: divLabel,
+            delivery_charge: deliveryCharge,
+            items: fullOrder.items,
+            total_amount: totalPayable,
+            payment_method: fullOrder.paymentMethod,
+            payment_status: fullOrder.paymentStatus,
+            status: 'Pending',
+            created_at: nowIso,
+          })
+          .then(({ error }) => {
+            if (error) console.warn('Supabase order insert notice:', error.message);
+            else console.log('✓ Order inserted into Supabase successfully!');
+          });
+      }
+
       // Clear product from cart if present
       removeFromCart(product.id);
 
@@ -305,6 +339,23 @@ export const BuyNowModal: React.FC<BuyNowModalProps> = ({
           area: area.trim(),
         };
         localStorage.setItem(SAVED_ADDRESS_KEY, JSON.stringify(addressToSave));
+
+        if (supabase) {
+          supabase
+            .from('saved_addresses')
+            .insert({
+              id: `addr-${Date.now()}`,
+              customer_name: name.trim(),
+              phone: phone.trim(),
+              division,
+              district,
+              upazila,
+              area: area.trim(),
+            })
+            .then(({ error }) => {
+              if (error) console.warn('Supabase address save notice:', error.message);
+            });
+        }
       }
 
       setIsSubmitting(false);
