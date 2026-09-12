@@ -3,6 +3,27 @@ import { supabase } from "../../lib/supabase";
 
 const STORAGE_KEY = "mex_tanim_admin_products";
 
+export function normalizeCategorySlug(rawCat: string): string {
+  if (!rawCat) return "gaming-mice";
+  const slug = rawCat
+    .toLowerCase()
+    .trim()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "");
+
+  if (slug === "mechanical-keyboard" || slug === "keyboard" || slug === "keyboards") return "mechanical-keyboards";
+  if (slug === "gaming-headset" || slug === "headset" || slug === "headphones") return "gaming-headsets";
+  if (slug === "gaming-mouse" || slug === "mouse" || slug === "mice") return "gaming-mice";
+  if (slug === "fast-charger" || slug === "charger" || slug === "chargers") return "fast-chargers";
+  if (slug === "cable") return "cables";
+  if (slug === "soundbox") return "soundboxes";
+  if (slug === "trimmer") return "trimmers";
+  if (slug === "cooler" || slug === "gaming-coolers") return "gaming-cooler";
+  if (slug === "sleeves" || slug === "finger-sleeve") return "finger-sleeves";
+
+  return slug || "gaming-mice";
+}
+
 export function getStoredProducts(): Product[] {
   if (typeof window === "undefined") return [];
   try {
@@ -11,6 +32,16 @@ export function getStoredProducts(): Product[] {
   } catch (error) {
     console.error("Error reading products from localStorage", error);
     return [];
+  }
+}
+
+export function saveStoredCategories(products: Product[]): void {
+  if (typeof window === "undefined") return;
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(products));
+    window.dispatchEvent(new Event("storage"));
+  } catch (error) {
+    console.error("Error saving products to localStorage", error);
   }
 }
 
@@ -33,7 +64,7 @@ export async function fetchProductsFromSupabase(): Promise<Product[]> {
       .order("created_at", { ascending: false });
 
     if (error) {
-      console.warn("Supabase products fetch error:", error);
+      console.warn("Supabase products fetch error:", error.message || error);
       return getStoredProducts();
     }
 
@@ -44,7 +75,7 @@ export async function fetchProductsFromSupabase(): Promise<Product[]> {
       title: item.title || "",
       titleBn: item.title_bn || item.titleBn || "",
       brand: item.brand || "",
-      category: item.category || "GAMING MICE",
+      category: item.category || "gaming-mice",
       price: Number(item.price) || 0,
       originalPrice: Number(item.original_price || item.originalPrice) || 0,
       discount: Number(item.discount) || 0,
@@ -64,13 +95,17 @@ export async function fetchProductsFromSupabase(): Promise<Product[]> {
     saveStoredProducts(mapped);
     return mapped;
   } catch (err) {
-    console.warn("Supabase fetch products error:", err);
+    console.warn("Supabase fetch products exception:", err);
     return getStoredProducts();
   }
 }
 
-export async function createProduct(formData: ProductFormData, existingProducts: Product[]): Promise<Product[]> {
+export async function createProduct(
+  formData: ProductFormData,
+  existingProducts: Product[]
+): Promise<Product[]> {
   const newId = `prod-${Date.now()}`;
+  const categorySlug = normalizeCategorySlug(formData.category);
   const specsArray = formData.specs
     ? formData.specs.split(/,|\n/).map((s) => s.trim()).filter(Boolean)
     : [];
@@ -78,6 +113,7 @@ export async function createProduct(formData: ProductFormData, existingProducts:
   const newProduct: Product = {
     id: newId,
     ...formData,
+    category: categorySlug,
     createdAt: new Date().toISOString(),
   };
 
@@ -91,7 +127,7 @@ export async function createProduct(formData: ProductFormData, existingProducts:
         title: formData.title,
         title_bn: formData.titleBn || null,
         brand: formData.brand || null,
-        category: formData.category,
+        category: categorySlug,
         price: formData.price,
         original_price: formData.originalPrice || 0,
         discount: formData.discount || 0,
@@ -107,7 +143,9 @@ export async function createProduct(formData: ProductFormData, existingProducts:
         is_combo: Boolean(formData.is_combo),
         created_at: new Date().toISOString(),
       });
-      if (error) console.error("Supabase product insert error:", error);
+      if (error) {
+        console.error("Supabase product insert error:", error.message || error.details || JSON.stringify(error));
+      }
     } catch (err) {
       console.error("Supabase product insert exception:", err);
     }
@@ -116,13 +154,18 @@ export async function createProduct(formData: ProductFormData, existingProducts:
   return updated;
 }
 
-export async function updateProduct(id: string, formData: ProductFormData, existingProducts: Product[]): Promise<Product[]> {
+export async function updateProduct(
+  id: string,
+  formData: ProductFormData,
+  existingProducts: Product[]
+): Promise<Product[]> {
+  const categorySlug = normalizeCategorySlug(formData.category);
   const specsArray = formData.specs
     ? formData.specs.split(/,|\n/).map((s) => s.trim()).filter(Boolean)
     : [];
 
   const updated = existingProducts.map((p) =>
-    p.id === id ? { ...p, ...formData } : p
+    p.id === id ? { ...p, ...formData, category: categorySlug } : p
   );
   saveStoredProducts(updated);
 
@@ -134,7 +177,7 @@ export async function updateProduct(id: string, formData: ProductFormData, exist
           title: formData.title,
           title_bn: formData.titleBn || null,
           brand: formData.brand || null,
-          category: formData.category,
+          category: categorySlug,
           price: formData.price,
           original_price: formData.originalPrice || 0,
           discount: formData.discount || 0,
@@ -150,7 +193,9 @@ export async function updateProduct(id: string, formData: ProductFormData, exist
           is_combo: Boolean(formData.is_combo),
         })
         .eq("id", id);
-      if (error) console.error("Supabase product update error:", error);
+      if (error) {
+        console.error("Supabase product update error:", error.message || error.details || JSON.stringify(error));
+      }
     } catch (err) {
       console.error("Supabase product update exception:", err);
     }
@@ -159,14 +204,19 @@ export async function updateProduct(id: string, formData: ProductFormData, exist
   return updated;
 }
 
-export async function deleteProduct(id: string, existingProducts: Product[]): Promise<Product[]> {
+export async function deleteProduct(
+  id: string,
+  existingProducts: Product[]
+): Promise<Product[]> {
   const updated = existingProducts.filter((p) => p.id !== id);
   saveStoredProducts(updated);
 
   if (supabase) {
     try {
       const { error } = await supabase.from("products").delete().eq("id", id);
-      if (error) console.error("Supabase product delete error:", error);
+      if (error) {
+        console.error("Supabase product delete error:", error.message || error.details || JSON.stringify(error));
+      }
     } catch (err) {
       console.error("Supabase product delete exception:", err);
     }

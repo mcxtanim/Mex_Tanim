@@ -8,6 +8,9 @@ import { Product, ProductFormData } from "./types";
 import { getStoredProducts, createProduct, updateProduct } from "./productService";
 import { ImageDropzone } from "../shared/ImageDropzone";
 
+import { Category } from "../categories/types";
+import { fetchCategoriesFromSupabase } from "../categories/categoryService";
+
 interface ProductFormViewProps {
   productId?: string;
 }
@@ -15,23 +18,13 @@ interface ProductFormViewProps {
 export function ProductFormView({ productId }: ProductFormViewProps) {
   const router = useRouter();
   const [products, setProducts] = useState<Product[]>([]);
-  const [categories, setCategories] = useState<string[]>([
-    "GAMING COOLER",
-    "GAMING MICE",
-    "MECHANICAL KEYBOARD",
-    "GAMING HEADSET",
-    "FAST CHARGER",
-    "FINGER SLEEVES",
-    "CABLE",
-    "SOUNDBOX",
-    "TRIMMER",
-  ]);
+  const [categoriesList, setCategoriesList] = useState<Category[]>([]);
 
   const [formData, setFormData] = useState<ProductFormData>({
     title: "",
     titleBn: "",
     brand: "",
-    category: "GAMING MICE",
+    category: "gaming-mice",
     price: 0,
     originalPrice: 0,
     discount: 0,
@@ -51,13 +44,14 @@ export function ProductFormView({ productId }: ProductFormViewProps) {
   const [saveSuccess, setSaveSuccess] = useState(false);
 
   useEffect(() => {
+    fetchCategoriesFromSupabase().then((cats) => {
+      if (cats && cats.length > 0) {
+        setCategoriesList(cats);
+      }
+    });
+
     const stored = getStoredProducts();
     setProducts(stored);
-
-    const availableCats = Array.from(new Set(stored.map((p) => p.category))).filter(Boolean);
-    if (availableCats.length > 0) {
-      setCategories((prev) => Array.from(new Set([...prev, ...availableCats])));
-    }
 
     if (productId) {
       const existing = stored.find((p) => p.id === productId);
@@ -198,11 +192,29 @@ export function ProductFormView({ productId }: ProductFormViewProps) {
                 onChange={(e) => setFormData({ ...formData, category: e.target.value })}
                 className="w-full bg-slate-950/80 border border-slate-800 rounded-xl px-3.5 py-2.5 text-xs text-slate-100 focus:outline-none focus:border-emerald-500/60 cursor-pointer"
               >
-                {categories.map((cat) => (
-                  <option key={cat} value={cat} className="bg-slate-900 text-slate-100">
-                    {cat}
-                  </option>
-                ))}
+                {categoriesList.length > 0 ? (
+                  categoriesList.map((cat) => (
+                    <option key={cat.id} value={cat.slug} className="bg-slate-900 text-slate-100">
+                      {cat.name} ({cat.slug})
+                    </option>
+                  ))
+                ) : (
+                  [
+                    { name: "GAMING COOLER", slug: "gaming-cooler" },
+                    { name: "GAMING MICE", slug: "gaming-mice" },
+                    { name: "MECHANICAL KEYBOARDS", slug: "mechanical-keyboards" },
+                    { name: "GAMING HEADSETS", slug: "gaming-headsets" },
+                    { name: "FAST CHARGERS", slug: "fast-chargers" },
+                    { name: "FINGER SLEEVES", slug: "finger-sleeves" },
+                    { name: "CABLES", slug: "cables" },
+                    { name: "SOUNDBOXES", slug: "soundboxes" },
+                    { name: "TRIMMERS", slug: "trimmers" },
+                  ].map((cat) => (
+                    <option key={cat.slug} value={cat.slug} className="bg-slate-900 text-slate-100">
+                      {cat.name}
+                    </option>
+                  ))
+                )}
               </select>
             </div>
 
