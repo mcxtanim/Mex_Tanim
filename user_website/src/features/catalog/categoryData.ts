@@ -10,8 +10,10 @@ import {
   Speaker,
   Scissors,
   Gift,
+  Layers,
 } from 'lucide-react';
 import { Product } from './types';
+import { supabase } from '../../lib/supabase';
 
 export interface CategoryItem {
   id: string;
@@ -25,46 +27,29 @@ export interface CategoryItem {
   image: string;
 }
 
+export const isCategorySelected = (selectedCategory: string, catId: string): boolean => {
+  if (!selectedCategory || !catId) return false;
+  const s = selectedCategory.toLowerCase().trim();
+  const c = catId.toLowerCase().trim();
+  if (s === c) return true;
+
+  if ((s === 'gaming-cooler' || s === 'cooler') && (c === 'gaming-cooler' || c === 'cooler')) return true;
+  if ((s === 'finger-sleeves' || s === 'sleeves') && (c === 'finger-sleeves' || c === 'sleeves')) return true;
+  if ((s === 'soundboxes' || s === 'soundbox') && (c === 'soundboxes' || c === 'soundbox')) return true;
+  if ((s === 'fast-chargers' || s === 'chargers' || s === 'charger-adapter') && (c === 'fast-chargers' || c === 'chargers' || c === 'charger-adapter')) return true;
+  if ((s === 'mechanical-keyboards' || s === 'keyboards') && (c === 'mechanical-keyboards' || c === 'keyboards')) return true;
+  if ((s === 'gaming-headsets' || s === 'headphones' || s === 'gaming-earphone' || s === 'earphone') && (c === 'gaming-headsets' || c === 'headphones' || c === 'gaming-earphone' || c === 'earphone')) return true;
+  if ((s === 'gaming-mice' || s === 'mice') && (c === 'gaming-mice' || c === 'mice')) return true;
+  if ((s === 'combo-offers' || s === 'combo') && (c === 'combo-offers' || c === 'combo')) return true;
+
+  return false;
+};
+
 export const getCategoryProductCount = (catId: string, staticCount: number = 0, productsList: Product[] = []): number => {
   if (!productsList || productsList.length === 0) return staticCount;
   if (catId === 'all') return productsList.length;
-  const realCount = productsList.filter(
-    (p) =>
-      p.category === catId ||
-      (catId === 'gaming-cooler' && (p.category === 'cooler' || p.category === 'gaming-cooler')) ||
-      (catId === 'finger-sleeves' && (p.category === 'sleeves' || p.category === 'finger-sleeves')) ||
-      (catId === 'gaming-earphone' && (p.category === 'earphone' || p.category === 'gaming-earphone')) ||
-      (catId === 'gaming-powder' && (p.category === 'powder' || p.category === 'gaming-powder')) ||
-      (catId === 'magnetic-plates' && (p.category === 'plates' || p.category === 'magnetic-plates')) ||
-      (catId === 'gaming-triggers' && (p.category === 'triggers' || p.category === 'gaming-triggers')) ||
-      (catId === 'power-bank' && (p.category === 'powerbank' || p.category === 'power-bank')) ||
-      (catId === 'charger-adapter' && (p.category === 'chargers' || p.category === 'fast-chargers' || p.category === 'charger-adapter')) ||
-      (catId === 'soundboxes' && (p.category === 'soundbox' || p.category === 'soundboxes')) ||
-      (catId === 'chargers' && (p.category === 'fast-chargers' || p.category === 'chargers')) ||
-      (catId === 'combo-offers' && (p.category === 'combo' || p.category === 'combo-offers' || p.isComboOffer === true))
-  ).length;
+  const realCount = productsList.filter((p) => isCategorySelected(catId, p.category)).length;
   return realCount > 0 ? realCount : staticCount;
-};
-
-export const isCategorySelected = (selectedCategory: string, catId: string): boolean => {
-  if (selectedCategory === catId) return true;
-  if (selectedCategory === 'gaming-cooler' && catId === 'cooler') return true;
-  if (selectedCategory === 'cooler' && catId === 'gaming-cooler') return true;
-  if (selectedCategory === 'sleeves' && catId === 'finger-sleeves') return true;
-  if (selectedCategory === 'finger-sleeves' && catId === 'sleeves') return true;
-  if (selectedCategory === 'soundbox' && catId === 'soundboxes') return true;
-  if (selectedCategory === 'soundboxes' && catId === 'soundbox') return true;
-  if (selectedCategory === 'fast-chargers' && catId === 'chargers') return true;
-  if (selectedCategory === 'chargers' && catId === 'fast-chargers') return true;
-  if (selectedCategory === 'keyboards' && catId === 'mechanical-keyboards') return true;
-  if (selectedCategory === 'mechanical-keyboards' && catId === 'keyboards') return true;
-  if (selectedCategory === 'headphones' && catId === 'gaming-headsets') return true;
-  if (selectedCategory === 'gaming-headsets' && catId === 'headphones') return true;
-  if (selectedCategory === 'mice' && catId === 'gaming-mice') return true;
-  if (selectedCategory === 'gaming-mice' && catId === 'mice') return true;
-  if (selectedCategory === 'combo-offers' && catId === 'combo') return true;
-  if (selectedCategory === 'combo' && catId === 'combo-offers') return true;
-  return false;
 };
 
 export const CATEGORIES: CategoryItem[] = [
@@ -212,3 +197,109 @@ export const CATEGORIES: CategoryItem[] = [
     image: '/categories/trimmers.svg',
   },
 ];
+
+const getLucideIconForSlug = (slug: string): ComponentType<{ className?: string }> => {
+  const s = slug.toLowerCase();
+  if (s.includes('headphone') || s.includes('headset') || s.includes('earphone')) return Headphones;
+  if (s.includes('mouse') || s.includes('mice')) return Mouse;
+  if (s.includes('keyboard')) return Keyboard;
+  if (s.includes('charger') || s.includes('power')) return Zap;
+  if (s.includes('sleeve')) return Shield;
+  if (s.includes('cable')) return Cable;
+  if (s.includes('sound') || s.includes('speaker')) return Speaker;
+  if (s.includes('trimmer')) return Scissors;
+  if (s.includes('combo')) return Gift;
+  return Layers;
+};
+
+const getSvgImageForSlug = (slug: string, fallbackImage?: string): string => {
+  if (fallbackImage && fallbackImage.startsWith('/') && !fallbackImage.includes('data:image')) {
+    return fallbackImage;
+  }
+  const s = slug.toLowerCase();
+  if (s.includes('headphone') || s.includes('headset') || s.includes('earphone')) return '/categories/gaming-headsets.svg';
+  if (s.includes('mouse') || s.includes('mice')) return '/categories/gaming-mice.svg';
+  if (s.includes('keyboard')) return '/categories/mechanical-keyboards.svg';
+  if (s.includes('charger') || s.includes('power')) return '/categories/fast-chargers.svg';
+  if (s.includes('sleeve')) return '/categories/finger-sleeves.svg';
+  if (s.includes('cable')) return '/categories/cables.svg';
+  if (s.includes('sound') || s.includes('speaker')) return '/categories/soundboxes.svg';
+  if (s.includes('trimmer')) return '/categories/trimmers.svg';
+  return '/categories/all.svg';
+};
+
+export async function fetchLiveCategories(): Promise<CategoryItem[]> {
+  let rawList: any[] = [];
+
+  if (supabase) {
+    try {
+      const { data, error } = await supabase
+        .from('categories')
+        .select('*')
+        .order('name', { ascending: true });
+
+      if (!error && data && data.length > 0) {
+        rawList = data;
+      }
+    } catch (e) {
+      console.warn('Supabase categories fetch error in user_website:', e);
+    }
+  }
+
+  if (rawList.length === 0 && typeof window !== 'undefined') {
+    try {
+      const local = localStorage.getItem('mex_tanim_admin_categories');
+      if (local) {
+        const parsed = JSON.parse(local);
+        if (Array.isArray(parsed) && parsed.length > 0) {
+          rawList = parsed;
+        }
+      }
+    } catch (err) {
+      console.warn('localStorage categories read error:', err);
+    }
+  }
+
+  if (rawList.length === 0) {
+    return CATEGORIES;
+  }
+
+  const categoryMap = new Map<string, CategoryItem>();
+
+  CATEGORIES.forEach((cat) => {
+    categoryMap.set(cat.id, cat);
+  });
+
+  rawList.forEach((item: any) => {
+    const rawName = item.name || '';
+    const slug = (item.slug || rawName.toLowerCase().replace(/[^a-z0-9]+/g, '-')).toLowerCase();
+    
+    const existingKey = Array.from(categoryMap.keys()).find((k) => isCategorySelected(k, slug));
+
+    if (existingKey) {
+      const existing = categoryMap.get(existingKey)!;
+      categoryMap.set(existingKey, {
+        ...existing,
+        nameEn: rawName ? rawName.toUpperCase() : existing.nameEn,
+        nameBn: item.name_bn || rawName || existing.nameBn,
+        staticCount: Number(item.product_count) || existing.staticCount,
+        image: getSvgImageForSlug(slug, item.image_url || item.image),
+      });
+    } else {
+      const newCatItem: CategoryItem = {
+        id: slug,
+        nameEn: rawName ? rawName.toUpperCase() : slug.toUpperCase(),
+        nameBn: item.name_bn || rawName || slug,
+        badge: rawName ? rawName.trim().charAt(0).toUpperCase() : 'C',
+        badgeBg: 'bg-slate-900 text-white',
+        icon: getLucideIconForSlug(slug),
+        colorClass: 'bg-slate-900 text-white',
+        staticCount: Number(item.product_count) || 0,
+        image: getSvgImageForSlug(slug, item.image_url || item.image),
+      };
+      categoryMap.set(slug, newCatItem);
+    }
+  });
+
+  return Array.from(categoryMap.values());
+}

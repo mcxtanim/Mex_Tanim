@@ -1,9 +1,11 @@
 'use client';
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { ChevronRight } from 'lucide-react';
 import { useLanguage } from '../shared/LanguageContext';
-import { CATEGORIES, getCategoryProductCount, isCategorySelected } from './categoryData';
+import { CATEGORIES, CategoryItem, fetchLiveCategories, getCategoryProductCount, isCategorySelected } from './categoryData';
+import { fetchLiveProducts } from './productService';
+import { Product } from './types';
 
 interface CategorySidebarProps {
   selectedCategory: string;
@@ -15,12 +17,29 @@ export const CategorySidebar: React.FC<CategorySidebarProps> = ({
   onSelectCategory,
 }) => {
   const { language } = useLanguage();
+  const [categories, setCategories] = useState<CategoryItem[]>(CATEGORIES);
+  const [products, setProducts] = useState<Product[]>([]);
+
+  useEffect(() => {
+    const loadCategoriesAndProducts = async () => {
+      const [liveCats, liveProds] = await Promise.all([
+        fetchLiveCategories(),
+        fetchLiveProducts(),
+      ]);
+      setCategories(liveCats);
+      setProducts(liveProds);
+    };
+    loadCategoriesAndProducts();
+
+    window.addEventListener('storage', loadCategoriesAndProducts);
+    return () => window.removeEventListener('storage', loadCategoriesAndProducts);
+  }, []);
 
   return (
     <div className="w-full bg-white divide-y divide-gray-100 rounded-b-2xl overflow-hidden shadow-xs">
-      {CATEGORIES.map((cat) => {
+      {categories.map((cat) => {
         const isSelected = isCategorySelected(selectedCategory, cat.id);
-        const count = getCategoryProductCount(cat.id, cat.staticCount);
+        const count = getCategoryProductCount(cat.id, cat.staticCount, products);
 
         return (
           <button
@@ -33,7 +52,7 @@ export const CategorySidebar: React.FC<CategorySidebarProps> = ({
             }`}
           >
             <div className="flex items-center space-x-3.5 min-w-0">
-              {/* Colored Badge Container (Matching Reference Image 1) */}
+              {/* Colored Badge Container */}
               <div
                 className={`w-10 h-10 rounded-xl flex items-center justify-center font-black text-sm font-mono shrink-0 shadow-2xs ${
                   cat.badgeBg || 'bg-slate-900 text-white'

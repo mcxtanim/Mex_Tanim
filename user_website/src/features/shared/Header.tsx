@@ -8,7 +8,7 @@ import { useCart } from '../cart/CartContext';
 import { useAuth } from '../auth/AuthContext';
 import { useLanguage } from './LanguageContext';
 import { CategorySidebar } from '../catalog/CategorySidebar';
-import { CATEGORIES } from '../catalog/categoryData';
+import { CATEGORIES, CategoryItem, fetchLiveCategories } from '../catalog/categoryData';
 
 interface HeaderProps {
   searchQuery?: string;
@@ -46,6 +46,18 @@ export const Header: React.FC<HeaderProps> = ({
   const router = useRouter();
 
   const [isCategoryDrawerOpen, setIsCategoryDrawerOpen] = useState(false);
+  const [categories, setCategories] = useState<CategoryItem[]>(CATEGORIES);
+
+  useEffect(() => {
+    const loadCategories = async () => {
+      const liveCats = await fetchLiveCategories();
+      setCategories(liveCats);
+    };
+    loadCategories();
+
+    window.addEventListener('storage', loadCategories);
+    return () => window.removeEventListener('storage', loadCategories);
+  }, []);
 
   // Keyboard listener for Escape key to close left category drawer
   useEffect(() => {
@@ -251,7 +263,7 @@ export const Header: React.FC<HeaderProps> = ({
                     {language === 'bn' ? 'ক্যাটাগরি' : 'Categories'}
                   </h3>
                   <p className="text-[11px] text-gray-400 font-medium">
-                    {CATEGORIES.length}{language === 'bn' ? 'টি কালেকশন' : ' Collections'}
+                    {categories.length}{language === 'bn' ? 'টি কালেকশন' : ' Collections'}
                   </p>
                 </div>
               </div>

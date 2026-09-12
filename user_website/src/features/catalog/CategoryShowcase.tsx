@@ -1,9 +1,10 @@
 'use client';
 
-import React, { useRef, useEffect } from 'react';
+import React, { useRef, useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { ChevronLeft, ChevronRight, ArrowRight } from 'lucide-react';
 import { useLanguage } from '../shared/LanguageContext';
-import { CATEGORIES, isCategorySelected } from './categoryData';
+import { CATEGORIES, CategoryItem, fetchLiveCategories, isCategorySelected } from './categoryData';
 import { CategoryThumbnail } from './CategoryThumbnail';
 
 interface CategoryShowcaseProps {
@@ -18,8 +19,21 @@ export const CategoryShowcase: React.FC<CategoryShowcaseProps> = ({
   onCloseBrowser,
 }) => {
   const { language } = useLanguage();
+  const router = useRouter();
   const scrollRef = useRef<HTMLDivElement>(null);
   const isHoveredRef = useRef(false);
+  const [categories, setCategories] = useState<CategoryItem[]>(CATEGORIES);
+
+  useEffect(() => {
+    const loadCategories = async () => {
+      const liveCats = await fetchLiveCategories();
+      setCategories(liveCats);
+    };
+    loadCategories();
+
+    window.addEventListener('storage', loadCategories);
+    return () => window.removeEventListener('storage', loadCategories);
+  }, []);
 
   useEffect(() => {
     const el = scrollRef.current;
@@ -63,12 +77,14 @@ export const CategoryShowcase: React.FC<CategoryShowcaseProps> = ({
   const handleViewAll = () => {
     onSelectCategory('all');
     if (onCloseBrowser) onCloseBrowser();
-    setTimeout(() => {
-      const prodEl = document.getElementById('products');
-      if (prodEl) {
-        prodEl.scrollIntoView({ behavior: 'smooth' });
-      }
-    }, 100);
+    
+    // Check if products element is on page
+    const prodEl = document.getElementById('products');
+    if (prodEl) {
+      prodEl.scrollIntoView({ behavior: 'smooth' });
+    } else {
+      router.push('/categories');
+    }
   };
 
   return (
@@ -120,7 +136,7 @@ export const CategoryShowcase: React.FC<CategoryShowcaseProps> = ({
         className="overflow-x-auto scrollbar-none flex space-x-3 sm:space-x-4 snap-x touch-pan-x py-2 px-0.5"
         style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
       >
-        {CATEGORIES.map((cat) => {
+        {categories.map((cat) => {
           const selected = isCategorySelected(selectedCategory, cat.id);
 
           return (

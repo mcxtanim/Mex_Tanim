@@ -4,7 +4,7 @@ import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import { Home, ChevronRight, ShoppingBag } from 'lucide-react';
-import { CATEGORIES, getCategoryProductCount, isCategorySelected } from './categoryData';
+import { CATEGORIES, CategoryItem, fetchLiveCategories, getCategoryProductCount, isCategorySelected } from './categoryData';
 import { fetchLiveProducts } from './productService';
 import { Product } from './types';
 import { ProductCard } from './ProductCard';
@@ -19,11 +19,23 @@ export const CategoriesView: React.FC<CategoriesViewProps> = ({ initialCategory 
   const catParam = searchParams.get('cat');
 
   const [selectedCategory, setSelectedCategory] = useState<string>(catParam || initialCategory || 'all');
+  const [categories, setCategories] = useState<CategoryItem[]>(CATEGORIES);
   const [products, setProducts] = useState<Product[]>([]);
   const { language } = useLanguage();
 
   useEffect(() => {
-    fetchLiveProducts().then((data) => setProducts(data));
+    const loadData = async () => {
+      const [prods, cats] = await Promise.all([
+        fetchLiveProducts(),
+        fetchLiveCategories(),
+      ]);
+      setProducts(prods);
+      setCategories(cats);
+    };
+    loadData();
+
+    window.addEventListener('storage', loadData);
+    return () => window.removeEventListener('storage', loadData);
   }, []);
 
   useEffect(() => {
@@ -32,7 +44,7 @@ export const CategoriesView: React.FC<CategoriesViewProps> = ({ initialCategory 
     }
   }, [catParam]);
 
-  const selectedCatObj = CATEGORIES.find((c) => isCategorySelected(selectedCategory, c.id)) || {
+  const selectedCatObj = categories.find((c) => isCategorySelected(selectedCategory, c.id)) || {
     id: 'all',
     nameEn: 'ALL PRODUCTS',
     nameBn: 'সকল প্রোডাক্ট',
@@ -45,19 +57,7 @@ export const CategoriesView: React.FC<CategoriesViewProps> = ({ initialCategory 
 
   const filteredProducts = products.filter((p) => {
     if (selectedCategory === 'all') return true;
-    return (
-      isCategorySelected(selectedCategory, p.category) ||
-      (selectedCategory === 'gaming-cooler' && (p.category === 'cooler' || p.category === 'gaming-cooler')) ||
-      (selectedCategory === 'finger-sleeves' && (p.category === 'sleeves' || p.category === 'finger-sleeves')) ||
-      (selectedCategory === 'gaming-earphone' && (p.category === 'earphone' || p.category === 'gaming-earphone')) ||
-      (selectedCategory === 'gaming-powder' && (p.category === 'powder' || p.category === 'gaming-powder')) ||
-      (selectedCategory === 'magnetic-plates' && (p.category === 'plates' || p.category === 'magnetic-plates')) ||
-      (selectedCategory === 'gaming-triggers' && (p.category === 'triggers' || p.category === 'gaming-triggers')) ||
-      (selectedCategory === 'power-bank' && (p.category === 'powerbank' || p.category === 'power-bank')) ||
-      (selectedCategory === 'charger-adapter' && (p.category === 'chargers' || p.category === 'fast-chargers' || p.category === 'charger-adapter')) ||
-      (selectedCategory === 'soundboxes' && (p.category === 'soundbox' || p.category === 'soundboxes')) ||
-      (selectedCategory === 'chargers' && (p.category === 'fast-chargers' || p.category === 'chargers'))
-    );
+    return isCategorySelected(selectedCategory, p.category);
   });
 
   return (

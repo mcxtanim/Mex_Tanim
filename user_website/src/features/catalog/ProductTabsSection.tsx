@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import { ProductCard } from './ProductCard';
-import { CATEGORIES, isCategorySelected } from './categoryData';
+import { CATEGORIES, CategoryItem, fetchLiveCategories, isCategorySelected } from './categoryData';
 import { fetchLiveProducts } from './productService';
 import { Product } from './types';
 import { useLanguage } from '../shared/LanguageContext';
@@ -27,9 +27,13 @@ type TabType = 'featured' | 'bestsellers' | 'newarrivals';
 
 const CATEGORY_ICONS: Record<string, React.ReactNode> = {
   headphones: <Headphones className="w-5 h-5" />,
+  'gaming-headsets': <Headphones className="w-5 h-5" />,
   mice: <Mouse className="w-5 h-5" />,
+  'gaming-mice': <Mouse className="w-5 h-5" />,
   keyboards: <Keyboard className="w-5 h-5" />,
+  'mechanical-keyboards': <Keyboard className="w-5 h-5" />,
   chargers: <ChargerIcon className="w-5 h-5" />,
+  'fast-chargers': <ChargerIcon className="w-5 h-5" />,
   'finger-sleeves': <Hand className="w-5 h-5" />,
   cables: <Cable className="w-5 h-5" />,
   soundboxes: <Speaker className="w-5 h-5" />,
@@ -135,17 +139,22 @@ const CategoryRailRow: React.FC<CategoryRailProps> = ({
 export const ProductTabsSection: React.FC = () => {
   const [activeTab, setActiveTab] = useState<TabType>('featured');
   const [allProducts, setAllProducts] = useState<Product[]>([]);
+  const [categories, setCategories] = useState<CategoryItem[]>(CATEGORIES);
   const { language } = useLanguage();
 
   useEffect(() => {
-    const loadProducts = async () => {
-      const data = await fetchLiveProducts();
-      setAllProducts(data);
+    const loadData = async () => {
+      const [prods, cats] = await Promise.all([
+        fetchLiveProducts(),
+        fetchLiveCategories(),
+      ]);
+      setAllProducts(prods);
+      setCategories(cats);
     };
-    loadProducts();
+    loadData();
 
-    window.addEventListener('storage', loadProducts);
-    return () => window.removeEventListener('storage', loadProducts);
+    window.addEventListener('storage', loadData);
+    return () => window.removeEventListener('storage', loadData);
   }, []);
 
   const activeTabProducts = allProducts.filter((p) => {
@@ -155,7 +164,7 @@ export const ProductTabsSection: React.FC = () => {
     return true;
   });
 
-  const categoryGroups = CATEGORIES
+  const categoryGroups = categories
     .filter((cat) => cat.id !== 'combo-offers')
     .map((cat) => {
       const prods = activeTabProducts.filter((p) => isCategorySelected(p.category, cat.id));
@@ -166,7 +175,7 @@ export const ProductTabsSection: React.FC = () => {
     }).filter((group) => group.products.length > 0);
 
   return (
-    <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-8">
+    <section id="products" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-8">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-gray-200/80 pb-6">
         <div>
           <div className="flex items-center space-x-2">
