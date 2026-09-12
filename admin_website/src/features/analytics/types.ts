@@ -8,7 +8,9 @@ export interface CostItem {
   id: string;
   title: string;
   category: CostCategory;
-  amount: number; // BDT
+  amount: number; // BDT Total
+  unitPrice?: number; // BDT per unit
+  quantity?: number; // Total units
   date: string; // YYYY-MM-DD
   notes?: string;
 }
@@ -17,6 +19,8 @@ export interface CostFormData {
   title: string;
   category: CostCategory;
   amount: number;
+  unitPrice?: number;
+  quantity?: number;
   date: string;
   notes?: string;
 }

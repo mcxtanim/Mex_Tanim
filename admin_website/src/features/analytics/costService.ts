@@ -8,6 +8,8 @@ const SEED_COSTS: CostItem[] = [
     id: "cost-101",
     title: "Fantech HG11 Headset Sourcing Batch",
     category: "Product Sourcing",
+    unitPrice: 1450,
+    quantity: 10,
     amount: 14500,
     date: "2026-09-01",
     notes: "10 units wholesale purchase from distributor",

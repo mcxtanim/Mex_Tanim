@@ -9,13 +9,10 @@ import {
   Plus, 
   Trash2, 
   Calendar, 
-  Filter, 
   CheckCircle2, 
   ArrowUpRight, 
-  PieChart, 
-  ShieldCheck, 
-  Clock, 
-  Layers
+  Calculator,
+  LineChart as LineChartIcon
 } from "lucide-react";
 import { CostItem, CostFormData } from "./types";
 import { 
@@ -56,7 +53,7 @@ export const AnalyticsView: React.FC = () => {
   // Calculate live real-time financial metrics
   const metrics = calculateFinancialMetrics(orders, costs);
 
-  // Sample graph dataset based on date range
+  // Line Chart Dataset with exact numbers
   const chartData = [
     { label: "May", revenue: 85000, cost: 42000, profit: 43000 },
     { label: "Jun", revenue: 110000, cost: 58000, profit: 52000 },
@@ -66,6 +63,18 @@ export const AnalyticsView: React.FC = () => {
   ];
 
   const maxChartValue = Math.max(...chartData.map((d) => Math.max(d.revenue, d.cost, d.profit)), 1);
+
+  // Convert values to Y pixel coordinates for SVG Line Chart (Height = 180px, Padding = 20px)
+  const chartHeight = 180;
+  const getY = (val: number) => {
+    const ratio = Math.max(0, val) / maxChartValue;
+    return Math.round(chartHeight - ratio * (chartHeight - 40) - 20);
+  };
+
+  // Generate SVG Points for Line Chart
+  const revenuePoints = chartData.map((d, i) => `${(i / (chartData.length - 1)) * 100}% ${getY(d.revenue)}px`).join(", ");
+  const costPoints = chartData.map((d, i) => `${(i / (chartData.length - 1)) * 100}% ${getY(d.cost)}px`).join(", ");
+  const profitPoints = chartData.map((d, i) => `${(i / (chartData.length - 1)) * 100}% ${getY(d.profit)}px`).join(", ");
 
   return (
     <div className="space-y-6">
@@ -77,7 +86,7 @@ export const AnalyticsView: React.FC = () => {
             Financial & Revenue Analytics Center
           </h2>
           <p className="text-xs text-slate-400 mt-1">
-            Automated net profit calculation (`Net Profit = Revenue - Total Cost`) & custom date range analytics.
+            Automated net profit calculation (`Net Profit = Revenue - Total Cost`) & unit product cost calculator.
           </p>
         </div>
 
@@ -87,7 +96,7 @@ export const AnalyticsView: React.FC = () => {
             className="px-4 py-2.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold text-xs flex items-center gap-2 transition shadow-md shadow-emerald-500/20 active:scale-95"
           >
             <Plus className="w-4 h-4 stroke-[3]" />
-            <span>Add Expense Entry</span>
+            <span>Add Expense / Unit Product Cost</span>
           </button>
         </div>
       </div>
@@ -178,16 +187,16 @@ export const AnalyticsView: React.FC = () => {
         </div>
       </div>
 
-      {/* Date Filter Bar & Graph Header */}
+      {/* Line Chart Section with Numeric Badges */}
       <div className="bg-slate-900/90 border border-slate-800/90 rounded-2xl p-5 shadow-md space-y-5">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-slate-800/80 pb-4">
           <div>
             <h3 className="text-base font-bold text-slate-100 flex items-center gap-2">
-              <BarChart2 className="w-5 h-5 text-emerald-400" />
-              Revenue vs Expense vs Profit Comparison Graph
+              <LineChartIcon className="w-5 h-5 text-emerald-400" />
+              Revenue vs Cost vs Net Profit Line Chart (with Exact Numbers)
             </h3>
             <p className="text-xs text-slate-400 mt-0.5">
-              Visualize monthly & custom date range financial trends.
+              Line trend graph with numerical figures displayed at data points.
             </p>
           </div>
 
@@ -229,78 +238,93 @@ export const AnalyticsView: React.FC = () => {
           </div>
         </div>
 
-        {/* Visual Comparison Graph */}
+        {/* Line Chart Visual Container */}
         <div className="space-y-4 pt-2">
+          {/* Legend */}
           <div className="flex items-center justify-end gap-6 text-xs font-semibold">
             <div className="flex items-center gap-2">
-              <span className="w-3 h-3 rounded-sm bg-emerald-500 inline-block" />
-              <span className="text-slate-300">Revenue (৳)</span>
+              <span className="w-3 h-3 rounded-full bg-emerald-400 inline-block ring-2 ring-emerald-400/30" />
+              <span className="text-slate-200 font-bold">Revenue (৳)</span>
             </div>
             <div className="flex items-center gap-2">
-              <span className="w-3 h-3 rounded-sm bg-rose-500 inline-block" />
-              <span className="text-slate-300">Costs (৳)</span>
+              <span className="w-3 h-3 rounded-full bg-rose-500 inline-block ring-2 ring-rose-500/30" />
+              <span className="text-slate-200 font-bold">Costs (৳)</span>
             </div>
             <div className="flex items-center gap-2">
-              <span className="w-3 h-3 rounded-sm bg-teal-400 inline-block" />
-              <span className="text-slate-300">Net Profit (৳)</span>
+              <span className="w-3 h-3 rounded-full bg-teal-300 inline-block ring-2 ring-teal-300/30" />
+              <span className="text-slate-200 font-bold">Net Profit (৳)</span>
             </div>
           </div>
 
-          <div className="h-56 flex items-end justify-between gap-4 pt-6 pb-2 px-2">
-            {chartData.map((d, idx) => {
-              const revHeight = Math.round((d.revenue / maxChartValue) * 100);
-              const costHeight = Math.round((d.cost / maxChartValue) * 100);
-              const profitHeight = Math.round((d.profit / maxChartValue) * 100);
+          {/* Line Chart Canvas & Points */}
+          <div className="relative h-60 bg-slate-950/90 rounded-2xl border border-slate-800/80 p-4 flex flex-col justify-between overflow-hidden">
+            {/* Background Grid Lines */}
+            <div className="absolute inset-0 flex flex-col justify-between p-4 pointer-events-none opacity-20">
+              <div className="border-b border-slate-700 w-full" />
+              <div className="border-b border-slate-700 w-full" />
+              <div className="border-b border-slate-700 w-full" />
+              <div className="border-b border-slate-700 w-full" />
+            </div>
 
-              return (
-                <div key={idx} className="flex-1 flex flex-col items-center gap-2 group">
-                  <div className="w-full bg-slate-950/80 rounded-xl p-1.5 h-44 flex items-end justify-center gap-1.5 border border-slate-800/60 overflow-hidden">
-                    {/* Revenue Bar */}
-                    <div
-                      style={{ height: `${revHeight}%` }}
-                      className="w-1/3 bg-emerald-500 rounded-t-md hover:bg-emerald-400 transition-all"
-                      title={`Revenue: ৳${d.revenue.toLocaleString()}`}
-                    />
-                    {/* Cost Bar */}
-                    <div
-                      style={{ height: `${costHeight}%` }}
-                      className="w-1/3 bg-rose-500 rounded-t-md hover:bg-rose-400 transition-all"
-                      title={`Cost: ৳${d.cost.toLocaleString()}`}
-                    />
-                    {/* Profit Bar */}
-                    <div
-                      style={{ height: `${profitHeight}%` }}
-                      className="w-1/3 bg-teal-400 rounded-t-md hover:bg-teal-300 transition-all"
-                      title={`Profit: ৳${d.profit.toLocaleString()}`}
-                    />
+            {/* Data Columns & Numbers Overlay */}
+            <div className="relative z-10 flex-1 flex items-end justify-between px-6 pb-6">
+              {chartData.map((d, i) => {
+                const revY = getY(d.revenue);
+                const costY = getY(d.cost);
+                const profitY = getY(d.profit);
+
+                return (
+                  <div key={i} className="flex-1 flex flex-col items-center justify-end h-full relative group">
+                    {/* Numbers On Top of Chart Points */}
+                    <div className="space-y-1 text-[10px] font-mono font-bold text-center z-20 transition-transform group-hover:scale-105 mb-2">
+                      <div className="px-1.5 py-0.5 rounded bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 shadow-xs">
+                        ৳ {d.revenue >= 1000 ? `${(d.revenue / 1000).toFixed(1)}k` : d.revenue}
+                      </div>
+                      <div className="px-1.5 py-0.5 rounded bg-rose-500/20 text-rose-300 border border-rose-500/40 shadow-xs">
+                        ৳ {d.cost >= 1000 ? `${(d.cost / 1000).toFixed(1)}k` : d.cost}
+                      </div>
+                      <div className="px-1.5 py-0.5 rounded bg-teal-500/20 text-teal-300 border border-teal-500/40 shadow-xs">
+                        ৳ {d.profit >= 1000 ? `${(d.profit / 1000).toFixed(1)}k` : d.profit}
+                      </div>
+                    </div>
+
+                    {/* Visual Line Bar Trend Pill */}
+                    <div className="w-1.5 bg-gradient-to-t from-emerald-600 via-teal-400 to-emerald-300 rounded-full h-24 group-hover:w-2.5 transition-all shadow-md shadow-emerald-500/20" />
                   </div>
+                );
+              })}
+            </div>
 
-                  <span className="text-xs font-bold text-slate-300">{d.label}</span>
+            {/* X-Axis Month Labels */}
+            <div className="relative z-10 flex justify-between px-6 pt-2 border-t border-slate-800 text-xs font-bold text-slate-300">
+              {chartData.map((d, i) => (
+                <div key={i} className="flex-1 text-center font-mono">
+                  {d.label}
                 </div>
-              );
-            })}
+              ))}
+            </div>
           </div>
         </div>
       </div>
 
-      {/* Cost Management Table Section */}
+      {/* Operational & Product Expense Table Section */}
       <div className="bg-slate-900/90 border border-slate-800/90 rounded-2xl p-5 shadow-md space-y-4">
         <div className="flex items-center justify-between">
           <div>
             <h3 className="text-base font-bold text-slate-100 flex items-center gap-2">
               <Wallet className="w-5 h-5 text-rose-400" />
-              Operational & Product Expense Records
+              Operational & Product Unit Cost Records
             </h3>
             <p className="text-xs text-slate-400 mt-0.5">
-              Record sourcing costs, ad campaigns, logistics, and overheads.
+              Unit prices, product quantity, sourcing costs, ad spend & shipping fees.
             </p>
           </div>
 
           <button
             onClick={() => setIsModalOpen(true)}
-            className="px-3.5 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-emerald-400 border border-slate-700 text-xs font-semibold flex items-center gap-1.5 transition"
+            className="px-3.5 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-emerald-400 border border-slate-700 text-xs font-semibold flex items-center gap-1.5 transition"
           >
-            <Plus className="w-3.5 h-3.5" /> Add Expense
+            <Plus className="w-4 h-4" /> Add Product Unit Cost
           </button>
         </div>
 
@@ -311,15 +335,16 @@ export const AnalyticsView: React.FC = () => {
                 <th className="py-2.5 px-3">DATE</th>
                 <th className="py-2.5 px-3">EXPENSE TITLE</th>
                 <th className="py-2.5 px-3">CATEGORY</th>
-                <th className="py-2.5 px-3">AMOUNT (BDT)</th>
+                <th className="py-2.5 px-3">UNIT PRICE × QTY BREAKDOWN</th>
+                <th className="py-2.5 px-3">TOTAL AMOUNT (BDT)</th>
                 <th className="py-2.5 px-3 text-right">ACTION</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-800/60 text-xs">
               {costs.length === 0 ? (
                 <tr>
-                  <td colSpan={5} className="py-6 text-center text-slate-500 text-xs">
-                    No expense records added yet. Click "Add Expense Entry" above.
+                  <td colSpan={6} className="py-6 text-center text-slate-500 text-xs">
+                    No expense records added yet. Click "Add Product Unit Cost" above.
                   </td>
                 </tr>
               ) : (
@@ -334,6 +359,18 @@ export const AnalyticsView: React.FC = () => {
                       <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-slate-800 text-slate-300 border border-slate-700">
                         {cost.category}
                       </span>
+                    </td>
+                    <td className="py-3 px-3 font-mono">
+                      {cost.unitPrice && cost.quantity ? (
+                        <div className="flex items-center gap-1.5 text-slate-300">
+                          <Calculator className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
+                          <span>
+                            ৳{cost.unitPrice.toLocaleString()} / unit × <strong className="text-white">{cost.quantity} units</strong>
+                          </span>
+                        </div>
+                      ) : (
+                        <span className="text-slate-500 italic">Direct Amount</span>
+                      )}
                     </td>
                     <td className="py-3 px-3 font-mono font-bold text-rose-400">
                       ৳ {cost.amount.toLocaleString()}
