@@ -1,6 +1,6 @@
 "use client";
 
-import { Edit2, Trash2, FolderTree, Layers } from "lucide-react";
+import { Edit2, Trash2, FolderTree, Layers, Image as ImageIcon } from "lucide-react";
 import { Category } from "./types";
 
 interface CategoriesTableProps {
@@ -27,9 +27,17 @@ export function CategoriesTable({ categories, onEdit, onDelete }: CategoriesTabl
         >
           <div>
             <div className="flex items-start justify-between mb-3">
-              <div className="w-10 h-10 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400">
-                <FolderTree className="w-5 h-5" />
-              </div>
+              {/* 1:1 Aspect Ratio Thumbnail Image or Icon */}
+              {cat.image ? (
+                <div className="w-12 h-12 aspect-square rounded-xl bg-slate-800 border border-slate-700 overflow-hidden shrink-0 p-1">
+                  <img src={cat.image} alt={cat.name} className="w-full h-full object-contain aspect-square" />
+                </div>
+              ) : (
+                <div className="w-10 h-10 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400">
+                  <FolderTree className="w-5 h-5" />
+                </div>
+              )}
+
               <div className="flex items-center gap-1">
                 <button
                   onClick={() => onEdit(cat)}

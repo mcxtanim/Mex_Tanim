@@ -316,22 +316,7 @@ export default function DedicatedProductPage() {
                 </div>
               </div>
 
-              {/* Rating Stars & Customer Review Count */}
-              <a
-                href="#customer-reviews"
-                className="flex items-center space-x-3 text-xs bg-slate-50 hover:bg-amber-50/60 p-3 rounded-2xl border border-gray-200/60 hover:border-amber-300 w-fit transition cursor-pointer"
-              >
-                <div className="flex items-center space-x-1 text-amber-400">
-                  <Star className="w-4 h-4 fill-amber-400" />
-                  <span className="font-extrabold text-slate-900 text-sm ml-1">
-                    {averageRatingScore}
-                  </span>
-                </div>
-                <span className="text-gray-300">|</span>
-                <span className="text-gray-600 font-semibold">
-                  {totalReviewsCount} {language === 'bn' ? 'টি কাস্টমার রিভিউ' : 'Customer Reviews'}
-                </span>
-              </a>
+
 
               {/* Pricing Section */}
               <div className="bg-gradient-to-r from-orange-50/80 via-amber-50/60 to-orange-50/80 p-5 rounded-3xl border border-orange-200/80 space-y-1">
@@ -470,112 +455,7 @@ export default function DedicatedProductPage() {
 
           </div>
 
-          {/* DEDICATED CUSTOMER REVIEWS & RATINGS SECTION */}
-          <div id="customer-reviews" className="bg-white rounded-3xl border border-gray-200/90 shadow-xl p-6 sm:p-8 space-y-6">
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between border-b border-gray-200/80 pb-4 gap-4">
-              <div className="flex items-center space-x-3">
-                <div className="w-11 h-11 rounded-2xl bg-amber-500/10 text-amber-600 flex items-center justify-center shadow-xs">
-                  <Star className="w-6 h-6 fill-amber-500 text-amber-500" />
-                </div>
-                <div>
-                  <h3 className="text-lg sm:text-xl font-black text-slate-900">
-                    {language === 'bn' ? 'কাস্টমার রিভিউ ও রেটিং' : 'Customer Reviews & Ratings'}
-                  </h3>
-                  <p className="text-xs text-gray-500 font-medium">
-                    {language === 'bn'
-                      ? 'শুধুমাত্র ভেরিফাইড ক্রেতাদের আসল মতামত'
-                      : 'Genuine feedback from verified buyers'}
-                  </p>
-                </div>
-              </div>
 
-              {/* Rating Summary Card */}
-              <div className="flex items-center space-x-3 bg-slate-50 px-4 py-2 rounded-2xl border border-gray-200/80 self-start sm:self-auto">
-                <div className="text-2xl font-black text-slate-900">{averageRatingScore}</div>
-                <div>
-                  <div className="flex items-center space-x-0.5 text-amber-400">
-                    {[1, 2, 3, 4, 5].map((star) => (
-                      <Star
-                        key={star}
-                        className={`w-3.5 h-3.5 ${
-                          star <= Math.round(Number(averageRatingScore))
-                            ? 'fill-amber-400 text-amber-400'
-                            : 'text-gray-300'
-                        }`}
-                      />
-                    ))}
-                  </div>
-                  <div className="text-[11px] font-bold text-gray-500 mt-0.5">
-                    {totalReviewsCount} {language === 'bn' ? 'টি রিভ্যু' : 'reviews'}
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* Review List */}
-            {reviews.length > 0 ? (
-              <div className="space-y-4">
-                {reviews.map((rev) => (
-                  <div
-                    key={rev.id}
-                    className="bg-slate-50/70 p-4 sm:p-5 rounded-2xl border border-gray-200/70 space-y-2.5 transition hover:bg-slate-50 hover:border-gray-300"
-                  >
-                    <div className="flex items-center justify-between flex-wrap gap-2">
-                      <div className="flex items-center space-x-2.5">
-                        <div className="w-8 h-8 rounded-full bg-slate-900 text-white font-black text-xs flex items-center justify-center uppercase">
-                          {rev.customerName.charAt(0) || 'C'}
-                        </div>
-                        <div>
-                          <div className="flex items-center space-x-2">
-                            <span className="font-extrabold text-sm text-slate-900">{rev.customerName}</span>
-                            {rev.isVerifiedBuyer && (
-                              <span className="inline-flex items-center space-x-1 text-[11px] font-bold text-emerald-700 bg-emerald-100/80 px-2.5 py-0.5 rounded-full border border-emerald-300">
-                                <CheckCircle2 className="w-3 h-3 text-emerald-600" />
-                                <span>{language === 'bn' ? '✓ Verified Buyer' : '✓ Verified Buyer'}</span>
-                              </span>
-                            )}
-                          </div>
-                        </div>
-                      </div>
-
-                      <div className="flex items-center space-x-3 text-xs text-gray-400 font-medium">
-                        <div className="flex items-center space-x-0.5 text-amber-400">
-                          {[1, 2, 3, 4, 5].map((star) => (
-                            <Star
-                              key={star}
-                              className={`w-3.5 h-3.5 ${
-                                star <= rev.rating ? 'fill-amber-400 text-amber-400' : 'text-gray-300'
-                              }`}
-                            />
-                          ))}
-                        </div>
-                        <span>•</span>
-                        <span>{rev.date}</span>
-                      </div>
-                    </div>
-
-                    <p className="text-xs sm:text-sm text-slate-700 font-medium leading-relaxed pl-10 sm:pl-10">
-                      {rev.comment}
-                    </p>
-                  </div>
-                ))}
-              </div>
-            ) : (
-              <div className="text-center py-8 bg-slate-50 rounded-2xl border border-dashed border-gray-200">
-                <MessageSquare className="w-8 h-8 text-gray-400 mx-auto mb-2 opacity-60" />
-                <p className="text-xs sm:text-sm font-semibold text-gray-600">
-                  {language === 'bn'
-                    ? 'এই প্রোডাক্টে এখনও কোনো রিভ্যু দেওয়া হয়নি।'
-                    : 'No reviews submitted for this product yet.'}
-                </p>
-                <p className="text-[11px] text-gray-400 font-medium mt-1">
-                  {language === 'bn'
-                    ? 'অর্ডার ডেলিভারি হলে My Orders পেজ থেকে ভেরিফাইড রিভিউ দিতে পারবেন।'
-                    : 'Once your order is delivered, you can write a verified review from My Orders page.'}
-                </p>
-              </div>
-            )}
-          </div>
 
           {/* DEDICATED RELATED ITEMS SECTION ("সম্পর্কিত আইটেম") */}
           {relatedProducts.length > 0 && (

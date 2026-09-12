@@ -46,7 +46,6 @@ export function AdminSidebar() {
       title: "SALES",
       items: [
         { name: "Orders", href: "/orders", icon: ShoppingCart },
-        { name: "Reviews", href: "/reviews", icon: Star },
       ]
     },
     {

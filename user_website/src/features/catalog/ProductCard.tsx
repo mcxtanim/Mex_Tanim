@@ -74,10 +74,6 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
                 {getBrandName(product, language)}
               </span>
             </div>
-            <div className="flex items-center space-x-1 text-amber-500 font-bold text-[11px] shrink-0 ml-1">
-              <Star className="w-3.5 h-3.5 fill-amber-400 text-amber-400" />
-              <span>{product.rating}</span>
-            </div>
           </div>
 
           <h3

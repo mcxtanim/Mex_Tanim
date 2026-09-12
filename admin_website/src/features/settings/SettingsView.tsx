@@ -146,71 +146,7 @@ export function SettingsView() {
           </div>
         </div>
 
-        {/* Steadfast Courier API Integration Card */}
-        <div className="bg-slate-900/60 backdrop-blur-md p-5 rounded-2xl border border-slate-800 shadow-md space-y-3">
-          <div className="flex items-center justify-between border-b border-slate-800 pb-2 flex-wrap gap-2">
-            <div className="flex items-center space-x-2">
-              <Truck className="w-4 h-4 text-cyan-400" />
-              <h2 className="text-xs font-bold text-slate-200 uppercase tracking-wider">Steadfast Courier API</h2>
-            </div>
 
-            <label className="relative inline-flex items-center cursor-pointer">
-              <input
-                type="checkbox"
-                checked={settings.enableSteadfastCourier}
-                onChange={(e) => setSettings({ ...settings, enableSteadfastCourier: e.target.checked })}
-                className="sr-only peer"
-              />
-              <div className="w-9 h-5 bg-slate-800 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-emerald-500"></div>
-            </label>
-          </div>
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
-            <div className="space-y-1">
-              <label className="text-xs font-semibold text-slate-400">API Key</label>
-              <input
-                type="text"
-                placeholder="sf_api_key_..."
-                value={settings.steadfastApiKey}
-                onChange={(e) => setSettings({ ...settings, steadfastApiKey: e.target.value })}
-                className="w-full bg-slate-800/80 border border-slate-700/70 rounded-xl px-3 py-2 text-xs text-slate-100 placeholder:text-slate-600 focus:outline-none focus:border-cyan-500/60 font-mono"
-              />
-            </div>
-
-            <div className="space-y-1">
-              <label className="text-xs font-semibold text-slate-400">Secret Key</label>
-              <input
-                type="password"
-                placeholder="sf_secret_..."
-                value={settings.steadfastSecretKey}
-                onChange={(e) => setSettings({ ...settings, steadfastSecretKey: e.target.value })}
-                className="w-full bg-slate-800/80 border border-slate-700/70 rounded-xl px-3 py-2 text-xs text-slate-100 placeholder:text-slate-600 focus:outline-none focus:border-cyan-500/60 font-mono"
-              />
-            </div>
-          </div>
-
-          <div className="space-y-1 pt-1">
-            <label className="text-xs font-semibold text-slate-400">Webhook URL</label>
-            <div className="flex items-center space-x-2">
-              <input
-                type="text"
-                readOnly
-                value={settings.steadfastWebhookUrl}
-                className="flex-1 bg-slate-950/80 border border-slate-800 rounded-xl px-3 py-2 text-xs text-slate-400 font-mono select-all"
-              />
-              <button
-                type="button"
-                onClick={() => {
-                  navigator.clipboard.writeText(settings.steadfastWebhookUrl);
-                  alert("Copied!");
-                }}
-                className="px-3 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 rounded-xl text-xs font-bold transition cursor-pointer border border-slate-700"
-              >
-                Copy
-              </button>
-            </div>
-          </div>
-        </div>
 
         {/* Save Button */}
         <div className="flex justify-end pt-2">

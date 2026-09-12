@@ -328,25 +328,7 @@ export const MyAccountView: React.FC = () => {
                             </div>
                           </div>
 
-                          {/* Verified Buyer Review Button (ONLY when status is Delivered) */}
-                          {isDelivered && (
-                            <div className="pt-1 sm:pt-0 sm:ml-2">
-                              {alreadyReviewed ? (
-                                <span className="text-[10px] font-black text-emerald-700 bg-emerald-50/90 backdrop-blur-xs px-2 py-1 rounded-lg border border-emerald-200 flex items-center space-x-1">
-                                  <CheckCircle2 className="w-3 h-3 text-emerald-600 shrink-0" />
-                                  <span>{language === 'bn' ? '✓ রিভিউ দেওয়া হয়েছে' : '✓ Reviewed'}</span>
-                                </span>
-                              ) : (
-                                <button
-                                  onClick={(e) => handleOpenReview(order, item, e)}
-                                  className="px-2.5 py-1 bg-gradient-to-r from-orange-500/90 to-amber-500/90 hover:from-orange-600 hover:to-amber-600 backdrop-blur-md text-white font-extrabold text-[11px] rounded-lg shadow-xs border border-white/30 transition active:scale-95 flex items-center space-x-1 cursor-pointer"
-                                >
-                                  <Star className="w-3 h-3 fill-white stroke-[2.5]" />
-                                  <span>{language === 'bn' ? 'Verified Review দিন' : 'Write Verified Review'}</span>
-                                </button>
-                              )}
-                            </div>
-                          )}
+
                         </div>
                       );
                     })}
@@ -373,18 +355,6 @@ export const MyAccountView: React.FC = () => {
         order={selectedOrder}
         isOpen={isDetailsOpen}
         onClose={() => setIsDetailsOpen(false)}
-      />
-
-      {/* VERIFIED BUYER REVIEW SUBMIT MODAL */}
-      <ReviewSubmitModal
-        isOpen={reviewModalData.isOpen}
-        onClose={() => setReviewModalData((prev) => ({ ...prev, isOpen: false }))}
-        orderId={reviewModalData.orderId}
-        productId={reviewModalData.productId}
-        productTitle={reviewModalData.productTitle}
-        productImage={reviewModalData.productImage}
-        customerName={reviewModalData.customerName}
-        onReviewSubmitted={() => loadCustomerData()}
       />
 
     </div>

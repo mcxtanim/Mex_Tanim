@@ -294,19 +294,7 @@ export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
               </div>
             </div>
 
-            {/* Rating Stars & Customer Review Count */}
-            <div className="flex items-center space-x-3 text-xs bg-slate-50 p-2.5 rounded-2xl border border-gray-200/60 w-fit">
-              <div className="flex items-center space-x-1 text-amber-400">
-                <Star className="w-4 h-4 fill-amber-400" />
-                <span className="font-extrabold text-slate-900 text-sm ml-1">
-                  {currentProduct.rating}
-                </span>
-              </div>
-              <span className="text-gray-300">|</span>
-              <span className="text-gray-600 font-semibold">
-                {currentProduct.reviewCount} {language === 'bn' ? 'টি কাস্টমার রিভিউ' : 'Customer Reviews'}
-              </span>
-            </div>
+
 
             {/* Pricing Section */}
             <div className="bg-gradient-to-r from-orange-50/80 via-amber-50/60 to-orange-50/80 p-4 rounded-3xl border border-orange-200/80 space-y-1">
