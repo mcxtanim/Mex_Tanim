@@ -13,6 +13,7 @@ import {
   ChevronRight,
   ShieldCheck,
   Star,
+  MessageSquare,
 } from "lucide-react";
 
 export function AdminSidebar() {
@@ -22,6 +23,7 @@ export function AdminSidebar() {
     { name: "Dashboard", href: "/", icon: LayoutDashboard },
     { name: "Products", href: "/products", icon: Package },
     { name: "Orders", href: "/orders", icon: ShoppingCart },
+    { name: "Messages", href: "/messages", icon: MessageSquare },
     { name: "Categories", href: "/categories", icon: FolderTree },
     { name: "Reviews", href: "/reviews", icon: Star },
     { name: "Settings", href: "/settings", icon: Settings },

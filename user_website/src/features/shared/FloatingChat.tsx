@@ -46,12 +46,28 @@ export const FloatingChat: React.FC = () => {
     return defaultMessages;
   });
 
-  // Save messages to localStorage
+  // Save messages to localStorage & sync cross-tab
   useEffect(() => {
     if (typeof window !== 'undefined') {
       localStorage.setItem('mex_tanim_chat_messages', JSON.stringify(messages));
     }
   }, [messages]);
+
+  // Sync messages from localStorage when Admin replies
+  useEffect(() => {
+    const handleStorage = (e: StorageEvent) => {
+      if (!e.key || e.key === 'mex_tanim_chat_messages') {
+        const saved = localStorage.getItem('mex_tanim_chat_messages');
+        if (saved) {
+          try {
+            setMessages(JSON.parse(saved));
+          } catch {}
+        }
+      }
+    };
+    window.addEventListener('storage', handleStorage);
+    return () => window.removeEventListener('storage', handleStorage);
+  }, []);
 
   // Auto scroll to bottom
   useEffect(() => {
