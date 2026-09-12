@@ -1,60 +1,47 @@
 "use client";
 
-import { TrendingUp, DollarSign } from "lucide-react";
+import { BarChart2 } from "lucide-react";
 
 export function RevenueChart() {
   const chartData = [
-    { month: "Apr", revenue: 24000 },
-    { month: "May", revenue: 31000 },
-    { month: "Jun", revenue: 28500 },
-    { month: "Jul", revenue: 42000 },
-    { month: "Aug", revenue: 53500 },
-    { month: "Sep", revenue: 43720 },
+    { month: "May", amount: "85,000", height: "45%" },
+    { month: "Jun", amount: "110,000", height: "65%" },
+    { month: "Jul", amount: "142,000", height: "80%" },
+    { month: "Aug", amount: "168,000", height: "95%" },
   ];
 
-  const maxRevenue = Math.max(...chartData.map((d) => d.revenue));
-
   return (
-    <div className="bg-slate-900/60 border border-slate-800 rounded-2xl p-6 shadow-xl space-y-4 flex flex-col justify-between">
+    <div className="bg-slate-900/90 border border-slate-800/90 rounded-2xl p-5 shadow-md flex flex-col justify-between">
       <div className="flex items-center justify-between">
-        <div>
-          <h3 className="text-sm font-bold text-slate-100 flex items-center gap-2">
-            <TrendingUp className="w-4 h-4 text-emerald-400" />
-            Revenue Analytics (BDT ৳)
-          </h3>
-          <p className="text-xs text-slate-400 mt-0.5">Monthly revenue trend over the past 6 months</p>
-        </div>
-        <span className="px-2.5 py-1 rounded-lg text-xs font-semibold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
-          +24.5% Growth
-        </span>
+        <h3 className="text-xs font-black uppercase tracking-wider text-slate-300 flex items-center gap-2">
+          <BarChart2 className="w-4 h-4 text-emerald-400" />
+          Sales Trend
+        </h3>
       </div>
 
-      {/* Bar Chart Visualization */}
-      <div className="h-44 flex items-end justify-between gap-3 pt-6 pb-2 px-2">
-        {chartData.map((item, idx) => {
-          const heightPercent = Math.round((item.revenue / maxRevenue) * 100);
-          return (
-            <div key={idx} className="flex-1 flex flex-col items-center gap-2 group relative">
-              {/* Tooltip on hover */}
-              <div className="absolute -top-8 opacity-0 group-hover:opacity-100 transition-opacity bg-slate-800 text-emerald-400 text-[10px] font-mono font-bold px-2 py-0.5 rounded border border-slate-700 pointer-events-none z-10 whitespace-nowrap shadow-md">
-                ৳{item.revenue.toLocaleString()}
-              </div>
-
-              {/* Bar */}
-              <div className="w-full bg-slate-800 rounded-t-lg overflow-hidden h-full flex items-end p-0.5">
-                <div
-                  style={{ height: `${heightPercent}%` }}
-                  className="w-full bg-gradient-to-t from-emerald-600 to-teal-400 rounded-t-md group-hover:from-emerald-500 group-hover:to-teal-300 transition-all duration-300"
-                />
-              </div>
-
-              {/* Label */}
-              <span className="text-[11px] font-medium text-slate-400 group-hover:text-slate-200">
-                {item.month}
-              </span>
+      {/* Visual Bar Chart Grid Matching Reference Image */}
+      <div className="grid grid-cols-4 gap-4 items-end mt-4 pt-4 pb-2">
+        {chartData.map((item, idx) => (
+          <div key={idx} className="flex flex-col items-center gap-2 group">
+            {/* Emerald Solid Bar */}
+            <div className="w-full bg-slate-950/80 rounded-2xl p-1 h-32 flex items-end border border-slate-800/60 overflow-hidden">
+              <div
+                style={{ height: item.height }}
+                className="w-full bg-gradient-to-t from-emerald-600 to-emerald-400 group-hover:from-emerald-500 group-hover:to-teal-300 rounded-xl transition-all duration-300 shadow-lg shadow-emerald-500/20"
+              />
             </div>
-          );
-        })}
+
+            {/* Label & Amount */}
+            <div className="text-center">
+              <p className="text-xs font-bold text-slate-400 group-hover:text-slate-200 transition-colors">
+                {item.month}
+              </p>
+              <p className="text-[11px] font-bold font-mono text-slate-200 mt-0.5">
+                ৳ {item.amount}
+              </p>
+            </div>
+          </div>
+        ))}
       </div>
     </div>
   );

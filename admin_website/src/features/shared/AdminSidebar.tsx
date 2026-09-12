@@ -9,91 +9,125 @@ import {
   FolderTree, 
   Store, 
   Settings, 
-  LogOut,
-  ChevronRight,
   ShieldCheck,
   Star,
   MessageSquare,
+  ChevronRight,
+  Boxes,
+  Users
 } from "lucide-react";
+
+interface NavSection {
+  title: string;
+  items: {
+    name: string;
+    href: string;
+    icon: React.ElementType;
+  }[];
+}
 
 export function AdminSidebar() {
   const pathname = usePathname();
 
-  const navigation = [
-    { name: "Dashboard", href: "/", icon: LayoutDashboard },
-    { name: "Products", href: "/products", icon: Package },
-    { name: "Orders", href: "/orders", icon: ShoppingCart },
-    { name: "Messages", href: "/messages", icon: MessageSquare },
-    { name: "Categories", href: "/categories", icon: FolderTree },
-    { name: "Reviews", href: "/reviews", icon: Star },
-    { name: "Settings", href: "/settings", icon: Settings },
+  const sections: NavSection[] = [
+    {
+      title: "OVERVIEW",
+      items: [
+        { name: "Dashboard", href: "/", icon: LayoutDashboard },
+      ]
+    },
+    {
+      title: "CATALOG",
+      items: [
+        { name: "Products", href: "/products", icon: Package },
+        { name: "Categories", href: "/categories", icon: FolderTree },
+      ]
+    },
+    {
+      title: "SALES & CUSTOMERS",
+      items: [
+        { name: "Orders", href: "/orders", icon: ShoppingCart },
+        { name: "Messages", href: "/messages", icon: MessageSquare },
+        { name: "Customer Reviews", href: "/reviews", icon: Star },
+      ]
+    },
+    {
+      title: "SETTINGS",
+      items: [
+        { name: "Settings", href: "/settings", icon: Settings },
+      ]
+    }
   ];
 
   return (
-    <aside className="w-64 bg-slate-900 border-r border-slate-800 flex flex-col justify-between h-screen sticky top-0 z-30 shrink-0">
+    <aside className="w-64 bg-slate-950 border-r border-slate-800/80 flex flex-col justify-between h-screen sticky top-0 z-30 shrink-0 select-none">
       <div>
         {/* Brand Header */}
-        <div className="h-16 flex items-center px-6 border-b border-slate-800 bg-slate-900/50">
+        <div className="h-16 flex items-center px-6 border-b border-slate-800/80 bg-slate-950/80 backdrop-blur-md">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-emerald-600 to-teal-400 flex items-center justify-center text-white shadow-lg shadow-emerald-500/20 font-bold text-xl">
+            <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-emerald-600 to-teal-400 flex items-center justify-center text-slate-950 shadow-md shadow-emerald-500/20 font-black text-lg">
               M
             </div>
             <div>
-              <h1 className="font-bold text-slate-100 text-sm leading-tight flex items-center gap-1.5">
-                Mex Tanim Store
+              <h1 className="font-extrabold text-slate-100 text-sm leading-tight flex items-center gap-1.5 tracking-tight">
+                Mex Tanim
                 <ShieldCheck className="w-4 h-4 text-emerald-400" />
               </h1>
-              <p className="text-xs text-emerald-400 font-medium">Admin Portal</p>
+              <p className="text-[11px] text-emerald-400 font-semibold tracking-wide">Gaming Store Admin</p>
             </div>
           </div>
         </div>
 
-        {/* Navigation Items */}
-        <div className="px-4 py-6">
-          <p className="px-3 text-[11px] font-semibold tracking-wider text-slate-400 uppercase mb-3">
-            Main Menu
-          </p>
-          <nav className="space-y-1">
-            {navigation.map((item) => {
-              const isActive = pathname === item.href || (item.href !== "/" && pathname.startsWith(item.href));
-              const Icon = item.icon;
-              return (
-                <Link
-                  key={item.name}
-                  href={item.href}
-                  className={`flex items-center justify-between px-3.5 py-2.5 rounded-xl text-sm font-medium transition-all group ${
-                    isActive
-                      ? "bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 shadow-sm"
-                      : "text-slate-400 hover:text-slate-200 hover:bg-slate-800/60"
-                  }`}
-                >
-                  <div className="flex items-center gap-3">
-                    <Icon className={`w-5 h-5 transition-colors ${isActive ? "text-emerald-400" : "text-slate-400 group-hover:text-slate-200"}`} />
-                    <span>{item.name}</span>
-                  </div>
-                  {isActive && (
-                    <ChevronRight className="w-4 h-4 text-emerald-400" />
-                  )}
-                </Link>
-              );
-            })}
-          </nav>
+        {/* Navigation Sections */}
+        <div className="px-3.5 py-5 space-y-6 overflow-y-auto max-h-[calc(100vh-8.5rem)] scrollbar-thin">
+          {sections.map((section, sIdx) => (
+            <div key={sIdx} className="space-y-1.5">
+              <p className="px-3 text-[10px] font-black tracking-widest text-slate-500 uppercase">
+                {section.title}
+              </p>
+              <nav className="space-y-1">
+                {section.items.map((item) => {
+                  const isActive = pathname === item.href || (item.href !== "/" && pathname.startsWith(item.href));
+                  const Icon = item.icon;
+                  return (
+                    <Link
+                      key={item.name}
+                      href={item.href}
+                      className={`flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-semibold transition-all group ${
+                        isActive
+                          ? "bg-emerald-500/10 text-emerald-400 border border-emerald-500/30 shadow-xs"
+                          : "text-slate-400 hover:text-slate-200 hover:bg-slate-900/80"
+                      }`}
+                    >
+                      <div className="flex items-center gap-3">
+                        <Icon className={`w-4 h-4 transition-colors ${isActive ? "text-emerald-400" : "text-slate-400 group-hover:text-slate-200"}`} />
+                        <span>{item.name}</span>
+                      </div>
+                      {isActive && (
+                        <ChevronRight className="w-3.5 h-3.5 text-emerald-400" />
+                      )}
+                    </Link>
+                  );
+                })}
+              </nav>
+            </div>
+          ))}
         </div>
       </div>
 
-      {/* Footer / Store Quick Switch */}
-      <div className="p-4 border-t border-slate-800 bg-slate-900/30">
-        <div className="p-3 bg-slate-800/50 rounded-xl border border-slate-700/50 flex items-center justify-between">
+      {/* Footer / Store Currency */}
+      <div className="p-3.5 border-t border-slate-800/80 bg-slate-950/60">
+        <div className="p-2.5 bg-slate-900/60 rounded-xl border border-slate-800/60 flex items-center justify-between">
           <div className="flex items-center gap-2.5 overflow-hidden">
-            <div className="w-8 h-8 rounded-lg bg-slate-700 flex items-center justify-center text-slate-300 font-semibold text-xs shrink-0">
+            <div className="w-7 h-7 rounded-lg bg-emerald-500/20 text-emerald-400 flex items-center justify-center font-bold text-[10px] shrink-0 border border-emerald-500/30">
               BD
             </div>
             <div className="truncate">
-              <p className="text-xs font-semibold text-slate-200 truncate">Store Currency</p>
-              <p className="text-[11px] text-emerald-400 font-mono">BDT (৳ Taka)</p>
+              <p className="text-[11px] font-semibold text-slate-200 truncate">Store Currency</p>
+              <p className="text-[10px] text-emerald-400 font-mono font-bold">BDT (৳ Taka)</p>
             </div>
           </div>
-          <Store className="w-4 h-4 text-slate-400 shrink-0" />
+          <Store className="w-3.5 h-3.5 text-slate-400 shrink-0" />
         </div>
       </div>
     </aside>

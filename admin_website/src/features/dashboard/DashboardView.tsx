@@ -9,18 +9,20 @@ import { getStoredOrders } from "../orders/orderService";
 import { Product } from "../products/types";
 import { Order } from "../orders/types";
 import { DashboardStats } from "./types";
-import { AlertTriangle, PackageX } from "lucide-react";
+import { Plus, PackagePlus, PackageX } from "lucide-react";
+import Link from "next/link";
 
 export function DashboardView() {
   const [products, setProducts] = useState<Product[]>([]);
   const [orders, setOrders] = useState<Order[]>([]);
+  const [timeFilter, setTimeFilter] = useState<"today" | "week" | "month" | "year" | "lifetime">("month");
 
   useEffect(() => {
     setProducts(getStoredProducts());
     setOrders(getStoredOrders());
   }, []);
 
-  // Compute live real-time stats
+  // Compute live stats
   const totalRevenue = orders
     .filter((o) => o.status === "Delivered" || o.status === "Processing")
     .reduce((sum, o) => sum + o.totalAmount, 0);
@@ -39,22 +41,73 @@ export function DashboardView() {
     lowStockCount,
   };
 
+  const timeFilters: { id: "today" | "week" | "month" | "year" | "lifetime"; label: string }[] = [
+    { id: "today", label: "Today" },
+    { id: "week", label: "Week" },
+    { id: "month", label: "Month" },
+    { id: "year", label: "Year" },
+    { id: "lifetime", label: "Lifetime" },
+  ];
+
   return (
     <div className="space-y-6">
-      {/* 4 Core Metric Cards */}
-      <DashboardStatsCards stats={stats} />
+      {/* Dashboard Top Title & Controls (Matching Reference Image) */}
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div>
+          <h2 className="text-2xl font-black text-slate-100 tracking-tight">Dashboard</h2>
+        </div>
 
-      {/* Main Grid: Revenue Trend & Recent Orders */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <RevenueChart />
-        <RecentOrdersList orders={orders} />
+        <div className="flex flex-wrap items-center gap-3">
+          {/* Time Filter Pill Buttons */}
+          <div className="bg-slate-900/90 border border-slate-800/90 p-1 rounded-xl flex items-center gap-1">
+            {timeFilters.map((tf) => (
+              <button
+                key={tf.id}
+                onClick={() => setTimeFilter(tf.id)}
+                className={`px-3 py-1 rounded-lg text-xs font-bold transition-all ${
+                  timeFilter === tf.id
+                    ? "bg-emerald-500 text-slate-950 shadow-sm"
+                    : "text-slate-400 hover:text-slate-200"
+                }`}
+              >
+                {tf.label}
+              </button>
+            ))}
+          </div>
+
+          {/* Action Buttons */}
+          <Link
+            href="/orders"
+            className="px-3.5 py-2 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-extrabold text-xs flex items-center gap-1.5 transition shadow-md shadow-emerald-500/20 active:scale-95"
+          >
+            <Plus className="w-4 h-4 stroke-[3]" />
+            <span>New Order</span>
+          </Link>
+
+          <Link
+            href="/products"
+            className="px-3.5 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 border border-slate-800 text-slate-200 hover:text-white font-bold text-xs flex items-center gap-1.5 transition active:scale-95"
+          >
+            <PackagePlus className="w-4 h-4 text-emerald-400" />
+            <span>Add Product</span>
+          </Link>
+        </div>
       </div>
 
-      {/* Low / Out of stock alerts section if any */}
+      {/* 6 Top KPI Metrics Cards Grid */}
+      <DashboardStatsCards stats={stats} />
+
+      {/* Sales Trend Visual Chart Section */}
+      <RevenueChart />
+
+      {/* Recent Customer Orders Table */}
+      <RecentOrdersList orders={orders} />
+
+      {/* Out of Stock Warning Banner if any */}
       {outOfStockProducts.length > 0 && (
-        <div className="bg-rose-500/10 border border-rose-500/20 rounded-2xl p-5 flex items-center justify-between">
+        <div className="bg-rose-500/10 border border-rose-500/20 rounded-2xl p-4 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-rose-500/20 text-rose-400 flex items-center justify-center shrink-0">
+            <div className="w-9 h-9 rounded-xl bg-rose-500/20 text-rose-400 flex items-center justify-center shrink-0">
               <PackageX className="w-5 h-5" />
             </div>
             <div>
