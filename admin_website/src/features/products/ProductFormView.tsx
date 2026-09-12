@@ -33,10 +33,10 @@ export function ProductFormView({ productId }: ProductFormViewProps) {
     descriptionBn: "",
     specs: "",
     imageUrl: "",
-    is_featured: false,
+    is_featured: true,
     is_popular: false,
     is_bestseller: false,
-    is_new_arrival: false,
+    is_new_arrival: true,
     is_combo: false,
   });
 

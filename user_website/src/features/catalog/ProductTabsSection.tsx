@@ -149,7 +149,7 @@ export const ProductTabsSection: React.FC = () => {
   }, []);
 
   const activeTabProducts = allProducts.filter((p) => {
-    if (activeTab === 'featured') return p.isFeatured === true;
+    if (activeTab === 'featured') return p.isFeatured === true || (!p.isFeatured && !p.isBestSeller && !p.isNewArrival);
     if (activeTab === 'bestsellers') return p.isBestSeller === true;
     if (activeTab === 'newarrivals') return p.isNewArrival === true;
     return true;

@@ -19,7 +19,7 @@ export const ComboOfferSection: React.FC = () => {
   useEffect(() => {
     const loadCombos = async () => {
       const allProds = await fetchLiveProducts();
-      const combos = allProds.filter((p) => p.isComboOffer === true);
+      const combos = allProds.filter((p) => p.isComboOffer === true || p.category === 'combo-offers' || p.category === 'combo');
       setComboProducts(combos);
     };
     loadCombos();
