@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from "react";
 import { DashboardStatsCards } from "./DashboardStatsCards";
-import { RevenueChart } from "./RevenueChart";
 import { RecentOrdersList } from "./RecentOrdersList";
 import { getStoredProducts } from "../products/productService";
 import { getStoredOrders } from "../orders/orderService";
@@ -51,10 +50,10 @@ export function DashboardView() {
 
   return (
     <div className="space-y-6">
-      {/* Dashboard Top Title & Controls (Matching Reference Image) */}
+      {/* Dashboard Top Title & Controls */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-          <h2 className="text-2xl font-black text-slate-100 tracking-tight">Dashboard</h2>
+          <h2 className="text-xl font-bold text-slate-100 tracking-tight">Dashboard</h2>
         </div>
 
         <div className="flex flex-wrap items-center gap-3">
@@ -94,11 +93,8 @@ export function DashboardView() {
         </div>
       </div>
 
-      {/* 6 Top KPI Metrics Cards Grid */}
+      {/* 7 Top KPI Metrics Cards Grid */}
       <DashboardStatsCards stats={stats} />
-
-      {/* Sales Trend Visual Chart Section */}
-      <RevenueChart />
 
       {/* Recent Customer Orders Table */}
       <RecentOrdersList orders={orders} />
@@ -107,13 +103,13 @@ export function DashboardView() {
       {outOfStockProducts.length > 0 && (
         <div className="bg-rose-500/10 border border-rose-500/20 rounded-2xl p-4 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="w-9 h-9 rounded-xl bg-rose-500/20 text-rose-400 flex items-center justify-center shrink-0">
-              <PackageX className="w-5 h-5" />
+            <div className="w-8 h-8 rounded-xl bg-rose-500/20 text-rose-400 flex items-center justify-center shrink-0">
+              <PackageX className="w-4 h-4" />
             </div>
             <div>
               <h4 className="text-xs font-bold text-rose-200 uppercase tracking-wider">Inventory Alert</h4>
               <p className="text-xs text-rose-300/80 mt-0.5">
-                {outOfStockProducts.length} product(s) are currently out of stock! ({outOfStockProducts.map((p) => p.title).join(", ")})
+                {outOfStockProducts.length} product(s) out of stock: ({outOfStockProducts.map((p) => p.title).join(", ")})
               </p>
             </div>
           </div>

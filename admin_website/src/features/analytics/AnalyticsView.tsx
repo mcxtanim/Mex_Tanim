@@ -234,12 +234,9 @@ export const AnalyticsView: React.FC = () => {
               <BarChart2 className="w-6 h-6" />
             </div>
             <div>
-              <h2 className="text-xl font-black text-slate-100 tracking-tight">
+              <h2 className="text-lg font-bold text-slate-100 tracking-tight">
                 Revenue vs Cost vs Net Profit
               </h2>
-              <p className="text-xs text-slate-400 mt-0.5">
-                Track performance across custom hours, days, months, and years. Hover over any point for details.
-              </p>
             </div>
           </div>
 
@@ -607,9 +604,6 @@ export const AnalyticsView: React.FC = () => {
               <Wallet className="w-5 h-5 text-rose-400" />
               Operational & Product Unit Cost Records
             </h3>
-            <p className="text-xs text-slate-400 mt-0.5">
-              Unit prices, product quantity, sourcing costs, ad spend & shipping fees.
-            </p>
           </div>
 
           <button
