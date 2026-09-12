@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { X, Image as ImageIcon, Sparkles, Upload } from "lucide-react";
 import { Product, ProductFormData } from "./types";
+import { uploadImageToCloudinary } from "../../lib/cloudinary";
 
 interface AddEditProductModalProps {
   isOpen: boolean;
@@ -70,14 +71,20 @@ export function AddEditProductModal({
 
   if (!isOpen) return null;
 
-  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const [isUploading, setIsUploading] = useState(false);
+
+  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setFormData((prev) => ({ ...prev, imageUrl: reader.result as string }));
-      };
-      reader.readAsDataURL(file);
+      setIsUploading(true);
+      try {
+        const url = await uploadImageToCloudinary(file);
+        setFormData((prev) => ({ ...prev, imageUrl: url }));
+      } catch (err) {
+        console.error('Image upload error:', err);
+      } finally {
+        setIsUploading(false);
+      }
     }
   };
 

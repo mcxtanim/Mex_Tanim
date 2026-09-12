@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { X, FolderPlus, Upload, Image as ImageIcon } from "lucide-react";
 import { Category, CategoryFormData } from "./types";
+import { uploadImageToCloudinary } from "../../lib/cloudinary";
 
 interface AddEditCategoryModalProps {
   isOpen: boolean;
@@ -41,14 +42,20 @@ export function AddEditCategoryModal({
 
   if (!isOpen) return null;
 
-  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const [isUploading, setIsUploading] = useState(false);
+
+  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setFormData((prev) => ({ ...prev, image: reader.result as string }));
-      };
-      reader.readAsDataURL(file);
+      setIsUploading(true);
+      try {
+        const url = await uploadImageToCloudinary(file);
+        setFormData((prev) => ({ ...prev, image: url }));
+      } catch (err) {
+        console.error('Category image upload error:', err);
+      } finally {
+        setIsUploading(false);
+      }
     }
   };
 
