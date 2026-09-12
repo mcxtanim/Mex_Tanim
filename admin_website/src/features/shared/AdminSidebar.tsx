@@ -11,7 +11,6 @@ import {
   Settings, 
   ShieldCheck,
   Star,
-  MessageSquare,
   ChevronRight,
   TrendingUp,
 } from "lucide-react";
@@ -47,7 +46,6 @@ export function AdminSidebar() {
       title: "SALES & CUSTOMERS",
       items: [
         { name: "Orders", href: "/orders", icon: ShoppingCart },
-        { name: "Messages", href: "/messages", icon: MessageSquare },
         { name: "Customer Reviews", href: "/reviews", icon: Star },
       ]
     },
