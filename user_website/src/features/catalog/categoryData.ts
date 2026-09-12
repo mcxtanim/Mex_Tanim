@@ -36,9 +36,8 @@ export const isCategorySelected = (selectedCategory: string, catId: string): boo
   if ((s === 'gaming-cooler' || s === 'cooler') && (c === 'gaming-cooler' || c === 'cooler')) return true;
   if ((s === 'finger-sleeves' || s === 'sleeves') && (c === 'finger-sleeves' || c === 'sleeves')) return true;
   if ((s === 'soundboxes' || s === 'soundbox') && (c === 'soundboxes' || c === 'soundbox')) return true;
-  if ((s === 'fast-chargers' || s === 'chargers' || s === 'charger-adapter') && (c === 'fast-chargers' || c === 'chargers' || c === 'charger-adapter')) return true;
+  if ((s === 'fast-chargers' || s === 'chargers') && (c === 'fast-chargers' || c === 'chargers')) return true;
   if ((s === 'mechanical-keyboards' || s === 'keyboards') && (c === 'mechanical-keyboards' || c === 'keyboards')) return true;
-  if ((s === 'gaming-headsets' || s === 'headphones' || s === 'gaming-earphone' || s === 'earphone') && (c === 'gaming-headsets' || c === 'headphones' || c === 'gaming-earphone' || c === 'earphone')) return true;
   if ((s === 'gaming-mice' || s === 'mice') && (c === 'gaming-mice' || c === 'mice')) return true;
   if ((s === 'combo-offers' || s === 'combo') && (c === 'combo-offers' || c === 'combo')) return true;
 
