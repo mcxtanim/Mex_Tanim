@@ -100,6 +100,47 @@ export async function fetchProductsFromSupabase(): Promise<Product[]> {
   }
 }
 
+export async function fetchProductById(id: string): Promise<Product | null> {
+  if (supabase) {
+    try {
+      const { data, error } = await supabase
+        .from("products")
+        .select("*")
+        .eq("id", id)
+        .maybeSingle();
+
+      if (!error && data) {
+        return {
+          id: String(data.id),
+          title: data.title || "",
+          titleBn: data.title_bn || data.titleBn || "",
+          brand: data.brand || "",
+          category: data.category || "gaming-mice",
+          price: Number(data.price) || 0,
+          originalPrice: Number(data.original_price || data.originalPrice) || 0,
+          discount: Number(data.discount) || 0,
+          stock: Number(data.stock) || 0,
+          description: data.description || "",
+          descriptionBn: data.description_bn || data.descriptionBn || "",
+          specs: Array.isArray(data.specs) ? data.specs.join(", ") : (data.specs || ""),
+          imageUrl: data.image_url || data.imageUrl || "",
+          is_featured: Boolean(data.is_featured),
+          is_popular: Boolean(data.is_popular),
+          is_bestseller: Boolean(data.is_bestseller),
+          is_new_arrival: Boolean(data.is_new_arrival),
+          is_combo: Boolean(data.is_combo),
+          createdAt: data.created_at || new Date().toISOString().split("T")[0],
+        };
+      }
+    } catch (err) {
+      console.warn("fetchProductById exception:", err);
+    }
+  }
+
+  const stored = getStoredProducts();
+  return stored.find((p) => p.id === id) || null;
+}
+
 export async function createProduct(
   formData: ProductFormData,
   existingProducts: Product[]

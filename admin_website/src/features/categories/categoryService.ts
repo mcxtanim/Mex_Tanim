@@ -117,6 +117,35 @@ export async function fetchCategoriesFromSupabase(): Promise<Category[]> {
   }
 }
 
+export async function fetchCategoryById(id: string): Promise<Category | null> {
+  if (supabase) {
+    try {
+      const { data, error } = await supabase
+        .from("categories")
+        .select("*")
+        .or(`id.eq.${id},slug.eq.${id}`)
+        .maybeSingle();
+
+      if (!error && data) {
+        const slug = data.slug || data.name.toLowerCase().replace(/[^a-z0-9]+/g, "-");
+        return {
+          id: String(data.id),
+          name: data.name || "",
+          slug,
+          description: data.description || "",
+          image: data.image_url || data.image || "",
+          productCount: Number(data.product_count) || 0,
+        };
+      }
+    } catch (err) {
+      console.warn("fetchCategoryById exception:", err);
+    }
+  }
+
+  const stored = getStoredCategories();
+  return stored.find((c) => c.id === id || c.slug === id) || null;
+}
+
 export async function createCategory(
   formData: CategoryFormData,
   existingCategories: Category[]

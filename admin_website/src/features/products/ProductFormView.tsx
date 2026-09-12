@@ -5,7 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { ArrowLeft, Save, Sparkles, Check } from "lucide-react";
 import { Product, ProductFormData } from "./types";
-import { getStoredProducts, createProduct, updateProduct } from "./productService";
+import { getStoredProducts, fetchProductsFromSupabase, fetchProductById, createProduct, updateProduct } from "./productService";
 import { ImageDropzone } from "../shared/ImageDropzone";
 
 import { Category } from "../categories/types";
@@ -19,6 +19,7 @@ export function ProductFormView({ productId }: ProductFormViewProps) {
   const router = useRouter();
   const [products, setProducts] = useState<Product[]>([]);
   const [categoriesList, setCategoriesList] = useState<Category[]>([]);
+  const [isLoadingProduct, setIsLoadingProduct] = useState<boolean>(Boolean(productId));
 
   const [formData, setFormData] = useState<ProductFormData>({
     title: "",
@@ -44,39 +45,58 @@ export function ProductFormView({ productId }: ProductFormViewProps) {
   const [saveSuccess, setSaveSuccess] = useState(false);
 
   useEffect(() => {
-    fetchCategoriesFromSupabase().then((cats) => {
-      if (cats && cats.length > 0) {
-        setCategoriesList(cats);
-      }
-    });
+    let isMounted = true;
 
-    const stored = getStoredProducts();
-    setProducts(stored);
+    const loadInitialData = async () => {
+      try {
+        const cats = await fetchCategoriesFromSupabase();
+        if (isMounted && cats && cats.length > 0) {
+          setCategoriesList(cats);
+        }
 
-    if (productId) {
-      const existing = stored.find((p) => p.id === productId);
-      if (existing) {
-        setFormData({
-          title: existing.title || "",
-          titleBn: existing.titleBn || "",
-          brand: existing.brand || "",
-          category: existing.category || "GAMING MICE",
-          price: existing.price || 0,
-          originalPrice: existing.originalPrice || 0,
-          discount: existing.discount || 0,
-          stock: existing.stock ?? 10,
-          description: existing.description || "",
-          descriptionBn: existing.descriptionBn || "",
-          specs: existing.specs || "",
-          imageUrl: existing.imageUrl || "",
-          is_featured: existing.is_featured || false,
-          is_popular: existing.is_popular || false,
-          is_bestseller: existing.is_bestseller || false,
-          is_new_arrival: existing.is_new_arrival || false,
-          is_combo: existing.is_combo || false,
-        });
+        const allProds = await fetchProductsFromSupabase();
+        if (isMounted && allProds) {
+          setProducts(allProds);
+        }
+
+        if (productId) {
+          const existing = await fetchProductById(productId);
+          if (isMounted && existing) {
+            setFormData({
+              title: existing.title || "",
+              titleBn: existing.titleBn || "",
+              brand: existing.brand || "",
+              category: existing.category || "gaming-mice",
+              price: existing.price || 0,
+              originalPrice: existing.originalPrice || 0,
+              discount: existing.discount || 0,
+              stock: existing.stock ?? 10,
+              description: existing.description || "",
+              descriptionBn: existing.descriptionBn || "",
+              specs: existing.specs || "",
+              imageUrl: existing.imageUrl || "",
+              is_featured: Boolean(existing.is_featured),
+              is_popular: Boolean(existing.is_popular),
+              is_bestseller: Boolean(existing.is_bestseller),
+              is_new_arrival: Boolean(existing.is_new_arrival),
+              is_combo: Boolean(existing.is_combo),
+            });
+          }
+        }
+      } catch (err) {
+        console.error("Error loading product edit data:", err);
+      } finally {
+        if (isMounted) {
+          setIsLoadingProduct(false);
+        }
       }
-    }
+    };
+
+    loadInitialData();
+
+    return () => {
+      isMounted = false;
+    };
   }, [productId]);
 
   const handleSubmit = async (e?: React.FormEvent | React.MouseEvent) => {
@@ -101,6 +121,14 @@ export function ProductFormView({ productId }: ProductFormViewProps) {
       setIsSaving(false);
     }
   };
+
+  if (isLoadingProduct) {
+    return (
+      <div className="p-12 text-center text-slate-400 font-bold text-xs bg-slate-900/60 rounded-2xl border border-slate-800 animate-pulse max-w-5xl mx-auto my-8">
+        Loading product information from database...
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6 max-w-5xl mx-auto pb-12">

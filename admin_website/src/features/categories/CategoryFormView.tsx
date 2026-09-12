@@ -5,7 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { ArrowLeft, Save, FolderPlus, Check } from "lucide-react";
 import { Category, CategoryFormData } from "./types";
-import { getStoredCategories, createCategory, updateCategory } from "./categoryService";
+import { getStoredCategories, fetchCategoriesFromSupabase, fetchCategoryById, createCategory, updateCategory } from "./categoryService";
 import { ImageDropzone } from "../shared/ImageDropzone";
 
 interface CategoryFormViewProps {
@@ -15,6 +15,7 @@ interface CategoryFormViewProps {
 export function CategoryFormView({ categoryId }: CategoryFormViewProps) {
   const router = useRouter();
   const [categories, setCategories] = useState<Category[]>([]);
+  const [isLoadingCategory, setIsLoadingCategory] = useState<boolean>(Boolean(categoryId));
   const [formData, setFormData] = useState<CategoryFormData>({
     name: "",
     description: "",
@@ -25,19 +26,39 @@ export function CategoryFormView({ categoryId }: CategoryFormViewProps) {
   const [saveSuccess, setSaveSuccess] = useState(false);
 
   useEffect(() => {
-    const stored = getStoredCategories();
-    setCategories(stored);
+    let isMounted = true;
 
-    if (categoryId) {
-      const existing = stored.find((c) => c.id === categoryId);
-      if (existing) {
-        setFormData({
-          name: existing.name || "",
-          description: existing.description || "",
-          image: existing.image || "",
-        });
+    const loadInitialData = async () => {
+      try {
+        const allCats = await fetchCategoriesFromSupabase();
+        if (isMounted && allCats) {
+          setCategories(allCats);
+        }
+
+        if (categoryId) {
+          const existing = await fetchCategoryById(categoryId);
+          if (isMounted && existing) {
+            setFormData({
+              name: existing.name || "",
+              description: existing.description || "",
+              image: existing.image || "",
+            });
+          }
+        }
+      } catch (err) {
+        console.error("Error loading category edit data:", err);
+      } finally {
+        if (isMounted) {
+          setIsLoadingCategory(false);
+        }
       }
-    }
+    };
+
+    loadInitialData();
+
+    return () => {
+      isMounted = false;
+    };
   }, [categoryId]);
 
   const handleSubmit = async (e?: React.FormEvent | React.MouseEvent) => {
@@ -62,6 +83,14 @@ export function CategoryFormView({ categoryId }: CategoryFormViewProps) {
       setIsSaving(false);
     }
   };
+
+  if (isLoadingCategory) {
+    return (
+      <div className="p-12 text-center text-slate-400 font-bold text-xs bg-slate-900/60 rounded-2xl border border-slate-800 animate-pulse max-w-3xl mx-auto my-8">
+        Loading category information from database...
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6 max-w-3xl mx-auto pb-12">
