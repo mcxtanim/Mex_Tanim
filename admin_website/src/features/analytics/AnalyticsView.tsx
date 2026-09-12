@@ -42,7 +42,7 @@ export const AnalyticsView: React.FC = () => {
   const [dateFilter, setDateFilter] = useState<"today" | "month" | "year" | "custom">("month");
   const [startDate, setStartDate] = useState<string>("2026-09-01");
   const [endDate, setEndDate] = useState<string>("2026-09-30");
-  const [hoveredIdx, setHoveredIdx] = useState<number | null>(3); // Default hover on Aug / active index
+  const [hoveredIdx, setHoveredIdx] = useState<number | null>(null); // Null on load so no cut-off tooltip appears until hovered
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   useEffect(() => {
@@ -70,25 +70,25 @@ export const AnalyticsView: React.FC = () => {
     switch (dateFilter) {
       case "today":
         return [
-          { label: "9 AM", revenue: 4500, cost: 1800, profit: 2700 },
-          { label: "12 PM", revenue: 12200, cost: 4500, profit: 7700 },
-          { label: "3 PM", revenue: 19800, cost: 8100, profit: 11700 },
-          { label: "6 PM", revenue: 26400, cost: 12000, profit: 14400 },
-          { label: "9 PM (Now)", revenue: metrics.totalRevenue, cost: metrics.totalCost, profit: metrics.netProfit },
+          { label: "9 AM", revenue: 4500, cost: 1800, profit: 2700, subLabel: "Today 9:00 AM" },
+          { label: "12 PM", revenue: 12200, cost: 4500, profit: 7700, subLabel: "Today 12:00 PM" },
+          { label: "3 PM", revenue: 19800, cost: 8100, profit: 11700, subLabel: "Today 3:00 PM" },
+          { label: "6 PM", revenue: 26400, cost: 12000, profit: 14400, subLabel: "Today 6:00 PM" },
+          { label: "9 PM (Now)", revenue: metrics.totalRevenue, cost: metrics.totalCost, profit: metrics.netProfit, subLabel: "Today 9:00 PM (Live)" },
         ];
       case "year":
         return [
-          { label: "2023", revenue: 320000, cost: 165000, profit: 155000 },
-          { label: "2024", revenue: 480000, cost: 240000, profit: 240000 },
-          { label: "2025", revenue: 620000, cost: 310000, profit: 310000 },
-          { label: "2026 (YTD)", revenue: metrics.totalRevenue + 450000, cost: metrics.totalCost + 220000, profit: metrics.netProfit + 230000 },
+          { label: "2023", revenue: 320000, cost: 165000, profit: 155000, subLabel: "Year 2023 Total" },
+          { label: "2024", revenue: 480000, cost: 240000, profit: 240000, subLabel: "Year 2024 Total" },
+          { label: "2025", revenue: 620000, cost: 310000, profit: 310000, subLabel: "Year 2025 Total" },
+          { label: "2026 (YTD)", revenue: metrics.totalRevenue + 450000, cost: metrics.totalCost + 220000, profit: metrics.netProfit + 230000, subLabel: "Year 2026 (YTD Live)" },
         ];
       case "custom":
         return [
-          { label: "Week 1", revenue: 14500, cost: 6200, profit: 8300 },
-          { label: "Week 2", revenue: 22800, cost: 9400, profit: 13400 },
-          { label: "Week 3", revenue: 31000, cost: 14200, profit: 16800 },
-          { label: "Current", revenue: metrics.totalRevenue, cost: metrics.totalCost, profit: metrics.netProfit },
+          { label: "Week 1", revenue: 14500, cost: 6200, profit: 8300, subLabel: "Custom Range - W1" },
+          { label: "Week 2", revenue: 22800, cost: 9400, profit: 13400, subLabel: "Custom Range - W2" },
+          { label: "Week 3", revenue: 31000, cost: 14200, profit: 16800, subLabel: "Custom Range - W3" },
+          { label: "Current", revenue: metrics.totalRevenue, cost: metrics.totalCost, profit: metrics.netProfit, subLabel: "Custom Range - Current" },
         ];
       case "month":
       default:
@@ -97,7 +97,7 @@ export const AnalyticsView: React.FC = () => {
           { label: "Jun", revenue: 110000, cost: 58000, profit: 52000, subLabel: "Jun 2024" },
           { label: "Jul", revenue: 142000, cost: 71000, profit: 71000, subLabel: "Jul 2024" },
           { label: "Aug", revenue: 168000, cost: 84000, profit: 84000, subLabel: "Aug 2024" },
-          { label: "Sep", revenue: metrics.totalRevenue, cost: metrics.totalCost, profit: metrics.netProfit, subLabel: "Sep 2026" },
+          { label: "Sep", revenue: metrics.totalRevenue, cost: metrics.totalCost, profit: metrics.netProfit, subLabel: "Sep 2026 (Live)" },
         ];
     }
   };
@@ -106,7 +106,7 @@ export const AnalyticsView: React.FC = () => {
   const maxVal = Math.max(...currentData.map((d) => Math.max(d.revenue, d.cost, d.profit)), 200000);
   const yAxisMax = Math.ceil(maxVal / 50000) * 50000; // e.g. 200k
 
-  // Formatting helpers (e.g. 168000 -> 168.0k)
+  // Formatting helpers (e.g. 168000 -> ৳ 168.0k)
   const formatK = (val: number) => {
     if (val >= 1000) {
       const k = val / 1000;
@@ -164,7 +164,7 @@ export const AnalyticsView: React.FC = () => {
 
   return (
     <div className="space-y-6">
-      {/* Top Main Financial Graph Container (Matching Reference Image media_1789203714934.png) */}
+      {/* Top Main Financial Graph Container */}
       <div className="bg-slate-900/90 border border-slate-800/90 rounded-2xl p-6 shadow-2xl space-y-6 select-none">
         {/* Header Title & Date Filter Controls */}
         <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
@@ -177,7 +177,7 @@ export const AnalyticsView: React.FC = () => {
                 Revenue vs Cost vs Net Profit
               </h2>
               <p className="text-xs text-slate-400 mt-0.5">
-                Track your business performance dynamically across days, months, and years.
+                Track your business performance dynamically across days, months, and years. Hover over any point to view exact details.
               </p>
             </div>
           </div>
@@ -218,7 +218,7 @@ export const AnalyticsView: React.FC = () => {
           </div>
         </div>
 
-        {/* Custom Range Picker Modal Input */}
+        {/* Custom Range Picker Input */}
         {dateFilter === "custom" && (
           <div className="p-3 bg-slate-950/80 rounded-xl border border-slate-800 flex items-center gap-3 animate-in fade-in">
             <Calendar className="w-4 h-4 text-emerald-400" />
@@ -239,35 +239,45 @@ export const AnalyticsView: React.FC = () => {
           </div>
         )}
 
-        {/* Main Line Chart Canvas (SVG Curves & Node Badges) */}
-        <div className="relative w-full overflow-x-auto scrollbar-none py-2">
+        {/* Main Line Chart Canvas (SVG Curves & Interactive Hover Card) */}
+        <div 
+          className="relative w-full overflow-x-auto scrollbar-none py-2"
+          onMouseLeave={() => setHoveredIdx(null)}
+        >
           <div className="min-w-[650px] relative">
-            {/* Hover Tooltip Floating Card (Matching Reference Image) */}
+            {/* Interactive Hover Tooltip Card (Smart Alignment: Never cut off on edges) */}
             {hoveredIdx !== null && currentData[hoveredIdx] && (
               <div
                 style={{
-                  left: `${(hoveredIdx / (currentData.length - 1)) * 75 + 12}%`,
-                  top: "10px",
+                  left: `${(hoveredIdx / (currentData.length - 1)) * 82 + 9}%`,
+                  top: "15px",
                 }}
-                className="absolute z-30 bg-slate-950/95 border border-slate-700/80 rounded-2xl p-3.5 shadow-2xl backdrop-blur-md w-48 text-xs space-y-2 pointer-events-none transition-all duration-150 animate-in fade-in"
+                className={`absolute z-40 bg-slate-950/95 border border-slate-700/90 rounded-2xl p-4 shadow-2xl backdrop-blur-xl w-52 text-xs space-y-2.5 pointer-events-none transition-all duration-150 animate-in fade-in ${
+                  hoveredIdx >= Math.floor(currentData.length / 2)
+                    ? "-translate-x-[102%]"
+                    : "translate-x-2"
+                }`}
               >
-                <div className="font-bold text-slate-200 border-b border-slate-800 pb-1.5">
-                  {currentData[hoveredIdx].subLabel || currentData[hoveredIdx].label}
+                <div className="font-extrabold text-slate-100 border-b border-slate-800 pb-2 flex items-center justify-between">
+                  <span>{currentData[hoveredIdx].subLabel || currentData[hoveredIdx].label}</span>
+                  <span className="text-[10px] px-1.5 py-0.5 rounded bg-emerald-500/20 text-emerald-400">
+                    Live Point
+                  </span>
                 </div>
-                <div className="space-y-1 font-mono text-[11px]">
-                  <div className="flex items-center justify-between text-emerald-400 font-semibold">
+                <div className="space-y-1.5 font-mono text-[11px]">
+                  <div className="flex items-center justify-between text-emerald-400 font-bold">
                     <span className="flex items-center gap-1.5">
                       <span className="w-2 h-2 rounded-full bg-emerald-400" /> Revenue
                     </span>
                     <strong>{formatK(currentData[hoveredIdx].revenue)}</strong>
                   </div>
-                  <div className="flex items-center justify-between text-rose-400 font-semibold">
+                  <div className="flex items-center justify-between text-rose-400 font-bold">
                     <span className="flex items-center gap-1.5">
                       <span className="w-2 h-2 rounded-full bg-rose-500" /> Costs
                     </span>
                     <strong>{formatK(currentData[hoveredIdx].cost)}</strong>
                   </div>
-                  <div className="flex items-center justify-between text-blue-400 font-semibold">
+                  <div className="flex items-center justify-between text-blue-400 font-bold">
                     <span className="flex items-center gap-1.5">
                       <span className="w-2 h-2 rounded-full bg-blue-500" /> Net Profit
                     </span>
@@ -290,6 +300,18 @@ export const AnalyticsView: React.FC = () => {
 
               {/* Chart Plot Area */}
               <div className="flex-1 relative h-[220px]">
+                {/* Full-Height Column Interactive Mouse Hover Targets */}
+                <div className="absolute inset-0 flex z-30">
+                  {currentData.map((_, i) => (
+                    <div
+                      key={i}
+                      onMouseEnter={() => setHoveredIdx(i)}
+                      onClick={() => setHoveredIdx(i)}
+                      className="flex-1 h-full cursor-pointer group"
+                    />
+                  ))}
+                </div>
+
                 {/* Horizontal Dashed Background Grid Lines */}
                 <div className="absolute inset-0 flex flex-col justify-between py-[30px] pointer-events-none opacity-20">
                   <div className="border-b border-dashed border-slate-600 w-full" />
@@ -302,63 +324,36 @@ export const AnalyticsView: React.FC = () => {
                 {/* SVG Render Lines */}
                 <svg
                   viewBox={`0 0 ${svgWidth} ${svgHeight}`}
-                  className="w-full h-full overflow-visible"
+                  className="w-full h-full overflow-visible pointer-events-none"
                   preserveAspectRatio="none"
                 >
                   <defs>
-                    {/* Revenue Area Gradient */}
                     <linearGradient id="revenueGlow" x1="0" y1="0" x2="0" y2="1">
                       <stop offset="0%" stopColor="#10b981" stopOpacity="0.25" />
                       <stop offset="100%" stopColor="#10b981" stopOpacity="0" />
                     </linearGradient>
-                    {/* Profit Area Gradient */}
-                    <linearGradient id="profitGlow" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="0%" stopColor="#3b82f6" stopOpacity="0.2" />
-                      <stop offset="100%" stopColor="#3b82f6" stopOpacity="0" />
-                    </linearGradient>
                   </defs>
 
-                  {/* Gradient Area Fills */}
+                  {/* Gradient Area Fill */}
                   <path d={revenueAreaPath} fill="url(#revenueGlow)" />
 
-                  {/* Vertical Dashed Guide Line for Active Hover Node */}
+                  {/* Vertical Guide Line on Hover */}
                   {hoveredIdx !== null && (
                     <line
                       x1={getX(hoveredIdx)}
                       y1={paddingTop}
                       x2={getX(hoveredIdx)}
                       y2={svgHeight - paddingBottom}
-                      stroke="#475569"
-                      strokeWidth="1.5"
+                      stroke="#10b981"
+                      strokeWidth="2"
                       strokeDasharray="4 4"
                     />
                   )}
 
-                  {/* Smooth Curved Trend Lines */}
-                  {/* 1. Revenue Line (Green) */}
-                  <path
-                    d={revenuePath}
-                    fill="none"
-                    stroke="#10b981"
-                    strokeWidth="3.5"
-                    strokeLinecap="round"
-                  />
-                  {/* 2. Costs Line (Rose) */}
-                  <path
-                    d={costPath}
-                    fill="none"
-                    stroke="#f43f5e"
-                    strokeWidth="3.5"
-                    strokeLinecap="round"
-                  />
-                  {/* 3. Net Profit Line (Blue) */}
-                  <path
-                    d={profitPath}
-                    fill="none"
-                    stroke="#3b82f6"
-                    strokeWidth="3.5"
-                    strokeLinecap="round"
-                  />
+                  {/* Smooth Curved Lines */}
+                  <path d={revenuePath} fill="none" stroke="#10b981" strokeWidth="3.5" strokeLinecap="round" />
+                  <path d={costPath} fill="none" stroke="#f43f5e" strokeWidth="3.5" strokeLinecap="round" />
+                  <path d={profitPath} fill="none" stroke="#3b82f6" strokeWidth="3.5" strokeLinecap="round" />
 
                   {/* Node Dots on Chart Lines */}
                   {currentData.map((d, i) => {
@@ -366,60 +361,33 @@ export const AnalyticsView: React.FC = () => {
                     const revY = getY(d.revenue);
                     const costY = getY(d.cost);
                     const profitY = getY(d.profit);
+                    const isSelected = hoveredIdx === i;
 
                     return (
-                      <g key={i} className="cursor-pointer" onMouseEnter={() => setHoveredIdx(i)}>
-                        {/* Revenue Node Circle */}
-                        <circle cx={cx} cy={revY} r="6" fill="#10b981" stroke="#022c22" strokeWidth="2" />
-                        <circle cx={cx} cy={revY} r="3" fill="#ffffff" />
+                      <g key={i}>
+                        {/* Revenue Circle */}
+                        <circle cx={cx} cy={revY} r={isSelected ? "7" : "5"} fill="#10b981" stroke="#022c22" strokeWidth="2" />
+                        <circle cx={cx} cy={revY} r="2.5" fill="#ffffff" />
 
-                        {/* Costs Node Circle */}
-                        <circle cx={cx} cy={costY} r="6" fill="#f43f5e" stroke="#4c0519" strokeWidth="2" />
-                        <circle cx={cx} cy={costY} r="3" fill="#ffffff" />
+                        {/* Costs Circle */}
+                        <circle cx={cx} cy={costY} r={isSelected ? "7" : "5"} fill="#f43f5e" stroke="#4c0519" strokeWidth="2" />
+                        <circle cx={cx} cy={costY} r="2.5" fill="#ffffff" />
 
-                        {/* Profit Node Circle */}
-                        <circle cx={cx} cy={profitY} r="6" fill="#3b82f6" stroke="#172554" strokeWidth="2" />
-                        <circle cx={cx} cy={profitY} r="3" fill="#ffffff" />
+                        {/* Profit Circle */}
+                        <circle cx={cx} cy={profitY} r={isSelected ? "7" : "5"} fill="#3b82f6" stroke="#172554" strokeWidth="2" />
+                        <circle cx={cx} cy={profitY} r="2.5" fill="#ffffff" />
                       </g>
                     );
                   })}
                 </svg>
 
-                {/* Numeric Pill Badges Positioned Absolutely Above Points (Matching Reference Image) */}
-                <div className="absolute inset-0 pointer-events-none">
-                  {currentData.map((d, i) => {
-                    const leftPct = (i / (currentData.length - 1)) * 90 + 5;
-                    return (
-                      <div
-                        key={i}
-                        style={{ left: `${leftPct}%` }}
-                        className="absolute -translate-x-1/2 flex flex-col items-center gap-1 top-2"
-                      >
-                        {/* Revenue Pill */}
-                        <span className="px-2 py-0.5 rounded-lg text-[10px] font-mono font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 shadow-md backdrop-blur-xs">
-                          {formatK(d.revenue)}
-                        </span>
-                        {/* Costs Pill */}
-                        <span className="px-2 py-0.5 rounded-lg text-[10px] font-mono font-bold bg-rose-500/20 text-rose-300 border border-rose-500/40 shadow-md backdrop-blur-xs">
-                          {formatK(d.cost)}
-                        </span>
-                        {/* Profit Pill */}
-                        <span className="px-2 py-0.5 rounded-lg text-[10px] font-mono font-bold bg-blue-500/20 text-blue-300 border border-blue-500/40 shadow-md backdrop-blur-xs">
-                          {formatK(d.profit)}
-                        </span>
-                      </div>
-                    );
-                  })}
-                </div>
-
-                {/* X-Axis Labels */}
-                <div className="absolute bottom-0 inset-x-0 flex justify-between px-8 text-xs font-bold text-slate-300">
+                {/* X-Axis Month / Date Labels */}
+                <div className="absolute bottom-0 inset-x-0 flex justify-between px-8 text-xs font-bold text-slate-300 pointer-events-none">
                   {currentData.map((d, i) => (
                     <span
                       key={i}
-                      onClick={() => setHoveredIdx(i)}
-                      className={`cursor-pointer transition ${
-                        hoveredIdx === i ? "text-emerald-400 font-extrabold" : "hover:text-slate-100"
+                      className={`transition ${
+                        hoveredIdx === i ? "text-emerald-400 font-extrabold scale-110" : "text-slate-400"
                       }`}
                     >
                       {d.label}
@@ -431,7 +399,7 @@ export const AnalyticsView: React.FC = () => {
           </div>
         </div>
 
-        {/* 3 Bottom Summary Cards Below Graph (Matching Reference Image media_1789203714934.png) */}
+        {/* 3 Bottom Summary Cards Below Graph */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-2">
           {/* 1. Total Revenue Card */}
           <div className="bg-slate-950/80 border border-slate-800/80 rounded-2xl p-4 flex items-center justify-between shadow-md">
