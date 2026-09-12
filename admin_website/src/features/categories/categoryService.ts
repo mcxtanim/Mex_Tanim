@@ -73,35 +73,27 @@ export async function fetchLinkedProductsForCategory(
 export async function fetchCategoriesFromSupabase(): Promise<Category[]> {
   if (!supabase) return getStoredCategories();
   try {
-    const { data: catData, error: catError } = await supabase
-      .from("categories")
-      .select("*")
-      .order("name", { ascending: true });
+    const [catRes, prodRes] = await Promise.all([
+      supabase.from("categories").select("*").order("name", { ascending: true }),
+      supabase.from("products").select("category"),
+    ]);
 
-    if (catError) {
-      console.warn("Supabase categories fetch error:", catError);
+    if (catRes.error) {
+      console.warn("Supabase categories fetch error:", catRes.error);
       return getStoredCategories();
     }
 
-    if (!catData) return [];
+    const catData = catRes.data || [];
+    const prodData = prodRes.data || [];
 
-    // Also fetch products to calculate exact real product counts per category
     let productMap: Record<string, number> = {};
-    try {
-      const { data: prodData } = await supabase
-        .from("products")
-        .select("category");
-
-      if (prodData && Array.isArray(prodData)) {
-        prodData.forEach((p: any) => {
-          const catKey = String(p.category || "").toLowerCase();
-          if (catKey) {
-            productMap[catKey] = (productMap[catKey] || 0) + 1;
-          }
-        });
-      }
-    } catch (e) {
-      console.warn("Error fetching products for category counts:", e);
+    if (Array.isArray(prodData)) {
+      prodData.forEach((p: any) => {
+        const catKey = String(p.category || "").toLowerCase();
+        if (catKey) {
+          productMap[catKey] = (productMap[catKey] || 0) + 1;
+        }
+      });
     }
 
     const mapped: Category[] = catData.map((item: any) => {

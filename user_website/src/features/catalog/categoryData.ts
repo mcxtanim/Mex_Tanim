@@ -272,32 +272,29 @@ export async function fetchLiveCategories(): Promise<CategoryItem[]> {
 
   rawList.forEach((item: any) => {
     const rawName = item.name || '';
-    const slug = (item.slug || rawName.toLowerCase().replace(/[^a-z0-9]+/g, '-')).toLowerCase();
+    const slug = (item.slug || item.id || rawName.toLowerCase().replace(/[^a-z0-9]+/g, '-')).toLowerCase();
     
-    const existingKey = Array.from(categoryMap.keys()).find((k) => isCategorySelected(k, slug));
+    const defaultMatch = CATEGORIES.find((c) => c.id === slug || c.id === String(item.id).toLowerCase());
 
-    if (existingKey) {
-      const existing = categoryMap.get(existingKey)!;
-      categoryMap.set(existingKey, {
-        ...existing,
-        nameEn: rawName ? rawName.toUpperCase() : existing.nameEn,
-        nameBn: item.name_bn || rawName || existing.nameBn,
-        staticCount: Number(item.product_count) || existing.staticCount,
-        image: getSvgImageForSlug(slug, item.image_url || item.image),
-      });
-    } else {
-      const newCatItem: CategoryItem = {
-        id: slug,
-        nameEn: rawName ? rawName.toUpperCase() : slug.toUpperCase(),
-        nameBn: item.name_bn || rawName || slug,
-        badge: rawName ? rawName.trim().charAt(0).toUpperCase() : 'C',
-        badgeBg: 'bg-slate-900 text-white',
-        icon: getLucideIconForSlug(slug),
-        colorClass: 'bg-slate-900 text-white',
-        staticCount: Number(item.product_count) || 0,
-        image: getSvgImageForSlug(slug, item.image_url || item.image),
-      };
-      categoryMap.set(slug, newCatItem);
+    const catItem: CategoryItem = {
+      id: slug,
+      nameEn: rawName ? rawName.toUpperCase() : (defaultMatch ? defaultMatch.nameEn : slug.toUpperCase()),
+      nameBn: item.name_bn || rawName || (defaultMatch ? defaultMatch.nameBn : slug),
+      badge: rawName ? rawName.trim().charAt(0).toUpperCase() : (defaultMatch ? defaultMatch.badge : 'C'),
+      badgeBg: defaultMatch ? defaultMatch.badgeBg : 'bg-slate-900 text-white',
+      icon: defaultMatch ? defaultMatch.icon : getLucideIconForSlug(slug),
+      colorClass: defaultMatch ? defaultMatch.colorClass : 'bg-slate-900 text-white',
+      staticCount: Number(item.product_count) || (defaultMatch ? defaultMatch.staticCount : 0),
+      image: getSvgImageForSlug(slug, item.image_url || item.image),
+    };
+
+    categoryMap.set(slug, catItem);
+  });
+
+  // Ensure default categories like combo-offers are included if missing
+  CATEGORIES.forEach((cat) => {
+    if (!categoryMap.has(cat.id)) {
+      categoryMap.set(cat.id, cat);
     }
   });
 

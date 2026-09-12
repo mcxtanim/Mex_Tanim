@@ -11,16 +11,6 @@ export function normalizeCategorySlug(rawCat: string): string {
     .replace(/[^a-z0-9]+/g, "-")
     .replace(/^-+|-+$/g, "");
 
-  if (slug === "mechanical-keyboard" || slug === "keyboard" || slug === "keyboards") return "mechanical-keyboards";
-  if (slug === "gaming-headset" || slug === "headset" || slug === "headphones") return "gaming-headsets";
-  if (slug === "gaming-mouse" || slug === "mouse" || slug === "mice") return "gaming-mice";
-  if (slug === "fast-charger" || slug === "charger" || slug === "chargers") return "fast-chargers";
-  if (slug === "cable") return "cables";
-  if (slug === "soundbox") return "soundboxes";
-  if (slug === "trimmer") return "trimmers";
-  if (slug === "cooler" || slug === "gaming-coolers") return "gaming-cooler";
-  if (slug === "sleeves" || slug === "finger-sleeve") return "finger-sleeves";
-
   return slug || "gaming-mice";
 }
 
