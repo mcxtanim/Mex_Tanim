@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import { ProductCard } from './ProductCard';
-import { CATEGORIES } from './categoryData';
+import { CATEGORIES, isCategorySelected } from './categoryData';
 import { fetchLiveProducts } from './productService';
 import { Product } from './types';
 import { useLanguage } from '../shared/LanguageContext';
@@ -156,13 +156,7 @@ export const ProductTabsSection: React.FC = () => {
   });
 
   const categoryGroups = CATEGORIES.map((cat) => {
-    const prods = activeTabProducts.filter(
-      (p) =>
-        p.category === cat.id ||
-        (cat.id === 'finger-sleeves' && p.category === 'sleeves') ||
-        (cat.id === 'soundboxes' && p.category === 'soundbox') ||
-        (cat.id === 'chargers' && p.category === 'fast-chargers')
-    );
+    const prods = activeTabProducts.filter((p) => isCategorySelected(p.category, cat.id));
     return {
       category: cat,
       products: prods,
@@ -225,11 +219,7 @@ export const ProductTabsSection: React.FC = () => {
         </div>
       </div>
 
-      {categoryGroups.length === 0 ? (
-        <div className="py-12 text-center bg-white rounded-3xl border border-gray-200 p-6 text-gray-500 text-sm font-bold">
-          {language === 'bn' ? 'এই ট্যাবে কোনো পণ্য পাওয়া যায়নি' : 'No products available in this tab.'}
-        </div>
-      ) : (
+      {categoryGroups.length > 0 ? (
         <div className="space-y-6">
           {categoryGroups.map((group) => (
             <CategoryRailRow
@@ -240,6 +230,16 @@ export const ProductTabsSection: React.FC = () => {
               products={group.products}
             />
           ))}
+        </div>
+      ) : activeTabProducts.length > 0 ? (
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6">
+          {activeTabProducts.map((product) => (
+            <ProductCard key={product.id} product={product} />
+          ))}
+        </div>
+      ) : (
+        <div className="py-12 text-center bg-white rounded-3xl border border-gray-200 p-6 text-gray-500 text-sm font-bold">
+          {language === 'bn' ? 'এই ট্যাবে কোনো পণ্য পাওয়া যায়নি' : 'No products available in this tab.'}
         </div>
       )}
 
