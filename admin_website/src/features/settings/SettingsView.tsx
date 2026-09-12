@@ -149,6 +149,83 @@ export function SettingsView() {
           </div>
         </div>
 
+        {/* Steadfast Courier API Integration Card */}
+        <div className="bg-slate-900/60 backdrop-blur-md p-6 rounded-2xl border border-slate-800 shadow-xl space-y-4">
+          <div className="flex items-center justify-between border-b border-slate-800 pb-3 flex-wrap gap-2">
+            <div className="flex items-center space-x-2">
+              <Truck className="w-5 h-5 text-cyan-400" />
+              <div>
+                <h2 className="text-sm font-bold text-slate-100">Steadfast Courier API Integration (কুরিয়ার ইন্টিগ্রেশন)</h2>
+                <p className="text-[11px] text-slate-400">Automated order dispatch & live tracking status updates</p>
+              </div>
+            </div>
+
+            <div className="flex items-center space-x-3">
+              <span className="text-[10px] font-bold px-2.5 py-1 rounded-full bg-amber-500/10 text-amber-400 border border-amber-500/20">
+                Setup Ready (Marchant Key Required Later)
+              </span>
+              <label className="relative inline-flex items-center cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={settings.enableSteadfastCourier}
+                  onChange={(e) => setSettings({ ...settings, enableSteadfastCourier: e.target.checked })}
+                  className="sr-only peer"
+                />
+                <div className="w-11 h-6 bg-slate-800 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-emerald-500"></div>
+              </label>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-1">
+            <div className="space-y-1.5">
+              <label className="text-xs font-semibold text-slate-300">Steadfast API Key</label>
+              <input
+                type="text"
+                placeholder="sf_api_key_xxxxxxxx..."
+                value={settings.steadfastApiKey}
+                onChange={(e) => setSettings({ ...settings, steadfastApiKey: e.target.value })}
+                className="w-full bg-slate-800/80 border border-slate-700/70 rounded-xl px-3.5 py-2 text-xs text-slate-100 placeholder:text-slate-600 focus:outline-none focus:border-cyan-500/60 font-mono"
+              />
+            </div>
+
+            <div className="space-y-1.5">
+              <label className="text-xs font-semibold text-slate-300">Steadfast Secret Key</label>
+              <input
+                type="password"
+                placeholder="sf_secret_xxxxxxxx..."
+                value={settings.steadfastSecretKey}
+                onChange={(e) => setSettings({ ...settings, steadfastSecretKey: e.target.value })}
+                className="w-full bg-slate-800/80 border border-slate-700/70 rounded-xl px-3.5 py-2 text-xs text-slate-100 placeholder:text-slate-600 focus:outline-none focus:border-cyan-500/60 font-mono"
+              />
+            </div>
+          </div>
+
+          <div className="space-y-1.5 pt-2">
+            <label className="text-xs font-semibold text-slate-300">Your Store Webhook Endpoint URL</label>
+            <div className="flex items-center space-x-2">
+              <input
+                type="text"
+                readOnly
+                value={settings.steadfastWebhookUrl}
+                className="flex-1 bg-slate-950/80 border border-slate-800 rounded-xl px-3.5 py-2 text-xs text-slate-400 font-mono select-all"
+              />
+              <button
+                type="button"
+                onClick={() => {
+                  navigator.clipboard.writeText(settings.steadfastWebhookUrl);
+                  alert("Webhook URL copied to clipboard!");
+                }}
+                className="px-3 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 rounded-xl text-xs font-bold transition cursor-pointer border border-slate-700"
+              >
+                Copy URL
+              </button>
+            </div>
+            <p className="text-[11px] text-slate-400">
+              * যখন মার্চেন্ট অ্যাকাউন্ট ওপেন করবেন, স্টিডফাস্ট প্যানেলের Webhook URL বক্সে এই লিংকটি পেস্ট করে দিলেই লাইভ রেভিনিউ সিঙ্ক শুরু হবে।
+            </p>
+          </div>
+        </div>
+
         {/* Save Button */}
         <div className="flex justify-end">
           <button

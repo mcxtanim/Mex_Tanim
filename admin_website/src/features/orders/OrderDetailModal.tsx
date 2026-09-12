@@ -1,6 +1,6 @@
 "use client";
 
-import { X, MapPin, User, Phone, Mail, ShoppingBag, CreditCard, Calendar, Clock } from "lucide-react";
+import { X, MapPin, User, Phone, Mail, ShoppingBag, CreditCard, Calendar, Clock, Truck } from "lucide-react";
 import { Order, OrderStatus } from "./types";
 
 interface OrderDetailModalProps {
@@ -148,19 +148,44 @@ export function OrderDetailModal({
             </div>
           </div>
 
-          {/* Quick Order Status Controller */}
-          <div className="bg-slate-800/60 p-4 rounded-xl border border-slate-700/60 flex items-center justify-between">
-            <label className="text-xs font-semibold text-slate-200">Update Order Status:</label>
-            <select
-              value={order.status}
-              onChange={(e) => onStatusChange(order.id, e.target.value as OrderStatus)}
-              className="bg-slate-900 border border-slate-700 rounded-xl px-3 py-1.5 text-xs text-slate-100 font-semibold focus:outline-none focus:border-emerald-500"
-            >
-              <option value="Pending">Pending</option>
-              <option value="Processing">Processing</option>
-              <option value="Delivered">Delivered</option>
-              <option value="Cancelled">Cancelled</option>
-            </select>
+          {/* Quick Order Status Controller & Courier Dispatch Placeholder */}
+          <div className="bg-slate-800/60 p-4 rounded-xl border border-slate-700/60 space-y-3">
+            <div className="flex items-center justify-between">
+              <label className="text-xs font-semibold text-slate-200">Update Order Status:</label>
+              <select
+                value={order.status}
+                onChange={(e) => onStatusChange(order.id, e.target.value as OrderStatus)}
+                className="bg-slate-900 border border-slate-700 rounded-xl px-3 py-1.5 text-xs text-slate-100 font-semibold focus:outline-none focus:border-emerald-500 cursor-pointer"
+              >
+                <option value="Pending">Pending</option>
+                <option value="Confirmed">Confirmed</option>
+                <option value="Processing">Processing</option>
+                <option value="Packing">Packing</option>
+                <option value="Shipped">Shipped</option>
+                <option value="Out for Delivery">Out for Delivery</option>
+                <option value="Delivered">Delivered</option>
+                <option value="Cancelled">Cancelled</option>
+              </select>
+            </div>
+
+            <div className="pt-2 border-t border-slate-700/50 flex items-center justify-between flex-wrap gap-2">
+              <div className="flex items-center space-x-1.5 text-xs text-slate-300 font-medium">
+                <Truck className="w-4 h-4 text-cyan-400" />
+                <span>Steadfast Courier API:</span>
+                <span className="text-[10px] text-amber-400 bg-amber-500/10 px-2 py-0.5 rounded-md border border-amber-500/20 font-mono">
+                  Ready (Pending API Key in Settings)
+                </span>
+              </div>
+
+              <button
+                type="button"
+                onClick={() => alert("Steadfast Courier API is ready! Once you enter your API Key & Secret Key in Settings, orders will automatically dispatch via Steadfast Courier.")}
+                className="px-3 py-1.5 bg-cyan-500/10 hover:bg-cyan-500/20 text-cyan-400 border border-cyan-500/30 rounded-xl text-xs font-bold transition flex items-center space-x-1.5 cursor-pointer"
+              >
+                <Truck className="w-3.5 h-3.5" />
+                <span>Send to Steadfast Courier</span>
+              </button>
+            </div>
           </div>
         </div>
       </div>

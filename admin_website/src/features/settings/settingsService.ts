@@ -9,6 +9,10 @@ const DEFAULT_SETTINGS: StoreSettings = {
   outsideDhakaFee: 120,
   announcementBn: "সেরা গেমিং গ্যাজেট ১ জায়গায় সব • দেশের সেরা দামে ১০-০% অথেনটিক প্রোডাক্ট",
   announcementEn: "Top Gaming Gadgets All in One Place • 100% Authentic Products at Best Price in BD",
+  enableSteadfastCourier: false,
+  steadfastApiKey: "",
+  steadfastSecretKey: "",
+  steadfastWebhookUrl: "https://mextanimstore.com/api/webhooks/steadfast",
 };
 
 export function getStoredSettings(): StoreSettings {
