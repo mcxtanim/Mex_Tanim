@@ -96,11 +96,11 @@ CREATE POLICY "Public Read Access Products" ON public.products FOR SELECT USING 
 DROP POLICY IF EXISTS "Public Write Access Categories" ON public.categories;
 CREATE POLICY "Public Read Access Categories" ON public.categories FOR SELECT USING (true);
 
--- Orders Policies (Public SELECT & INSERT allowed; Public UPDATE & DELETE blocked)
+-- Orders Policies (Public INSERT allowed for order placement; Public SELECT/UPDATE/DELETE blocked)
 DROP POLICY IF EXISTS "Public Write Access Orders" ON public.orders;
-CREATE POLICY "Public Read Access Orders" ON public.orders FOR SELECT USING (true);
+DROP POLICY IF EXISTS "Public Read Access Orders" ON public.orders;
 CREATE POLICY "Public Insert Access Orders" ON public.orders FOR INSERT WITH CHECK (true);
 
--- Saved Addresses Policies (Public SELECT & INSERT allowed)
-CREATE POLICY "Public Read Access Saved Addresses" ON public.saved_addresses FOR SELECT USING (true);
+-- Saved Addresses Policies (Public INSERT allowed for saving address; Public SELECT/UPDATE/DELETE blocked)
+DROP POLICY IF EXISTS "Public Read Access Saved Addresses" ON public.saved_addresses;
 CREATE POLICY "Public Insert Access Saved Addresses" ON public.saved_addresses FOR INSERT WITH CHECK (true);
