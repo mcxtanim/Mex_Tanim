@@ -195,7 +195,15 @@ export function ProductFormView({ productId }: ProductFormViewProps) {
               <label className="text-xs font-semibold text-slate-300">Category</label>
               <select
                 value={formData.category}
-                onChange={(e) => setFormData({ ...formData, category: e.target.value })}
+                onChange={(e) => {
+                  const newCat = e.target.value;
+                  const isComboCat = newCat === "combo-offers" || newCat === "combo";
+                  setFormData({
+                    ...formData,
+                    category: newCat,
+                    is_combo: isComboCat ? true : formData.is_combo,
+                  });
+                }}
                 className="w-full bg-slate-950/80 border border-slate-800 rounded-xl px-3.5 py-2.5 text-xs text-slate-100 focus:outline-none focus:border-emerald-500/60 cursor-pointer"
               >
                 {categoriesList.length > 0 ? (
@@ -206,6 +214,7 @@ export function ProductFormView({ productId }: ProductFormViewProps) {
                   ))
                 ) : (
                   [
+                    { name: "COMBO OFFERS", slug: "combo-offers" },
                     { name: "GAMING COOLER", slug: "gaming-cooler" },
                     { name: "GAMING MICE", slug: "gaming-mice" },
                     { name: "MECHANICAL KEYBOARDS", slug: "mechanical-keyboards" },
@@ -217,7 +226,7 @@ export function ProductFormView({ productId }: ProductFormViewProps) {
                     { name: "TRIMMERS", slug: "trimmers" },
                   ].map((cat) => (
                     <option key={cat.slug} value={cat.slug} className="bg-slate-900 text-slate-100">
-                      {cat.name}
+                      {cat.name} ({cat.slug})
                     </option>
                   ))
                 )}
@@ -329,7 +338,14 @@ export function ProductFormView({ productId }: ProductFormViewProps) {
                 <button
                   key={flag.id}
                   type="button"
-                  onClick={() => setFormData({ ...formData, [key]: !isChecked })}
+                  onClick={() => {
+                    const nextVal = !isChecked;
+                    setFormData({
+                      ...formData,
+                      [key]: nextVal,
+                      category: key === "is_combo" && nextVal ? "combo-offers" : formData.category,
+                    });
+                  }}
                   className={`p-3 rounded-xl border text-xs font-bold text-left flex items-center justify-between transition-all cursor-pointer ${
                     isChecked
                       ? "bg-emerald-500/10 border-emerald-500/40 text-emerald-400 shadow-sm"

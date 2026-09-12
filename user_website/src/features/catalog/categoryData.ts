@@ -9,6 +9,7 @@ import {
   Cable,
   Speaker,
   Scissors,
+  Gift,
 } from 'lucide-react';
 import { Product } from './types';
 
@@ -39,7 +40,8 @@ export const getCategoryProductCount = (catId: string, staticCount: number = 0, 
       (catId === 'power-bank' && (p.category === 'powerbank' || p.category === 'power-bank')) ||
       (catId === 'charger-adapter' && (p.category === 'chargers' || p.category === 'fast-chargers' || p.category === 'charger-adapter')) ||
       (catId === 'soundboxes' && (p.category === 'soundbox' || p.category === 'soundboxes')) ||
-      (catId === 'chargers' && (p.category === 'fast-chargers' || p.category === 'chargers'))
+      (catId === 'chargers' && (p.category === 'fast-chargers' || p.category === 'chargers')) ||
+      (catId === 'combo-offers' && (p.category === 'combo' || p.category === 'combo-offers' || p.isComboOffer === true))
   ).length;
   return realCount > 0 ? realCount : staticCount;
 };
@@ -60,10 +62,23 @@ export const isCategorySelected = (selectedCategory: string, catId: string): boo
   if (selectedCategory === 'gaming-headsets' && catId === 'headphones') return true;
   if (selectedCategory === 'mice' && catId === 'gaming-mice') return true;
   if (selectedCategory === 'gaming-mice' && catId === 'mice') return true;
+  if (selectedCategory === 'combo-offers' && catId === 'combo') return true;
+  if (selectedCategory === 'combo' && catId === 'combo-offers') return true;
   return false;
 };
 
 export const CATEGORIES: CategoryItem[] = [
+  {
+    id: 'combo-offers',
+    nameEn: 'COMBO OFFERS',
+    nameBn: 'কম্বো অফার',
+    icon: Gift,
+    colorClass: 'bg-gradient-to-r from-red-600 to-amber-500 text-white',
+    badge: 'C',
+    badgeBg: 'bg-red-600 text-white',
+    staticCount: 5,
+    image: '/categories/all.svg',
+  },
   {
     id: 'gaming-cooler',
     nameEn: 'GAMING COOLER',
