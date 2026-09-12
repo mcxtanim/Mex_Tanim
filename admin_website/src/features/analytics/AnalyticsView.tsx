@@ -235,7 +235,7 @@ export const AnalyticsView: React.FC = () => {
             </div>
             <div>
               <h2 className="text-lg font-bold text-slate-100 tracking-tight">
-                Revenue vs Cost vs Net Profit
+                Financial Overview
               </h2>
             </div>
           </div>
@@ -602,7 +602,7 @@ export const AnalyticsView: React.FC = () => {
           <div>
             <h3 className="text-base font-bold text-slate-100 flex items-center gap-2">
               <Wallet className="w-5 h-5 text-rose-400" />
-              Operational & Product Unit Cost Records
+              Cost & Expense Records
             </h3>
           </div>
 
@@ -610,7 +610,7 @@ export const AnalyticsView: React.FC = () => {
             onClick={() => setIsModalOpen(true)}
             className="px-3.5 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-emerald-400 border border-slate-700 text-xs font-semibold flex items-center gap-1.5 transition"
           >
-            <Plus className="w-4 h-4" /> Add Product Unit Cost
+            <Plus className="w-4 h-4" /> Add Expense
           </button>
         </div>
 
@@ -619,10 +619,10 @@ export const AnalyticsView: React.FC = () => {
             <thead>
               <tr className="border-b border-slate-800 text-[10px] font-black uppercase tracking-widest text-slate-500">
                 <th className="py-2.5 px-3">DATE</th>
-                <th className="py-2.5 px-3">EXPENSE TITLE</th>
+                <th className="py-2.5 px-3">EXPENSE</th>
                 <th className="py-2.5 px-3">CATEGORY</th>
-                <th className="py-2.5 px-3">UNIT PRICE × QTY BREAKDOWN</th>
-                <th className="py-2.5 px-3">TOTAL AMOUNT (BDT)</th>
+                <th className="py-2.5 px-3">BREAKDOWN</th>
+                <th className="py-2.5 px-3">TOTAL (৳)</th>
                 <th className="py-2.5 px-3 text-right">ACTION</th>
               </tr>
             </thead>
@@ -630,7 +630,7 @@ export const AnalyticsView: React.FC = () => {
               {costs.length === 0 ? (
                 <tr>
                   <td colSpan={6} className="py-6 text-center text-slate-500 text-xs">
-                    No expense records added yet. Click "Add Product Unit Cost" above.
+                    No expense records added yet. Click "Add Expense" above.
                   </td>
                 </tr>
               ) : (

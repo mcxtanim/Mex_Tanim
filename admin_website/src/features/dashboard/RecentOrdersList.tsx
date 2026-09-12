@@ -24,24 +24,11 @@ export function RecentOrdersList({ orders }: RecentOrdersListProps) {
     }
   };
 
-  const getStatusLabel = (status: OrderStatus) => {
-    switch (status) {
-      case "Pending":
-        return "● Pending";
-      case "Processing":
-        return "● Call Confirmed";
-      case "Delivered":
-        return "● Delivered";
-      case "Cancelled":
-        return "● Cancelled";
-    }
-  };
-
   return (
-    <div className="bg-slate-900/90 border border-slate-800/90 rounded-2xl p-5 shadow-md space-y-4">
+    <div className="bg-slate-900/90 border border-slate-800/90 rounded-2xl p-4 shadow-md space-y-3">
       <div className="flex items-center justify-between">
         <h3 className="text-xs font-black uppercase tracking-wider text-slate-300">
-          Recent Customer Orders
+          Recent Orders
         </h3>
         <Link
           href="/orders"
@@ -55,42 +42,39 @@ export function RecentOrdersList({ orders }: RecentOrdersListProps) {
         <table className="w-full text-left border-collapse">
           <thead>
             <tr className="border-b border-slate-800/80 text-[10px] font-black uppercase tracking-widest text-slate-500">
-              <th className="py-2.5 px-3">ORDER #</th>
-              <th className="py-2.5 px-3">CUSTOMER</th>
-              <th className="py-2.5 px-3">PRODUCT</th>
-              <th className="py-2.5 px-3">PRICE</th>
-              <th className="py-2.5 px-3 text-right">STATUS</th>
+              <th className="py-2 px-3">ORDER</th>
+              <th className="py-2 px-3">CUSTOMER</th>
+              <th className="py-2 px-3">PRODUCT</th>
+              <th className="py-2 px-3">AMOUNT</th>
+              <th className="py-2 px-3 text-right">STATUS</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-slate-800/50 text-xs">
             {recent.map((ord) => {
               const mainItem = ord.items[0];
-              const productDesc = mainItem
-                ? `${mainItem.title} (${mainItem.quantity} unit)`
-                : "Gaming Gadget";
+              const productDesc = mainItem ? mainItem.title : "Gadget";
 
               return (
                 <tr key={ord.id} className="hover:bg-slate-800/30 transition-colors">
-                  <td className="py-3 px-3 font-mono font-bold text-emerald-400">
+                  <td className="py-2.5 px-3 font-mono font-bold text-emerald-400">
                     {ord.orderNumber}
                   </td>
-                  <td className="py-3 px-3">
+                  <td className="py-2.5 px-3">
                     <p className="font-bold text-slate-200">{ord.customerName}</p>
-                    <p className="text-[10px] text-slate-400 font-mono">{ord.customerPhone}</p>
                   </td>
-                  <td className="py-3 px-3 text-slate-300 max-w-[200px] truncate">
+                  <td className="py-2.5 px-3 text-slate-300 max-w-[180px] truncate">
                     {productDesc}
                   </td>
-                  <td className="py-3 px-3 font-mono font-bold text-slate-100">
+                  <td className="py-2.5 px-3 font-mono font-bold text-slate-100">
                     ৳ {ord.totalAmount.toLocaleString()}
                   </td>
-                  <td className="py-3 px-3 text-right">
+                  <td className="py-2.5 px-3 text-right">
                     <span
-                      className={`inline-block px-3 py-1 rounded-full text-[11px] font-bold border ${getStatusBadge(
+                      className={`inline-block px-2.5 py-0.5 rounded-full text-[10px] font-bold border ${getStatusBadge(
                         ord.status
                       )}`}
                     >
-                      {getStatusLabel(ord.status)}
+                      {ord.status}
                     </span>
                   </td>
                 </tr>
