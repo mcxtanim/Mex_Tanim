@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { CategoryItem } from './categoryData';
+import { CategoryItem, getCategoryName } from './categoryData';
 import { useLanguage } from '../shared/LanguageContext';
 
 export interface CategoryThumbnailProps {
@@ -22,7 +22,9 @@ export const CategoryThumbnail: React.FC<CategoryThumbnailProps> = ({
   count,
 }) => {
   const { language } = useLanguage();
-  const catName = language === 'bn' ? category.nameBn : category.nameEn;
+  const catName = language === 'bn'
+    ? (category.nameBn || getCategoryName(category.id, 'bn'))
+    : (category.nameEn || getCategoryName(category.id, 'en'));
 
   if (variant === 'icon') {
     return (

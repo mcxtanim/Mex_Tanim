@@ -1,5 +1,6 @@
 import { Product } from './types';
 import { supabase } from '../../lib/supabase';
+import { getCategoryName } from './categoryData';
 
 const ADMIN_STORAGE_KEY = 'mex_tanim_admin_products';
 
@@ -22,12 +23,17 @@ export const getBrandName = (product?: Partial<Product> | null, language: string
 };
 
 function mapRawProduct(item: any): Product {
+  const catSlug = item.category ? String(item.category).toLowerCase().trim().replace(/\s+/g, '-') : 'gaming-cooler';
+  const catBn = (item.category_bn && /[\u0980-\u09FF]/.test(item.category_bn))
+    ? item.category_bn
+    : getCategoryName(catSlug, 'bn');
+
   return {
     id: String(item.id),
     name: item.title || item.name || '',
     nameBn: item.title_bn || item.titleBn || item.nameBn || item.title || '',
-    category: item.category ? String(item.category).toLowerCase().replace(/\s+/g, '-') : 'gaming-cooler',
-    categoryBn: item.category || 'গেমিং গ্যাজেট',
+    category: catSlug,
+    categoryBn: catBn,
     brand: item.brand || 'Mex Tanim',
     brandBn: item.brand || 'মেক্স তানিম',
     price: Number(item.price) || 0,

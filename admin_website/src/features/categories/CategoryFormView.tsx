@@ -18,6 +18,7 @@ export function CategoryFormView({ categoryId }: CategoryFormViewProps) {
   const [isLoadingCategory, setIsLoadingCategory] = useState<boolean>(Boolean(categoryId));
   const [formData, setFormData] = useState<CategoryFormData>({
     name: "",
+    name_bn: "",
     description: "",
     image: "",
   });
@@ -40,6 +41,7 @@ export function CategoryFormView({ categoryId }: CategoryFormViewProps) {
           if (isMounted && existing) {
             setFormData({
               name: existing.name || "",
+              name_bn: existing.name_bn || "",
               description: existing.description || "",
               image: existing.image || "",
             });
@@ -144,7 +146,7 @@ export function CategoryFormView({ categoryId }: CategoryFormViewProps) {
 
           <div className="space-y-1.5">
             <label className="text-xs font-semibold text-slate-300">
-              Category Name <span className="text-emerald-400">*</span>
+              Category Name (English) <span className="text-emerald-400">*</span>
             </label>
             <input
               type="text"
@@ -152,6 +154,19 @@ export function CategoryFormView({ categoryId }: CategoryFormViewProps) {
               placeholder="e.g. GAMING MICE"
               value={formData.name}
               onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+              className="w-full bg-slate-950/80 border border-slate-800 rounded-xl px-3.5 py-2.5 text-xs text-slate-100 placeholder:text-slate-500 focus:outline-none focus:border-emerald-500/60"
+            />
+          </div>
+
+          <div className="space-y-1.5">
+            <label className="text-xs font-semibold text-slate-300">
+              ক্যাটাগরির নাম (বাংলা) / Category Name (Bangla)
+            </label>
+            <input
+              type="text"
+              placeholder="যেমন: গেমিং মাউস"
+              value={formData.name_bn || ""}
+              onChange={(e) => setFormData({ ...formData, name_bn: e.target.value })}
               className="w-full bg-slate-950/80 border border-slate-800 rounded-xl px-3.5 py-2.5 text-xs text-slate-100 placeholder:text-slate-500 focus:outline-none focus:border-emerald-500/60"
             />
           </div>

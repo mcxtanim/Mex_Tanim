@@ -104,6 +104,7 @@ export async function fetchCategoriesFromSupabase(): Promise<Category[]> {
       return {
         id: catId,
         name: item.name || "",
+        name_bn: item.name_bn || "",
         slug: slug,
         description: item.description || "",
         image: item.image_url || item.image || "",
@@ -133,6 +134,7 @@ export async function fetchCategoryById(id: string): Promise<Category | null> {
         return {
           id: String(data.id),
           name: data.name || "",
+          name_bn: data.name_bn || "",
           slug,
           description: data.description || "",
           image: data.image_url || data.image || "",
@@ -157,6 +159,7 @@ export async function createCategory(
   const newCat: Category = {
     id: newId,
     name: formData.name,
+    name_bn: formData.name_bn,
     slug,
     description: formData.description,
     image: formData.image,
@@ -171,6 +174,7 @@ export async function createCategory(
       const { error } = await supabase.from("categories").insert({
         id: newId,
         name: formData.name,
+        name_bn: formData.name_bn || null,
         slug,
         description: formData.description || null,
         image_url: formData.image || null,
@@ -193,7 +197,7 @@ export async function updateCategory(
   const slug = formData.name.toLowerCase().replace(/[^a-z0-9]+/g, "-");
   const updated = existingCategories.map((cat) =>
     cat.id === id
-      ? { ...cat, name: formData.name, description: formData.description, image: formData.image, slug }
+      ? { ...cat, name: formData.name, name_bn: formData.name_bn, description: formData.description, image: formData.image, slug }
       : cat
   );
   saveStoredCategories(updated);
@@ -204,6 +208,7 @@ export async function updateCategory(
         .from("categories")
         .update({
           name: formData.name,
+          name_bn: formData.name_bn || null,
           slug,
           description: formData.description || null,
           image_url: formData.image || null,

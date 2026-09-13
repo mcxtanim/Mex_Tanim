@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { ChevronRight } from 'lucide-react';
 import { useLanguage } from '../shared/LanguageContext';
-import { CATEGORIES, CategoryItem, fetchLiveCategories, getCategoryProductCount, isCategorySelected } from './categoryData';
+import { CATEGORIES, CategoryItem, fetchLiveCategories, getCategoryProductCount, isCategorySelected, getCategoryName } from './categoryData';
 import { fetchLiveProducts } from './productService';
 import { Product } from './types';
 
@@ -68,7 +68,7 @@ export const CategorySidebar: React.FC<CategorySidebarProps> = ({
                     isSelected ? 'text-slate-900 font-black' : 'text-slate-900 group-hover:text-orange-600'
                   }`}
                 >
-                  {language === 'bn' ? cat.nameBn : cat.nameEn}
+                  {language === 'bn' ? (cat.nameBn || getCategoryName(cat.id, 'bn')) : (cat.nameEn || getCategoryName(cat.id, 'en'))}
                 </h3>
                 <p className="text-[11px] font-medium text-slate-400 mt-0.5">
                   {count} {language === 'bn' ? 'টি প্রোডাক্ট' : 'products'}

@@ -97,9 +97,16 @@ export function CategoriesTable({ categories, onDelete, onCautionDelete }: Categ
                 </div>
               </div>
 
-              <h3 className="font-bold text-slate-100 text-sm group-hover:text-emerald-400 transition-colors">
-                {cat.name}
-              </h3>
+              <div className="flex items-center justify-between gap-2">
+                <h3 className="font-bold text-slate-100 text-sm group-hover:text-emerald-400 transition-colors">
+                  {cat.name}
+                </h3>
+                {cat.name_bn && (
+                  <span className="text-xs font-semibold text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded-md border border-emerald-500/20 font-sans">
+                    {cat.name_bn}
+                  </span>
+                )}
+              </div>
               <p className="text-xs text-slate-400 mt-1 line-clamp-2 leading-relaxed">
                 {cat.description}
               </p>

@@ -10,6 +10,7 @@ import { ComboOfferSection } from '@/features/catalog/ComboOfferSection';
 import { Footer } from '@/features/shared/Footer';
 import { useLanguage } from '@/features/shared/LanguageContext';
 import { fetchLiveProducts, getCachedProducts } from '@/features/catalog/productService';
+import { getCategoryName, isCategorySelected } from '@/features/catalog/categoryData';
 import { Product } from '@/features/catalog/types';
 import { RotateCcw } from 'lucide-react';
 
@@ -22,14 +23,16 @@ const CATEGORY_META: Record<string, { en: string; bn: string; badge: string }> =
   keyboards: { en: 'Mechanical Keyboards', bn: 'মেকানিক্যাল কিবোর্ড', badge: 'K' },
   'gaming-headsets': { en: 'Gaming Headsets', bn: 'গেমিং হেডসেট', badge: 'H' },
   headphones: { en: 'Gaming Headsets', bn: 'গেমিং হেডসেট', badge: 'H' },
+  'gaming-earphone': { en: 'Gaming Earphone', bn: 'গেমিং ইয়ারফোন', badge: 'E' },
   chargers: { en: 'Fast Chargers', bn: 'ফাস্ট চার্জার', badge: 'F' },
   'fast-chargers': { en: 'Fast Chargers', bn: 'ফাস্ট চার্জার', badge: 'F' },
   'finger-sleeves': { en: 'Finger Sleeves', bn: 'ফিঙ্গার স্লিকস', badge: 'S' },
   sleeves: { en: 'Finger Sleeves', bn: 'ফিঙ্গার স্লিকস', badge: 'S' },
   cables: { en: 'Cables', bn: 'কেবলস', badge: 'C' },
-  soundboxes: { en: 'Soundboxes', bn: 'সাউন্ডবক্স', badge: 'B' },
-  soundbox: { en: 'Soundboxes', bn: 'সাউন্ডবক্স', badge: 'B' },
+  soundboxes: { en: 'Soundboxes', bn: 'সাউন্ডবক্স', badge: 'S' },
+  soundbox: { en: 'Soundboxes', bn: 'সাউন্ডবক্স', badge: 'S' },
   trimmers: { en: 'Trimmers', bn: 'ট্রিমার', badge: 'T' },
+  'combo-offers': { en: 'Combo Offers', bn: 'কম্বো অফার', badge: 'C' },
 };
 
 export default function Home() {
@@ -50,21 +53,13 @@ export default function Home() {
   }, []);
 
   const currentMeta = CATEGORY_META[selectedCategory] || {
-    en: selectedCategory.replace('-', ' '),
-    bn: selectedCategory,
+    en: getCategoryName(selectedCategory, 'en'),
+    bn: getCategoryName(selectedCategory, 'bn'),
     badge: selectedCategory.charAt(0).toUpperCase(),
   };
 
   const productCount = products.filter(
-    (p) =>
-      selectedCategory === 'all' ||
-      p.category === selectedCategory ||
-      (selectedCategory === 'finger-sleeves' && p.category === 'sleeves') ||
-      (selectedCategory === 'sleeves' && p.category === 'finger-sleeves') ||
-      (selectedCategory === 'soundboxes' && p.category === 'soundbox') ||
-      (selectedCategory === 'soundbox' && p.category === 'soundboxes') ||
-      (selectedCategory === 'chargers' && p.category === 'fast-chargers') ||
-      (selectedCategory === 'fast-chargers' && p.category === 'chargers')
+    (p) => isCategorySelected(selectedCategory, p.category)
   ).length;
 
   return (

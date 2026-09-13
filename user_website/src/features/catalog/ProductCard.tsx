@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { Star, ShoppingBag } from 'lucide-react';
 import { Product } from './types';
 import { getBrandName } from './productService';
+import { getCategoryName } from './categoryData';
 import { useCart } from '../cart/CartContext';
 import { useLanguage } from '../shared/LanguageContext';
 
@@ -67,7 +68,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
           <div className="flex items-center justify-between text-xs text-gray-500 mb-1">
             <div className="flex items-center space-x-1.5 overflow-hidden">
               <span className="font-semibold text-orange-600 uppercase text-[10px] tracking-wider truncate">
-                {product.categoryBn || product.category}
+                {language === 'bn' ? (product.categoryBn || getCategoryName(product.category, 'bn')) : getCategoryName(product.category, 'en')}
               </span>
               <span className="text-gray-300">•</span>
               <span className="font-extrabold text-slate-800 text-[10px] bg-slate-100/90 backdrop-blur-xs px-1.5 py-0.5 rounded border border-slate-200/80 truncate">

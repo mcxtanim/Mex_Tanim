@@ -4,7 +4,7 @@ import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import { Home, ChevronRight, ShoppingBag } from 'lucide-react';
-import { CATEGORIES, CategoryItem, fetchLiveCategories, getCategoryProductCount, isCategorySelected, getCachedCategories } from './categoryData';
+import { CATEGORIES, CategoryItem, fetchLiveCategories, getCategoryProductCount, isCategorySelected, getCachedCategories, getCategoryName } from './categoryData';
 import { fetchLiveProducts, getCachedProducts } from './productService';
 import { Product } from './types';
 import { ProductCard } from './ProductCard';
@@ -72,7 +72,7 @@ export const CategoriesView: React.FC<CategoriesViewProps> = ({ initialCategory 
           </Link>
           <ChevronRight className="w-3 h-3 text-slate-300" />
           <span className="font-extrabold text-slate-900 uppercase tracking-wide">
-            {language === 'bn' ? selectedCatObj.nameBn : selectedCatObj.nameEn}
+            {language === 'bn' ? (selectedCatObj.nameBn || getCategoryName(selectedCatObj.id, 'bn')) : (selectedCatObj.nameEn || getCategoryName(selectedCatObj.id, 'en'))}
           </span>
         </nav>
       </div>
@@ -80,7 +80,7 @@ export const CategoriesView: React.FC<CategoriesViewProps> = ({ initialCategory 
       {/* 2. Centered Category Title & Count Only */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center py-6 sm:py-8 space-y-1">
         <h1 className="text-3xl sm:text-4xl md:text-5xl font-black text-slate-900 uppercase tracking-tight font-sans">
-          {language === 'bn' ? selectedCatObj.nameBn : selectedCatObj.nameEn}
+          {language === 'bn' ? (selectedCatObj.nameBn || getCategoryName(selectedCatObj.id, 'bn')) : (selectedCatObj.nameEn || getCategoryName(selectedCatObj.id, 'en'))}
         </h1>
         <p className="text-xs sm:text-sm font-semibold text-slate-400 font-mono">
           {filteredProducts.length > 0 ? filteredProducts.length : productCount} {language === 'bn' ? 'টি প্রোডাক্ট' : 'products'}

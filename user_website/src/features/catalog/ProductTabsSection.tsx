@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import { ProductCard } from './ProductCard';
-import { CATEGORIES, CategoryItem, fetchLiveCategories, isCategorySelected, getCachedCategories } from './categoryData';
+import { CATEGORIES, CategoryItem, fetchLiveCategories, isCategorySelected, getCachedCategories, getCategoryName } from './categoryData';
 import { fetchLiveProducts, getCachedProducts } from './productService';
 import { Product } from './types';
 import { useLanguage } from '../shared/LanguageContext';
@@ -90,7 +90,7 @@ const CategoryRailRow: React.FC<CategoryRailProps> = ({
           </div>
           <div>
             <h3 className="text-base sm:text-lg font-black text-slate-900 tracking-wide uppercase">
-              {language === 'bn' ? categoryNameBn : categoryName}
+              {language === 'bn' ? (categoryNameBn || getCategoryName(categoryName, 'bn')) : (categoryName || getCategoryName(categoryNameBn, 'en'))}
             </h3>
             <span className="text-[11px] font-extrabold text-orange-600">
               {products.length} {language === 'bn' ? 'টি এভেলেবল পণ্য' : 'Available Items'}

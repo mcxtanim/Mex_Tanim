@@ -24,6 +24,7 @@ import {
 import { Header } from '@/features/shared/Header';
 import { Footer } from '@/features/shared/Footer';
 import { fetchLiveProducts, getBrandName, getCachedProducts, fetchProductById } from '@/features/catalog/productService';
+import { getCategoryName } from '@/features/catalog/categoryData';
 import { Product } from '@/features/catalog/types';
 import { ProductCard } from '@/features/catalog/ProductCard';
 import { useCart } from '@/features/cart/CartContext';
@@ -281,7 +282,9 @@ export default function DedicatedProductPage() {
               <span>{language === 'bn' ? 'হোম' : 'Home'}</span>
             </Link>
             <ArrowRight className="w-3.5 h-3.5 text-gray-300" />
-            <span className="capitalize">{product.categoryBn || product.category}</span>
+            <span className="capitalize">
+              {language === 'bn' ? (product.categoryBn || getCategoryName(product.category, 'bn')) : getCategoryName(product.category, 'en')}
+            </span>
             <ArrowRight className="w-3.5 h-3.5 text-gray-300" />
             <span className="font-extrabold text-slate-900 truncate max-w-[200px] sm:max-w-md">
               {language === 'bn' ? product.nameBn : product.name}
@@ -359,7 +362,7 @@ export default function DedicatedProductPage() {
               {/* Category, Brand & Stock Status Badges */}
               <div className="flex flex-wrap items-center gap-2">
                 <span className="bg-orange-50 text-orange-600 font-extrabold text-xs uppercase px-3.5 py-1 rounded-full border border-orange-200">
-                  {product.categoryBn || product.category}
+                  {language === 'bn' ? (product.categoryBn || getCategoryName(product.category, 'bn')) : getCategoryName(product.category, 'en')}
                 </span>
 
                 {/* Brand Name Badge */}

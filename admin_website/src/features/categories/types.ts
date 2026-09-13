@@ -1,6 +1,7 @@
 export interface Category {
   id: string;
   name: string;
+  name_bn?: string;
   slug: string;
   description: string;
   productCount: number;
@@ -9,6 +10,7 @@ export interface Category {
 
 export interface CategoryFormData {
   name: string;
+  name_bn?: string;
   description: string;
   image?: string;
 }

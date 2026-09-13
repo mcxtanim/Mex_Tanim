@@ -17,6 +17,7 @@ import {
 } from 'lucide-react';
 import { Product } from './types';
 import { getBrandName, fetchLiveProducts } from './productService';
+import { getCategoryName } from './categoryData';
 import { ProductCard } from './ProductCard';
 import { useCart } from '../cart/CartContext';
 import { useLanguage } from '../shared/LanguageContext';
@@ -277,7 +278,7 @@ export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
             {/* Category, Brand & Stock Badges */}
             <div className="flex flex-wrap items-center gap-2">
               <span className="bg-orange-50 text-orange-600 font-extrabold text-xs uppercase px-3 py-1 rounded-full border border-orange-200">
-                {currentProduct.categoryBn || currentProduct.category}
+                {language === 'bn' ? (currentProduct.categoryBn || getCategoryName(currentProduct.category, 'bn')) : getCategoryName(currentProduct.category, 'en')}
               </span>
 
               {/* Brand Name Badge */}
