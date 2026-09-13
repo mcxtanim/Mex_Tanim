@@ -52,7 +52,7 @@ export function RecentOrdersList({ orders }: RecentOrdersListProps) {
           <tbody className="divide-y divide-slate-800/50 text-xs">
             {recent.map((ord) => {
               const mainItem = ord.items[0];
-              const productDesc = mainItem ? mainItem.title : "Gadget";
+              const productDesc = ord.productName || (mainItem ? mainItem.title : "Gadget");
 
               return (
                 <tr key={ord.id} className="hover:bg-slate-800/30 transition-colors">
@@ -62,8 +62,19 @@ export function RecentOrdersList({ orders }: RecentOrdersListProps) {
                   <td className="py-2.5 px-3">
                     <p className="font-bold text-slate-200">{ord.customerName}</p>
                   </td>
-                  <td className="py-2.5 px-3 text-slate-300 max-w-[180px] truncate">
-                    {productDesc}
+                  <td className="py-2.5 px-3">
+                    <div className="flex items-center gap-2 max-w-[220px]">
+                      {mainItem?.imageUrl && (
+                        <img
+                          src={mainItem.imageUrl}
+                          alt={productDesc}
+                          className="w-7 h-7 rounded-md object-cover border border-slate-700 shrink-0"
+                        />
+                      )}
+                      <span className="text-slate-300 truncate font-medium" title={productDesc}>
+                        {productDesc}
+                      </span>
+                    </div>
                   </td>
                   <td className="py-2.5 px-3 font-mono font-bold text-slate-100">
                     ৳ {ord.totalAmount.toLocaleString()}
