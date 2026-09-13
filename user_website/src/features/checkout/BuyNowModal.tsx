@@ -308,6 +308,7 @@ export const BuyNowModal: React.FC<BuyNowModalProps> = ({
             customer_name: fullOrder.customerName,
             customer_email: fullOrder.customerEmail || null,
             phone: fullOrder.customerPhone,
+            product_name: `${product.name} (x${quantity})`,
             address: `${area.trim()}, ${upaLabel}, ${distLabel}, ${divLabel}`,
             shipping_address: {
               street: area.trim(),

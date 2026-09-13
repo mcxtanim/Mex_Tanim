@@ -73,10 +73,15 @@ export async function fetchOrdersFromSupabase(): Promise<Order[]> {
       const addrCity = shipping.city || item.delivery_area || "City";
       const addrDistrict = shipping.district || item.delivery_area || "District";
 
+      const computedProductName = item.product_name || (itemsList.length > 0
+        ? itemsList.map((i: any) => `${i.title} (x${i.quantity})`).join(", ")
+        : "Product Item");
+
       return {
         id: String(item.id),
         orderNumber: item.order_number || `#${item.id}`,
         customerName: item.customer_name || "Customer",
+        productName: computedProductName,
         customerEmail: item.customer_email || "",
         customerPhone: item.phone || item.customer_phone || "",
         shippingAddress: {

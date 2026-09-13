@@ -46,7 +46,7 @@ export function OrdersTable({ orders, onStatusChange }: OrdersTableProps) {
           <tr className="border-b border-slate-800 bg-slate-900/90 text-[11px] font-semibold text-slate-400 uppercase tracking-wider">
             <th className="py-3.5 px-4">Order Ref</th>
             <th className="py-3.5 px-4">Customer</th>
-            <th className="py-3.5 px-4">Items Count</th>
+            <th className="py-3.5 px-4">Product / Ordered Items</th>
             <th className="py-3.5 px-4">Total (BDT)</th>
             <th className="py-3.5 px-4">Payment</th>
             <th className="py-3.5 px-4">Status</th>
@@ -75,9 +75,32 @@ export function OrdersTable({ orders, onStatusChange }: OrdersTableProps) {
                 </p>
               </td>
 
-              {/* Items count */}
-              <td className="py-3.5 px-4 font-medium text-slate-300">
-                {order.items.reduce((sum, item) => sum + item.quantity, 0)} item(s)
+              {/* Product Name & Items */}
+              <td className="py-3.5 px-4">
+                <div className="flex items-center gap-2.5 max-w-[260px]">
+                  {order.items[0]?.imageUrl ? (
+                    <img
+                      src={order.items[0].imageUrl}
+                      alt={order.items[0].title}
+                      className="w-9 h-9 rounded-lg object-cover border border-slate-700 bg-slate-800 shrink-0"
+                    />
+                  ) : (
+                    <div className="w-9 h-9 rounded-lg bg-slate-800 border border-slate-700 flex items-center justify-center text-slate-400 font-bold text-[10px] shrink-0">
+                      PKG
+                    </div>
+                  )}
+                  <div className="min-w-0">
+                    <p
+                      className="font-bold text-slate-100 truncate text-xs group-hover:text-emerald-400 transition-colors"
+                      title={order.productName || order.items.map((i) => i.title).join(", ")}
+                    >
+                      {order.productName || order.items[0]?.title || "Product Item"}
+                    </p>
+                    <p className="text-[11px] text-slate-400 font-medium">
+                      {order.items.reduce((sum, item) => sum + item.quantity, 0)} item(s) total
+                    </p>
+                  </div>
+                </div>
               </td>
 
               {/* Total Amount */}

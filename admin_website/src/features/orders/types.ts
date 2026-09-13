@@ -21,6 +21,7 @@ export interface Order {
   id: string;
   orderNumber: string;
   customerName: string;
+  productName?: string;
   customerEmail: string;
   customerPhone: string;
   shippingAddress: {

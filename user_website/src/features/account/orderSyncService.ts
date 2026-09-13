@@ -115,7 +115,7 @@ export async function fetchCustomerOrdersFromSupabase(customerPhone?: string): P
         items: Array.isArray(item.items)
           ? item.items.map((i: any) => ({
               productId: String(i.id || i.productId || ''),
-              title: i.name || i.title || '',
+              title: i.name || i.title || item.product_name || 'Product Item',
               unitPrice: Number(i.price || i.unitPrice) || 0,
               quantity: Number(i.quantity) || 1,
               image: i.image || i.imageUrl || '',

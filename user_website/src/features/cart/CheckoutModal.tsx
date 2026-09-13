@@ -71,11 +71,16 @@ export function CheckoutModal({ isOpen, onClose }: CheckoutModalProps) {
     // Save to Supabase if available
     if (supabase) {
       try {
+        const productSummary = newOrder.items
+          .map((it: any) => `${it.name || it.title || 'Product'} (x${it.quantity})`)
+          .join(', ');
+
         await supabase.from('orders').insert({
           id: orderId,
           order_number: `#${orderId}`,
           customer_name: customerName,
           phone,
+          product_name: productSummary,
           address,
           shipping_address: {
             street: address,
