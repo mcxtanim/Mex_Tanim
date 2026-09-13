@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { ProductCard } from './ProductCard';
-import { fetchLiveProducts } from './productService';
+import { fetchLiveProducts, getCachedProducts } from './productService';
 import { Product } from './types';
 import { useLanguage } from '../shared/LanguageContext';
 import { Flame, PackageSearch } from 'lucide-react';
@@ -48,12 +48,11 @@ export const ProductGrid: React.FC<ProductGridProps> = ({
   onSelectCategory,
 }) => {
   const { t, language } = useLanguage();
-  const [products, setProducts] = useState<Product[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [products, setProducts] = useState<Product[]>(() => getCachedProducts());
+  const [loading, setLoading] = useState(() => getCachedProducts().length === 0);
 
   useEffect(() => {
     const loadData = async () => {
-      setLoading(true);
       const data = await fetchLiveProducts();
       setProducts(data);
       setLoading(false);

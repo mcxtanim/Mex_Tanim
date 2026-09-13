@@ -4,7 +4,7 @@ import React, { useRef, useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { ChevronLeft, ChevronRight, ArrowRight } from 'lucide-react';
 import { useLanguage } from '../shared/LanguageContext';
-import { CATEGORIES, CategoryItem, fetchLiveCategories, isCategorySelected } from './categoryData';
+import { CATEGORIES, CategoryItem, fetchLiveCategories, isCategorySelected, getCachedCategories } from './categoryData';
 import { CategoryThumbnail } from './CategoryThumbnail';
 
 interface CategoryShowcaseProps {
@@ -22,7 +22,7 @@ export const CategoryShowcase: React.FC<CategoryShowcaseProps> = ({
   const router = useRouter();
   const scrollRef = useRef<HTMLDivElement>(null);
   const isHoveredRef = useRef(false);
-  const [categories, setCategories] = useState<CategoryItem[]>(CATEGORIES);
+  const [categories, setCategories] = useState<CategoryItem[]>(() => getCachedCategories());
 
   useEffect(() => {
     const loadCategories = async () => {

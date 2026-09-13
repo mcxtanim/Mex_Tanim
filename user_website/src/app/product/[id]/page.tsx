@@ -23,7 +23,7 @@ import {
 } from 'lucide-react';
 import { Header } from '@/features/shared/Header';
 import { Footer } from '@/features/shared/Footer';
-import { fetchLiveProducts, getBrandName } from '@/features/catalog/productService';
+import { fetchLiveProducts, getBrandName, getCachedProducts, fetchProductById } from '@/features/catalog/productService';
 import { Product } from '@/features/catalog/types';
 import { ProductCard } from '@/features/catalog/ProductCard';
 import { useCart } from '@/features/cart/CartContext';
@@ -43,17 +43,40 @@ export default function DedicatedProductPage() {
 
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('all');
-  const [allProducts, setAllProducts] = useState<Product[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
+  const [allProducts, setAllProducts] = useState<Product[]>(() => getCachedProducts());
+
+  // Instant 0ms product resolution from memory/localStorage cache
+  const cachedProd =
+    allProducts.find((p) => String(p.id) === String(productId)) ||
+    getCachedProducts().find((p) => String(p.id) === String(productId));
+
+  const [product, setProduct] = useState<Product | undefined>(cachedProd);
+  const [isLoading, setIsLoading] = useState(!cachedProd);
 
   useEffect(() => {
+    // If not in instant cache, fetch by single ID immediately
+    if (!product) {
+      fetchProductById(productId).then((prod) => {
+        if (prod) {
+          setProduct(prod);
+          setIsLoading(false);
+        }
+      });
+    }
+
+    // Background revalidation for fresh Supabase data
     fetchLiveProducts().then((data) => {
       setAllProducts(data);
-      setIsLoading(false);
+      const found = data.find((p) => String(p.id) === String(productId));
+      if (found) {
+        setProduct(found);
+        setIsLoading(false);
+      } else if (!product && data.length > 0) {
+        setProduct(data[0]);
+        setIsLoading(false);
+      }
     });
-  }, []);
-
-  const product = allProducts.find((p) => String(p.id) === String(productId)) || allProducts[0];
+  }, [productId]);
 
   const [quantity, setQuantity] = useState(1);
   const [added, setAdded] = useState(false);

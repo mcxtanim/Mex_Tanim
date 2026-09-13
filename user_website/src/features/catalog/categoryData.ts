@@ -227,41 +227,62 @@ const getSvgImageForSlug = (slug: string, fallbackImage?: string): string => {
   return '/categories/all.svg';
 };
 
-export async function fetchLiveCategories(): Promise<CategoryItem[]> {
-  let rawList: any[] = [];
+let memoryCategoriesCache: CategoryItem[] | null = null;
+let lastCategoriesFetchTimestamp = 0;
+let inFlightCategoriesPromise: Promise<CategoryItem[]> | null = null;
 
-  if (supabase) {
-    try {
-      const { data, error } = await supabase
-        .from('categories')
-        .select('*')
-        .order('name', { ascending: true });
+export function getCachedCategories(): CategoryItem[] {
+  if (memoryCategoriesCache && memoryCategoriesCache.length > 0) {
+    return memoryCategoriesCache;
+  }
+  return CATEGORIES;
+}
 
-      if (!error && data && data.length > 0) {
-        rawList = data;
-      }
-    } catch (e) {
-      console.warn('Supabase categories fetch error in user_website:', e);
-    }
+export async function fetchLiveCategories(forceRefresh = false): Promise<CategoryItem[]> {
+  if (!forceRefresh && memoryCategoriesCache && memoryCategoriesCache.length > 0 && Date.now() - lastCategoriesFetchTimestamp < 60000) {
+    return memoryCategoriesCache;
   }
 
-  if (rawList.length === 0 && typeof window !== 'undefined') {
-    try {
-      const local = localStorage.getItem('mex_tanim_admin_categories');
-      if (local) {
-        const parsed = JSON.parse(local);
-        if (Array.isArray(parsed) && parsed.length > 0) {
-          rawList = parsed;
+  if (inFlightCategoriesPromise) {
+    return inFlightCategoriesPromise;
+  }
+
+  inFlightCategoriesPromise = (async () => {
+    let rawList: any[] = [];
+
+    if (supabase) {
+      try {
+        const { data, error } = await supabase
+          .from('categories')
+          .select('*')
+          .order('name', { ascending: true });
+
+        if (!error && data && data.length > 0) {
+          rawList = data;
         }
+      } catch (e) {
+        console.warn('Supabase categories fetch error in user_website:', e);
       }
-    } catch (err) {
-      console.warn('localStorage categories read error:', err);
     }
-  }
 
-  if (rawList.length === 0) {
-    return CATEGORIES;
-  }
+    if (rawList.length === 0 && typeof window !== 'undefined') {
+      try {
+        const local = localStorage.getItem('mex_tanim_admin_categories');
+        if (local) {
+          const parsed = JSON.parse(local);
+          if (Array.isArray(parsed) && parsed.length > 0) {
+            rawList = parsed;
+          }
+        }
+      } catch (err) {
+        console.warn('localStorage categories read error:', err);
+      }
+    }
+
+    if (rawList.length === 0) {
+      memoryCategoriesCache = CATEGORIES;
+      return CATEGORIES;
+    }
 
   const categoryMap = new Map<string, CategoryItem>();
 
@@ -297,5 +318,13 @@ export async function fetchLiveCategories(): Promise<CategoryItem[]> {
     }
   });
 
-  return Array.from(categoryMap.values());
+    const result = Array.from(categoryMap.values());
+    memoryCategoriesCache = result;
+    lastCategoriesFetchTimestamp = Date.now();
+    return result;
+  })().finally(() => {
+    inFlightCategoriesPromise = null;
+  });
+
+  return inFlightCategoriesPromise;
 }

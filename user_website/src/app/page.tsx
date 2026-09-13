@@ -9,14 +9,18 @@ import { ProductTabsSection } from '@/features/catalog/ProductTabsSection';
 import { ComboOfferSection } from '@/features/catalog/ComboOfferSection';
 import { Footer } from '@/features/shared/Footer';
 import { useLanguage } from '@/features/shared/LanguageContext';
-import { fetchLiveProducts } from '@/features/catalog/productService';
+import { fetchLiveProducts, getCachedProducts } from '@/features/catalog/productService';
 import { Product } from '@/features/catalog/types';
 import { RotateCcw } from 'lucide-react';
 
 const CATEGORY_META: Record<string, { en: string; bn: string; badge: string }> = {
-  all: { en: 'All Products', bn: 'সকল পণ্য', badge: 'A' },
-  mice: { en: 'Gaming Mice', bn: 'গেমিং মাউস', badge: 'G' },
-  keyboards: { en: 'Mechanical Keyboards', bn: 'মেকানিক্যাল কীবোর্ড', badge: 'M' },
+  'gaming-cooler': { en: 'Gaming Cooler', bn: 'গেমিং কুলার', badge: 'G' },
+  cooler: { en: 'Gaming Cooler', bn: 'গেমিং কুলার', badge: 'G' },
+  'gaming-mice': { en: 'Gaming Mice', bn: 'গেমিং মাউস', badge: 'M' },
+  mice: { en: 'Gaming Mice', bn: 'গেমিং মাউস', badge: 'M' },
+  'mechanical-keyboards': { en: 'Mechanical Keyboards', bn: 'মেকানিক্যাল কিবোর্ড', badge: 'K' },
+  keyboards: { en: 'Mechanical Keyboards', bn: 'মেকানিক্যাল কিবোর্ড', badge: 'K' },
+  'gaming-headsets': { en: 'Gaming Headsets', bn: 'গেমিং হেডসেট', badge: 'H' },
   headphones: { en: 'Gaming Headsets', bn: 'গেমিং হেডসেট', badge: 'H' },
   chargers: { en: 'Fast Chargers', bn: 'ফাস্ট চার্জার', badge: 'F' },
   'fast-chargers': { en: 'Fast Chargers', bn: 'ফাস্ট চার্জার', badge: 'F' },
@@ -31,7 +35,7 @@ const CATEGORY_META: Record<string, { en: string; bn: string; badge: string }> =
 export default function Home() {
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
   const [searchQuery, setSearchQuery] = useState<string>('');
-  const [products, setProducts] = useState<Product[]>([]);
+  const [products, setProducts] = useState<Product[]>(() => getCachedProducts());
   const { language } = useLanguage();
 
   useEffect(() => {

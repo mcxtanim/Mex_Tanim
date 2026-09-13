@@ -2,8 +2,8 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import { ProductCard } from './ProductCard';
-import { CATEGORIES, CategoryItem, fetchLiveCategories, isCategorySelected } from './categoryData';
-import { fetchLiveProducts } from './productService';
+import { CATEGORIES, CategoryItem, fetchLiveCategories, isCategorySelected, getCachedCategories } from './categoryData';
+import { fetchLiveProducts, getCachedProducts } from './productService';
 import { Product } from './types';
 import { useLanguage } from '../shared/LanguageContext';
 import {
@@ -138,8 +138,8 @@ const CategoryRailRow: React.FC<CategoryRailProps> = ({
 
 export const ProductTabsSection: React.FC = () => {
   const [activeTab, setActiveTab] = useState<TabType>('featured');
-  const [allProducts, setAllProducts] = useState<Product[]>([]);
-  const [categories, setCategories] = useState<CategoryItem[]>(CATEGORIES);
+  const [allProducts, setAllProducts] = useState<Product[]>(() => getCachedProducts());
+  const [categories, setCategories] = useState<CategoryItem[]>(() => getCachedCategories());
   const { language } = useLanguage();
 
   useEffect(() => {

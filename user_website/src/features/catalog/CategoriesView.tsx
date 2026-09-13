@@ -4,8 +4,8 @@ import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import { Home, ChevronRight, ShoppingBag } from 'lucide-react';
-import { CATEGORIES, CategoryItem, fetchLiveCategories, getCategoryProductCount, isCategorySelected } from './categoryData';
-import { fetchLiveProducts } from './productService';
+import { CATEGORIES, CategoryItem, fetchLiveCategories, getCategoryProductCount, isCategorySelected, getCachedCategories } from './categoryData';
+import { fetchLiveProducts, getCachedProducts } from './productService';
 import { Product } from './types';
 import { ProductCard } from './ProductCard';
 import { useLanguage } from '../shared/LanguageContext';
@@ -14,13 +14,13 @@ interface CategoriesViewProps {
   initialCategory?: string;
 }
 
-export const CategoriesView: React.FC<CategoriesViewProps> = ({ initialCategory = 'all' }) => {
+export const CategoriesView: React.FC<CategoriesViewProps> = ({ initialCategory }) => {
   const searchParams = useSearchParams();
   const catParam = searchParams.get('cat');
 
   const [selectedCategory, setSelectedCategory] = useState<string>(catParam || initialCategory || 'all');
-  const [categories, setCategories] = useState<CategoryItem[]>(CATEGORIES);
-  const [products, setProducts] = useState<Product[]>([]);
+  const [categories, setCategories] = useState<CategoryItem[]>(() => getCachedCategories());
+  const [products, setProducts] = useState<Product[]>(() => getCachedProducts());
   const { language } = useLanguage();
 
   useEffect(() => {
