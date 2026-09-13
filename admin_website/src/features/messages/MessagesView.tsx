@@ -97,7 +97,7 @@ export const MessagesView: React.FC = () => {
   );
 
   const lastUserMsg = [...messages].reverse().find((m) => m.sender === "user");
-  const customerName = lastUserMsg?.customerName || "Tanvir Ahmed (Customer)";
+  const customerName = lastUserMsg?.customerName || "Customer Inquiry";
 
   const quickReplies = [
     "🛒 অর্ডার কনফার্ম করতে আপনার নাম, সম্পূর্ণ ঠিকানা ও মোবাইল নম্বর লিখে পাঠান।",

@@ -260,7 +260,7 @@ export function SettingsView() {
                     <input
                       type="text"
                       required
-                      placeholder="e.g. 8801317170609"
+                      placeholder="e.g. 8801XXXXXXXXX"
                       value={settings.whatsappNumber}
                       onChange={(e) => setSettings({ ...settings, whatsappNumber: e.target.value })}
                       className="w-full bg-slate-800/80 border border-slate-700/80 rounded-xl pl-10 pr-3 py-2 text-xs text-slate-100 focus:outline-none focus:border-[#25D366]/60 font-mono"
@@ -504,7 +504,7 @@ export function SettingsView() {
                   <Phone className="w-3.5 h-3.5 text-slate-500 absolute left-3 top-1/2 -translate-y-1/2" />
                   <input
                     type="text"
-                    placeholder="01317170609"
+                    placeholder="01XXXXXXXXX"
                     value={settings.phone}
                     onChange={(e) => setSettings({ ...settings, phone: e.target.value })}
                     className="w-full bg-slate-800/80 border border-slate-700/80 rounded-xl pl-9 pr-3 py-2 text-xs text-slate-100 focus:outline-none focus:border-emerald-500/60 font-mono"
@@ -722,7 +722,7 @@ export function SettingsView() {
                   <label className="text-xs font-semibold text-slate-300">bKash Merchant / Personal Number</label>
                   <input
                     type="text"
-                    placeholder="e.g. 01317170609"
+                    placeholder="e.g. 01XXXXXXXXX"
                     value={settings.bkashNumber}
                     onChange={(e) => setSettings({ ...settings, bkashNumber: e.target.value })}
                     className="w-full bg-slate-800/80 border border-slate-700/80 rounded-xl px-3 py-2 text-xs text-slate-100 focus:outline-none focus:border-emerald-500/60 font-mono"
@@ -733,7 +733,7 @@ export function SettingsView() {
                   <label className="text-xs font-semibold text-slate-300">Nagad Merchant / Personal Number</label>
                   <input
                     type="text"
-                    placeholder="e.g. 01317170609"
+                    placeholder="e.g. 01XXXXXXXXX"
                     value={settings.nagadNumber}
                     onChange={(e) => setSettings({ ...settings, nagadNumber: e.target.value })}
                     className="w-full bg-slate-800/80 border border-slate-700/80 rounded-xl px-3 py-2 text-xs text-slate-100 focus:outline-none focus:border-emerald-500/60 font-mono"

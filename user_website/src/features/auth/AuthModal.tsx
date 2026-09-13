@@ -92,7 +92,7 @@ export const AuthModal: React.FC = () => {
                 <UserIcon className="w-4 h-4 text-gray-400 absolute left-3 top-3" />
                 <input
                   type="text"
-                  placeholder={language === 'bn' ? 'যেমন: তানিম আহমেদ' : 'e.g. Tanim Ahmed'}
+                  placeholder={language === 'bn' ? 'আপনার নাম লিখুন' : 'Enter your name'}
                   value={name}
                   onChange={(e) => setName(e.target.value)}
                   className="w-full pl-9 pr-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-orange-500 outline-none"

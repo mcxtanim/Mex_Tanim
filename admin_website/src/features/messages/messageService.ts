@@ -14,7 +14,7 @@ const SEED_MESSAGES: AdminChatMessage[] = [
     sender: "user",
     text: "Fantech 7.1 Gaming Headset er stock e ache ki? Fast delivery hobeno?",
     time: "10:15 AM",
-    customerName: "Tanvir Ahmed",
+    customerName: "Customer",
   },
   {
     id: "msg-102",

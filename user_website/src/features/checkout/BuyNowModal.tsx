@@ -688,7 +688,7 @@ export const BuyNowModal: React.FC<BuyNowModalProps> = ({
                     <input
                       type="text"
                       required
-                      placeholder={language === 'bn' ? 'যেমন: আতিক তানভির' : 'e.g. Atik Tanvir'}
+                      placeholder={language === 'bn' ? 'আপনার নাম লিখুন' : 'Enter your full name'}
                       value={name}
                       onChange={(e) => setName(e.target.value)}
                       className="w-full px-3.5 py-2.5 bg-slate-50 border border-gray-300 rounded-xl text-xs font-semibold text-slate-900 focus:bg-white focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20 outline-none transition"
@@ -704,7 +704,7 @@ export const BuyNowModal: React.FC<BuyNowModalProps> = ({
                     <input
                       type="tel"
                       required
-                      placeholder={language === 'bn' ? 'যেমন: 01317170609' : 'e.g. 01317170609'}
+                      placeholder="01XXXXXXXXX"
                       value={phone}
                       onChange={(e) => setPhone(e.target.value)}
                       className="w-full px-3.5 py-2.5 bg-slate-50 border border-gray-300 rounded-xl text-xs font-semibold text-slate-900 focus:bg-white focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20 outline-none transition"

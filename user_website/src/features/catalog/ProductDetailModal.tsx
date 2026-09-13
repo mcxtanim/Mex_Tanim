@@ -110,9 +110,13 @@ export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
 
   const handleWhatsAppOrder = () => {
     if (!currentProduct) return;
+    if (!settings.whatsappNumber) {
+      alert(language === 'bn' ? 'হোয়াটসঅ্যাপ নম্বর এখনো যুক্ত করা হয়নি' : 'WhatsApp number is not configured yet');
+      return;
+    }
     const storeName = settings.storeName || 'Mex Tanim Store';
     const message = `Hello! I want to order this product from ${storeName}:\n\n*Product:* ${currentProduct.name}\n*Price:* ৳${currentProduct.price}\n*Quantity:* ${quantity}`;
-    const url = formatWhatsAppUrl(settings.whatsappNumber || '8801317170609', message);
+    const url = formatWhatsAppUrl(settings.whatsappNumber, message);
     if (url) window.open(url, '_blank');
   };
 

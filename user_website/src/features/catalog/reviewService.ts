@@ -15,9 +15,9 @@ const INITIAL_SEED_REVIEWS: ProductReview[] = [
   {
     id: 'rev-101',
     productId: 'prod-1',
-    customerName: 'Tanvir Ahmed',
+    customerName: 'Tarek Hasan',
     rating: 5,
-    comment: 'প্রোডাক্টটি অত্যন্ত ভালো! সাউন্ড কোয়ালিটি এবং আরজিবি লাইটিং এক কথায় অসাধারণ। মেক্স তানভির স্টোরকে ধন্যবাদ।',
+    comment: 'প্রোডাক্টটি অত্যন্ত ভালো! সাউন্ড কোয়ালিটি এবং আরজিবি লাইটিং এক কথায় অসাধারণ। মেক্স তানিম স্টোরকে ধন্যবাদ।',
     date: '2026-09-01',
     isVerifiedBuyer: true,
   },

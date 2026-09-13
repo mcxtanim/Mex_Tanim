@@ -58,14 +58,14 @@ export const DEFAULT_SETTINGS: StoreSettings = {
   // Store Profile
   storeName: 'Mex Tanim Store',
   storeTagline: 'Shop Smart • Fast Delivery • Trusted Quality',
-  phone: '01317170609',
+  phone: '',
   email: 'support@mextanimstore.com',
   address: 'Dhaka, Bangladesh',
   supportHoursBn: 'সকাল ৮টা থেকে রাত ১২টা',
   supportHoursEn: '8:00 AM - 12:00 AM',
 
   // Connect & Chat Channels
-  whatsappNumber: '8801317170609',
+  whatsappNumber: '',
   messengerUsername: 'mextanimstore',
   messengerLink: 'https://m.me/mextanimstore',
   telegramUsername: 'mextanimstore',
@@ -112,13 +112,13 @@ export function mapDbToSettings(item: any): StoreSettings {
     id: item.id || 'default',
     storeName: item.store_name || DEFAULT_SETTINGS.storeName,
     storeTagline: item.store_tagline || DEFAULT_SETTINGS.storeTagline,
-    phone: item.phone || DEFAULT_SETTINGS.phone,
+    phone: item.phone ?? '',
     email: item.email || DEFAULT_SETTINGS.email,
     address: item.address || DEFAULT_SETTINGS.address,
     supportHoursBn: item.support_hours_bn || DEFAULT_SETTINGS.supportHoursBn,
     supportHoursEn: item.support_hours_en || DEFAULT_SETTINGS.supportHoursEn,
 
-    whatsappNumber: item.whatsapp_number || DEFAULT_SETTINGS.whatsappNumber,
+    whatsappNumber: item.whatsapp_number ?? '',
     messengerUsername: item.messenger_username || DEFAULT_SETTINGS.messengerUsername,
     messengerLink: item.messenger_link || (item.messenger_username ? `https://m.me/${item.messenger_username}` : DEFAULT_SETTINGS.messengerLink),
     telegramUsername: item.telegram_username || DEFAULT_SETTINGS.telegramUsername,

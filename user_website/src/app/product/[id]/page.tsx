@@ -198,9 +198,13 @@ export default function DedicatedProductPage() {
 
   const handleWhatsAppOrder = () => {
     if (!product) return;
+    if (!settings.whatsappNumber) {
+      alert(language === 'bn' ? 'হোয়াটসঅ্যাপ নম্বর এখনো যুক্ত করা হয়নি' : 'WhatsApp number is not configured yet');
+      return;
+    }
     const storeName = settings.storeName || 'Mex Tanim Store';
     const message = `Hello! I want to order this product from ${storeName}:\n\n*Product:* ${product.name}\n*Price:* ৳${product.price}\n*Quantity:* ${quantity}`;
-    const url = formatWhatsAppUrl(settings.whatsappNumber || '8801317170609', message);
+    const url = formatWhatsAppUrl(settings.whatsappNumber, message);
     if (url) window.open(url, '_blank');
   };
 

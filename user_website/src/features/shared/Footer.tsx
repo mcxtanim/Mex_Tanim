@@ -16,8 +16,6 @@ import { useLanguage } from './LanguageContext';
 import { WhatsAppIcon } from './WhatsAppIcon';
 import { useStoreSettings, formatWhatsAppUrl, formatMessengerUrl, formatTelegramUrl } from './storeSettingsService';
 
-const DEVELOPER_WHATSAPP = '8801317170609';
-
 export const Footer: React.FC = () => {
   const { language } = useLanguage();
   const settings = useStoreSettings();
@@ -266,20 +264,12 @@ export const Footer: React.FC = () => {
 
         </div>
 
-        {/* Polished Bottom Bar: Copyright & Clickable Developer WhatsApp Link */}
+        {/* Polished Bottom Bar: Copyright */}
         <div className="border-t border-gray-200/80 pt-6 text-center text-xs sm:text-sm text-gray-600 font-medium">
           <p>
-            {language === 'bn' ? 'সর্বস্বত্ব সংরক্ষিত | ডেভেলপ করেছেন ' : 'All rights reserved | Developed by '}
-            <a
-              href={`https://wa.me/${DEVELOPER_WHATSAPP}`}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center space-x-1 font-extrabold text-red-600 hover:text-red-700 hover:underline transition cursor-pointer"
-              title="Chat with Developer Atik Tanvir on WhatsApp"
-            >
-              <span>Atik Tanvir</span>
-              <WhatsAppIcon className="w-4 h-4 fill-current text-[#25D366] shrink-0 ml-0.5" />
-            </a>
+            {language === 'bn'
+              ? '© ২০২৬ Mex Tanim Store | সর্বস্বত্ব সংরক্ষিত'
+              : '© 2026 Mex Tanim Store. All rights reserved.'}
           </p>
         </div>
 

@@ -14,9 +14,9 @@ async function testOrder() {
   const { data, error } = await supabase.from('orders').insert({
     id: orderId,
     order_number: orderNum,
-    customer_name: 'আতিক তানভির (Test)',
-    customer_email: 'test@mextanim.com',
-    phone: '01317170609',
+    customer_name: 'Customer (Test)',
+    customer_email: 'customer@mextanim.com',
+    phone: '01700000000',
     address: 'বাসা #১২, রোড #০৫, মিরপুর-১০, ঢাকা',
     shipping_address: {
       street: 'মিরপুর-১০',
