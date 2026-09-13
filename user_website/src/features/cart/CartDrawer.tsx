@@ -5,6 +5,7 @@ import { X, Trash2, Plus, Minus, ShoppingBag, ArrowRight, CheckCircle2 } from 'l
 import { useCart } from './CartContext';
 import { useLanguage } from '../shared/LanguageContext';
 import { BuyNowModal } from '../checkout/BuyNowModal';
+import { useStoreSettings } from '../shared/storeSettingsService';
 
 export const CartDrawer: React.FC = () => {
   const {
@@ -20,12 +21,18 @@ export const CartDrawer: React.FC = () => {
   } = useCart();
 
   const { t, language } = useLanguage();
+  const settings = useStoreSettings();
   const [orderSuccess, setOrderSuccess] = useState(false);
   const [isBuyNowModalOpen, setIsBuyNowModalOpen] = useState(false);
 
+  const insideFee = Number(settings.insideDhakaFee) || 60;
+  const outsideFee = Number(settings.outsideDhakaFee) || 120;
+
   if (!isCartOpen) return null;
 
-  const total = subtotal + (cart.length > 0 ? deliveryFee : 0);
+  const isFreeDelivery = settings.freeDeliveryThreshold > 0 && subtotal >= settings.freeDeliveryThreshold;
+  const effectiveDeliveryFee = isFreeDelivery ? 0 : deliveryFee;
+  const total = subtotal + (cart.length > 0 ? effectiveDeliveryFee : 0);
 
   const handleCheckout = () => {
     if (cart.length > 0) {
@@ -155,24 +162,24 @@ export const CartDrawer: React.FC = () => {
                 <span className="text-[11px] font-bold text-gray-600 block">{t.deliveryFee}</span>
                 <div className="grid grid-cols-2 gap-2 text-xs">
                   <button
-                    onClick={() => setDeliveryFee(60)}
+                    onClick={() => setDeliveryFee(insideFee)}
                     className={`py-2 px-2.5 rounded-xl border text-[11px] font-bold transition ${
-                      deliveryFee === 60
+                      deliveryFee === insideFee
                         ? 'border-orange-500 bg-orange-50 text-orange-600'
                         : 'border-gray-200 bg-white text-gray-600'
                     }`}
                   >
-                    {t.insideDhaka}
+                    {t.insideDhaka} (৳{insideFee})
                   </button>
                   <button
-                    onClick={() => setDeliveryFee(120)}
+                    onClick={() => setDeliveryFee(outsideFee)}
                     className={`py-2 px-2.5 rounded-xl border text-[11px] font-bold transition ${
-                      deliveryFee === 120
+                      deliveryFee === outsideFee
                         ? 'border-orange-500 bg-orange-50 text-orange-600'
                         : 'border-gray-200 bg-white text-gray-600'
                     }`}
                   >
-                    {t.outsideDhaka}
+                    {t.outsideDhaka} (৳{outsideFee})
                   </button>
                 </div>
               </div>
@@ -185,7 +192,13 @@ export const CartDrawer: React.FC = () => {
                 </div>
                 <div className="flex justify-between text-gray-600">
                   <span>{t.deliveryFee}</span>
-                  <span className="font-bold text-slate-900">৳{deliveryFee}</span>
+                  <span className="font-bold text-slate-900">
+                    {isFreeDelivery ? (
+                      <span className="text-emerald-600 font-extrabold">{language === 'bn' ? 'ফ্রি' : 'FREE'} (৳0)</span>
+                    ) : (
+                      `৳${deliveryFee}`
+                    )}
+                  </span>
                 </div>
                 <div className="flex justify-between text-sm font-black text-slate-900 pt-1 border-t border-gray-200">
                   <span>{t.total}</span>

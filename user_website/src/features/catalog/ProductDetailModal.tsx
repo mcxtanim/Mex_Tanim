@@ -22,8 +22,7 @@ import { useCart } from '../cart/CartContext';
 import { useLanguage } from '../shared/LanguageContext';
 import { WhatsAppIcon } from '../shared/WhatsAppIcon';
 import { BuyNowModal } from '../checkout/BuyNowModal';
-
-const DEVELOPER_WHATSAPP = '8801317170609';
+import { useStoreSettings, formatWhatsAppUrl } from '../shared/storeSettingsService';
 
 interface ProductDetailModalProps {
   product: Product | null;
@@ -36,6 +35,7 @@ export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
 }) => {
   const { addToCart } = useCart();
   const { language } = useLanguage();
+  const settings = useStoreSettings();
 
   // Active product state (can change when clicking a related item)
   const [currentProduct, setCurrentProduct] = useState<Product | null>(initialProduct);
@@ -109,10 +109,11 @@ export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
   };
 
   const handleWhatsAppOrder = () => {
-    const text = encodeURIComponent(
-      `Hello! I want to order this product from Mex Tanim Store:\n\n*Product:* ${currentProduct.name}\n*Price:* ৳${currentProduct.price}\n*Quantity:* ${quantity}`
-    );
-    window.open(`https://wa.me/${DEVELOPER_WHATSAPP}?text=${text}`, '_blank');
+    if (!currentProduct) return;
+    const storeName = settings.storeName || 'Mex Tanim Store';
+    const message = `Hello! I want to order this product from ${storeName}:\n\n*Product:* ${currentProduct.name}\n*Price:* ৳${currentProduct.price}\n*Quantity:* ${quantity}`;
+    const url = formatWhatsAppUrl(settings.whatsappNumber || '8801317170609', message);
+    if (url) window.open(url, '_blank');
   };
 
   const handleShareProduct = () => {

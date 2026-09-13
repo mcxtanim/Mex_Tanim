@@ -10,14 +10,22 @@ import {
   Youtube,
   CheckCircle2,
   Send,
+  Instagram,
 } from 'lucide-react';
 import { useLanguage } from './LanguageContext';
 import { WhatsAppIcon } from './WhatsAppIcon';
+import { useStoreSettings, formatWhatsAppUrl, formatMessengerUrl, formatTelegramUrl } from './storeSettingsService';
 
 const DEVELOPER_WHATSAPP = '8801317170609';
 
 export const Footer: React.FC = () => {
   const { language } = useLanguage();
+  const settings = useStoreSettings();
+
+  const messengerUrl = formatMessengerUrl(settings.messengerLink || settings.messengerUsername);
+  const whatsappUrl = formatWhatsAppUrl(settings.whatsappNumber);
+  const telegramUrl = formatTelegramUrl(settings.telegramLink || settings.telegramUsername);
+  const supportHours = language === 'bn' ? settings.supportHoursBn : settings.supportHoursEn;
 
   return (
     <footer className="bg-gradient-to-b from-gray-50 to-gray-100/90 text-slate-800 border-t border-gray-200/80 mt-16 pt-12 pb-6">
@@ -39,7 +47,7 @@ export const Footer: React.FC = () => {
                 />
               </a>
               <h4 className="text-sm sm:text-base font-extrabold text-slate-900 tracking-tight">
-                Shop Smart • Fast Delivery • Trusted Quality
+                {settings.storeTagline || 'Shop Smart • Fast Delivery • Trusted Quality'}
               </h4>
               <p className="text-xs sm:text-sm text-gray-600 font-medium leading-relaxed max-w-xl">
                 {language === 'bn'
@@ -112,39 +120,58 @@ export const Footer: React.FC = () => {
             </div>
 
             {/* Premium Social Media Links Bar */}
-            <div className="flex items-center space-x-3 pt-2">
+            <div className="flex flex-wrap items-center gap-3 pt-2">
               {/* Facebook Button */}
-              <a
-                href="https://facebook.com/mextanimstore"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="bg-white hover:bg-[#1877F2] hover:text-white text-slate-800 border border-gray-200/90 px-4 py-2.5 rounded-xl text-xs sm:text-sm font-extrabold transition-all duration-300 shadow-2xs hover:shadow-md flex items-center space-x-2 cursor-pointer group"
-              >
-                <Facebook className="w-4 h-4 text-[#1877F2] group-hover:text-white transition-colors" />
-                <span>Facebook</span>
-              </a>
+              {settings.facebookLink && (
+                <a
+                  href={settings.facebookLink}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="bg-white hover:bg-[#1877F2] hover:text-white text-slate-800 border border-gray-200/90 px-4 py-2.5 rounded-xl text-xs sm:text-sm font-extrabold transition-all duration-300 shadow-2xs hover:shadow-md flex items-center space-x-2 cursor-pointer group"
+                >
+                  <Facebook className="w-4 h-4 text-[#1877F2] group-hover:text-white transition-colors" />
+                  <span>Facebook</span>
+                </a>
+              )}
 
               {/* YouTube Button */}
-              <a
-                href="https://youtube.com/@mextanimstore"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="bg-white hover:bg-[#FF0000] hover:text-white text-slate-800 border border-gray-200/90 px-4 py-2.5 rounded-xl text-xs sm:text-sm font-extrabold transition-all duration-300 shadow-2xs hover:shadow-md flex items-center space-x-2 cursor-pointer group"
-              >
-                <Youtube className="w-4 h-4 text-[#FF0000] group-hover:text-white transition-colors" />
-                <span>YouTube</span>
-              </a>
+              {settings.youtubeLink && (
+                <a
+                  href={settings.youtubeLink}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="bg-white hover:bg-[#FF0000] hover:text-white text-slate-800 border border-gray-200/90 px-4 py-2.5 rounded-xl text-xs sm:text-sm font-extrabold transition-all duration-300 shadow-2xs hover:shadow-md flex items-center space-x-2 cursor-pointer group"
+                >
+                  <Youtube className="w-4 h-4 text-[#FF0000] group-hover:text-white transition-colors" />
+                  <span>YouTube</span>
+                </a>
+              )}
 
               {/* Telegram Button */}
-              <a
-                href="https://t.me/mextanimstore"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="bg-white hover:bg-[#0088cc] hover:text-white text-slate-800 border border-gray-200/90 px-4 py-2.5 rounded-xl text-xs sm:text-sm font-extrabold transition-all duration-300 shadow-2xs hover:shadow-md flex items-center space-x-2 cursor-pointer group"
-              >
-                <Send className="w-4 h-4 text-[#0088cc] group-hover:text-white transition-colors" />
-                <span>Telegram</span>
-              </a>
+              {telegramUrl && (
+                <a
+                  href={telegramUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="bg-white hover:bg-[#0088cc] hover:text-white text-slate-800 border border-gray-200/90 px-4 py-2.5 rounded-xl text-xs sm:text-sm font-extrabold transition-all duration-300 shadow-2xs hover:shadow-md flex items-center space-x-2 cursor-pointer group"
+                >
+                  <Send className="w-4 h-4 text-[#0088cc] group-hover:text-white transition-colors" />
+                  <span>Telegram</span>
+                </a>
+              )}
+
+              {/* Instagram Button (if provided) */}
+              {settings.instagramLink && (
+                <a
+                  href={settings.instagramLink}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="bg-white hover:bg-gradient-to-r hover:from-purple-600 hover:to-pink-600 hover:text-white text-slate-800 border border-gray-200/90 px-4 py-2.5 rounded-xl text-xs sm:text-sm font-extrabold transition-all duration-300 shadow-2xs hover:shadow-md flex items-center space-x-2 cursor-pointer group"
+                >
+                  <Instagram className="w-4 h-4 text-[#E4405F] group-hover:text-white transition-colors" />
+                  <span>Instagram</span>
+                </a>
+              )}
             </div>
           </div>
 
@@ -157,77 +184,83 @@ export const Footer: React.FC = () => {
             {/* Support Channels List */}
             <div className="space-y-3.5">
               {/* Channel 1: Facebook Helpline */}
-              <a
-                href="https://m.me/mextanimstore"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="group bg-white p-4 rounded-2xl border border-gray-200/90 shadow-2xs hover:shadow-md hover:border-blue-300 transition-all duration-300 flex items-center space-x-4 cursor-pointer"
-              >
-                <div className="w-12 h-12 rounded-2xl bg-[#0084FF] text-white flex items-center justify-center shadow-md group-hover:scale-105 transition-transform shrink-0">
-                  <svg className="w-6 h-6 fill-current" viewBox="0 0 24 24">
-                    <path d="M12 2C6.477 2 2 6.145 2 11.258c0 2.91 1.455 5.51 3.734 7.218V22l3.37-1.85c.928.257 1.91.397 2.896.397 5.523 0 10-4.145 10-9.258C22 6.145 17.523 2 12 2zm1.18 12.396l-2.613-2.788-5.099 2.788 5.608-5.952 2.678 2.788 5.034-2.788-5.608 5.952z"/>
-                  </svg>
-                </div>
-                <div>
-                  <div className="flex items-center space-x-1.5">
-                    <h5 className="font-extrabold text-slate-900 text-sm sm:text-base">
-                      {language === 'bn' ? 'ফেসবুক হেল্পলাইন' : 'Facebook Helpline'}
-                    </h5>
-                    <CheckCircle2 className="w-4 h-4 fill-[#0084FF] text-white" />
+              {messengerUrl && (
+                <a
+                  href={messengerUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="group bg-white p-4 rounded-2xl border border-gray-200/90 shadow-2xs hover:shadow-md hover:border-blue-300 transition-all duration-300 flex items-center space-x-4 cursor-pointer"
+                >
+                  <div className="w-12 h-12 rounded-2xl bg-[#0084FF] text-white flex items-center justify-center shadow-md group-hover:scale-105 transition-transform shrink-0">
+                    <svg className="w-6 h-6 fill-current" viewBox="0 0 24 24">
+                      <path d="M12 2C6.477 2 2 6.145 2 11.258c0 2.91 1.455 5.51 3.734 7.218V22l3.37-1.85c.928.257 1.91.397 2.896.397 5.523 0 10-4.145 10-9.258C22 6.145 17.523 2 12 2zm1.18 12.396l-2.613-2.788-5.099 2.788 5.608-5.952 2.678 2.788 5.034-2.788-5.608 5.952z"/>
+                    </svg>
                   </div>
-                  <p className="text-xs text-gray-500 font-medium mt-0.5">
-                    {language === 'bn' ? 'সকাল ৮টা থেকে রাত ১২টা' : '8:00 AM - 12:00 AM'}
-                  </p>
-                </div>
-              </a>
+                  <div>
+                    <div className="flex items-center space-x-1.5">
+                      <h5 className="font-extrabold text-slate-900 text-sm sm:text-base">
+                        {language === 'bn' ? 'ফেসবুক হেল্পলাইন' : 'Facebook Helpline'}
+                      </h5>
+                      <CheckCircle2 className="w-4 h-4 fill-[#0084FF] text-white" />
+                    </div>
+                    <p className="text-xs text-gray-500 font-medium mt-0.5">
+                      {supportHours}
+                    </p>
+                  </div>
+                </a>
+              )}
 
               {/* Channel 2: WhatsApp Support */}
-              <a
-                href={`https://wa.me/${DEVELOPER_WHATSAPP}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="group bg-white p-4 rounded-2xl border border-gray-200/90 shadow-2xs hover:shadow-md hover:border-emerald-300 transition-all duration-300 flex items-center space-x-4 cursor-pointer"
-              >
-                <div className="w-12 h-12 rounded-2xl bg-[#25D366] text-white flex items-center justify-center shadow-md group-hover:scale-105 transition-transform shrink-0">
-                  <WhatsAppIcon className="w-6 h-6 fill-current" />
-                </div>
-                <div>
-                  <div className="flex items-center space-x-1.5">
-                    <h5 className="font-extrabold text-slate-900 text-sm sm:text-base">
-                      {language === 'bn' ? 'হোয়াটসঅ্যাপ সাপোর্ট' : 'WhatsApp Support'}
-                    </h5>
-                    <CheckCircle2 className="w-4 h-4 fill-[#25D366] text-white" />
+              {whatsappUrl && (
+                <a
+                  href={whatsappUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="group bg-white p-4 rounded-2xl border border-gray-200/90 shadow-2xs hover:shadow-md hover:border-emerald-300 transition-all duration-300 flex items-center space-x-4 cursor-pointer"
+                >
+                  <div className="w-12 h-12 rounded-2xl bg-[#25D366] text-white flex items-center justify-center shadow-md group-hover:scale-105 transition-transform shrink-0">
+                    <WhatsAppIcon className="w-6 h-6 fill-current" />
                   </div>
-                  <p className="text-xs text-gray-500 font-medium mt-0.5">
-                    {language === 'bn' ? 'সকাল ৮টা থেকে রাত ১২টা' : '8:00 AM - 12:00 AM'}
-                  </p>
-                </div>
-              </a>
+                  <div>
+                    <div className="flex items-center space-x-1.5">
+                      <h5 className="font-extrabold text-slate-900 text-sm sm:text-base">
+                        {language === 'bn' ? 'হোয়াটসঅ্যাপ সাপোর্ট' : 'WhatsApp Support'}
+                      </h5>
+                      <CheckCircle2 className="w-4 h-4 fill-[#25D366] text-white" />
+                    </div>
+                    <p className="text-xs text-gray-500 font-medium mt-0.5">
+                      {supportHours}
+                    </p>
+                  </div>
+                </a>
+              )}
 
               {/* Channel 3: Telegram Support */}
-              <a
-                href="https://t.me/mextanimstore"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="group bg-white p-4 rounded-2xl border border-gray-200/90 shadow-2xs hover:shadow-md hover:border-sky-300 transition-all duration-300 flex items-center space-x-4 cursor-pointer"
-              >
-                <div className="w-12 h-12 rounded-2xl bg-[#0088cc] text-white flex items-center justify-center shadow-md group-hover:scale-105 transition-transform shrink-0">
-                  <svg className="w-6 h-6 fill-current" viewBox="0 0 24 24">
-                    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm4.64 6.8c-.15 1.58-.8 5.42-1.13 7.19-.14.75-.42 1-.68 1.03-.58.05-1.02-.38-1.58-.75-.88-.58-1.38-.94-2.23-1.5-.99-.65-.35-1.01.22-1.59.15-.15 2.71-2.48 2.76-2.69.01-.03.01-.14-.07-.2-.08-.06-.19-.04-.27-.02-.12.03-1.99 1.27-5.62 3.72-.53.36-1.01.54-1.44.53-.47-.01-1.38-.27-2.05-.49-.83-.27-1.49-.42-1.43-.89.03-.25.38-.51 1.07-.78 4.2-1.83 7-3.04 8.4-3.63 4-.17 4.83.52 4.77 1.07z"/>
-                  </svg>
-                </div>
-                <div>
-                  <div className="flex items-center space-x-1.5">
-                    <h5 className="font-extrabold text-slate-900 text-sm sm:text-base">
-                      {language === 'bn' ? 'টেলিগ্রাম সাপোর্ট' : 'Telegram Support'}
-                    </h5>
-                    <CheckCircle2 className="w-4 h-4 fill-[#0088cc] text-white" />
+              {telegramUrl && (
+                <a
+                  href={telegramUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="group bg-white p-4 rounded-2xl border border-gray-200/90 shadow-2xs hover:shadow-md hover:border-sky-300 transition-all duration-300 flex items-center space-x-4 cursor-pointer"
+                >
+                  <div className="w-12 h-12 rounded-2xl bg-[#0088cc] text-white flex items-center justify-center shadow-md group-hover:scale-105 transition-transform shrink-0">
+                    <svg className="w-6 h-6 fill-current" viewBox="0 0 24 24">
+                      <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm4.64 6.8c-.15 1.58-.8 5.42-1.13 7.19-.14.75-.42 1-.68 1.03-.58.05-1.02-.38-1.58-.75-.88-.58-1.38-.94-2.23-1.5-.99-.65-.35-1.01.22-1.59.15-.15 2.71-2.48 2.76-2.69.01-.03.01-.14-.07-.2-.08-.06-.19-.04-.27-.02-.12.03-1.99 1.27-5.62 3.72-.53.36-1.01.54-1.44.53-.47-.01-1.38-.27-2.05-.49-.83-.27-1.49-.42-1.43-.89.03-.25.38-.51 1.07-.78 4.2-1.83 7-3.04 8.4-3.63 4-.17 4.83.52 4.77 1.07z"/>
+                    </svg>
                   </div>
-                  <p className="text-xs text-gray-500 font-medium mt-0.5">
-                    {language === 'bn' ? 'সকাল ৮টা থেকে রাত ১২টা' : '8:00 AM - 12:00 AM'}
-                  </p>
-                </div>
-              </a>
+                  <div>
+                    <div className="flex items-center space-x-1.5">
+                      <h5 className="font-extrabold text-slate-900 text-sm sm:text-base">
+                        {language === 'bn' ? 'টেলিগ্রাম সাপোর্ট' : 'Telegram Support'}
+                      </h5>
+                      <CheckCircle2 className="w-4 h-4 fill-[#0088cc] text-white" />
+                    </div>
+                    <p className="text-xs text-gray-500 font-medium mt-0.5">
+                      {supportHours}
+                    </p>
+                  </div>
+                </a>
+              )}
             </div>
           </div>
 

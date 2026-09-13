@@ -31,6 +31,7 @@ import {
   getUpazilasByDistrict,
 } from './bangladeshAddressData';
 import { supabase } from '../../lib/supabase';
+import { useStoreSettings } from '../shared/storeSettingsService';
 
 const ADMIN_ORDERS_KEY = 'mex_tanim_admin_orders';
 const SAVED_ADDRESS_KEY = 'mex_tanim_saved_address';
@@ -52,6 +53,7 @@ export const BuyNowModal: React.FC<BuyNowModalProps> = ({
   const modalBodyRef = useRef<HTMLDivElement>(null);
   const { language } = useLanguage();
   const { clearCart, removeFromCart } = useCart();
+  const settings = useStoreSettings();
 
   // Quantity state inside modal
   const [quantity, setQuantity] = useState<number>(initialQuantity);
@@ -144,9 +146,13 @@ export const BuyNowModal: React.FC<BuyNowModalProps> = ({
     setUpazila('');
   };
 
-  // Delivery charge calculation (Dhaka Division: ৳60, Outside Dhaka: ৳120)
-  const deliveryCharge = division === 'dhaka' ? 60 : 120;
+  // Delivery charge calculation (Dhaka Division vs Outside Dhaka with free delivery threshold)
+  const insideFee = Number(settings.insideDhakaFee) || 60;
+  const outsideFee = Number(settings.outsideDhakaFee) || 120;
+  const rawDeliveryCharge = division === 'dhaka' ? insideFee : outsideFee;
   const itemTotal = product.price * quantity;
+  const isFreeDelivery = settings.freeDeliveryThreshold > 0 && itemTotal >= settings.freeDeliveryThreshold;
+  const deliveryCharge = isFreeDelivery ? 0 : rawDeliveryCharge;
   const totalPayable = itemTotal + deliveryCharge;
 
   // Handle Form Submission / Order Creation

@@ -9,6 +9,7 @@ import { useAuth } from '../auth/AuthContext';
 import { useLanguage } from './LanguageContext';
 import { CategorySidebar } from '../catalog/CategorySidebar';
 import { CATEGORIES, CategoryItem, fetchLiveCategories } from '../catalog/categoryData';
+import { useStoreSettings } from './storeSettingsService';
 
 interface HeaderProps {
   searchQuery?: string;
@@ -43,6 +44,7 @@ export const Header: React.FC<HeaderProps> = ({
 }) => {
   const { totalItems, openCart } = useCart();
   const { language, setLanguage, t } = useLanguage();
+  const settings = useStoreSettings();
   const router = useRouter();
 
   const [isCategoryDrawerOpen, setIsCategoryDrawerOpen] = useState(false);
@@ -111,6 +113,14 @@ export const Header: React.FC<HeaderProps> = ({
   return (
     <>
       <header className="sticky top-0 z-40 bg-white/80 backdrop-blur-md border-b border-white/40 shadow-xs transition-all">
+        {settings.showAnnouncement && (settings.announcementBn || settings.announcementEn) && (
+          <div className="bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-900 text-white text-[11px] sm:text-xs font-medium py-1.5 px-4 text-center border-b border-white/10 flex items-center justify-center space-x-2">
+            <span className="text-orange-400 font-bold">📢</span>
+            <span className="truncate max-w-4xl font-semibold tracking-wide">
+              {language === 'bn' ? settings.announcementBn : settings.announcementEn}
+            </span>
+          </div>
+        )}
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-20 sm:h-24 gap-3">
             

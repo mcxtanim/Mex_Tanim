@@ -31,8 +31,7 @@ import { useLanguage } from '@/features/shared/LanguageContext';
 import { WhatsAppIcon } from '@/features/shared/WhatsAppIcon';
 import { BuyNowModal } from '@/features/checkout/BuyNowModal';
 import { getReviewsForProduct, ProductReview } from '@/features/catalog/reviewService';
-
-const DEVELOPER_WHATSAPP = '8801317170609';
+import { useStoreSettings, formatWhatsAppUrl } from '@/features/shared/storeSettingsService';
 
 export default function DedicatedProductPage() {
   const params = useParams();
@@ -40,6 +39,7 @@ export default function DedicatedProductPage() {
   const productId = params?.id as string;
   const { addToCart } = useCart();
   const { language } = useLanguage();
+  const settings = useStoreSettings();
 
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('all');
@@ -197,10 +197,11 @@ export default function DedicatedProductPage() {
   };
 
   const handleWhatsAppOrder = () => {
-    const text = encodeURIComponent(
-      `Hello! I want to order this product from Mex Tanim Store:\n\n*Product:* ${product.name}\n*Price:* ৳${product.price}\n*Quantity:* ${quantity}`
-    );
-    window.open(`https://wa.me/${DEVELOPER_WHATSAPP}?text=${text}`, '_blank');
+    if (!product) return;
+    const storeName = settings.storeName || 'Mex Tanim Store';
+    const message = `Hello! I want to order this product from ${storeName}:\n\n*Product:* ${product.name}\n*Price:* ৳${product.price}\n*Quantity:* ${quantity}`;
+    const url = formatWhatsAppUrl(settings.whatsappNumber || '8801317170609', message);
+    if (url) window.open(url, '_blank');
   };
 
   const handleShareProduct = () => {
