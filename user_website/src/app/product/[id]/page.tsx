@@ -43,36 +43,42 @@ export default function DedicatedProductPage() {
 
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('all');
-  const [allProducts, setAllProducts] = useState<Product[]>(() => getCachedProducts());
-
-  // Instant 0ms product resolution from memory/localStorage cache
-  const cachedProd =
-    allProducts.find((p) => String(p.id) === String(productId)) ||
-    getCachedProducts().find((p) => String(p.id) === String(productId));
-
-  const [product, setProduct] = useState<Product | undefined>(cachedProd);
-  const [isLoading, setIsLoading] = useState(!cachedProd);
+  const [isMounted, setIsMounted] = useState(false);
+  const [allProducts, setAllProducts] = useState<Product[]>([]);
+  const [product, setProduct] = useState<Product | undefined>(undefined);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    // If not in instant cache, fetch by single ID immediately
-    if (!product) {
-      fetchProductById(productId).then((prod) => {
-        if (prod) {
-          setProduct(prod);
-          setIsLoading(false);
-        }
-      });
+    setIsMounted(true);
+
+    // 1. Instant 0ms cache lookup on client mount
+    const cached = getCachedProducts();
+    if (cached.length > 0) {
+      setAllProducts(cached);
+      const found = cached.find((p) => String(p.id) === String(productId));
+      if (found) {
+        setProduct(found);
+        setIsLoading(false);
+      }
     }
 
-    // Background revalidation for fresh Supabase data
+    // 2. Fetch specific product by ID if not in memory cache
+    fetchProductById(productId).then((prod) => {
+      if (prod) {
+        setProduct(prod);
+        setIsLoading(false);
+      }
+    });
+
+    // 3. Background revalidation for fresh Supabase data
     fetchLiveProducts().then((data) => {
       setAllProducts(data);
       const found = data.find((p) => String(p.id) === String(productId));
       if (found) {
         setProduct(found);
         setIsLoading(false);
-      } else if (!product && data.length > 0) {
-        setProduct(data[0]);
+      } else if (data.length > 0) {
+        setProduct((prev) => prev || data[0]);
         setIsLoading(false);
       }
     });
@@ -121,29 +127,31 @@ export default function DedicatedProductPage() {
     }
   }, [productId, product?.id]);
 
-  // Early Loading / Missing Product Guard
-  if (isLoading || !product) {
+  // Early Loading / Missing Product Guard (Structured identically to main layout for SSR consistency)
+  if (!isMounted || isLoading || !product) {
     return (
-      <div className="min-h-screen flex flex-col justify-between bg-slate-50/50 font-sans">
-        <Header
-          searchQuery={searchQuery}
-          setSearchQuery={setSearchQuery}
-          selectedCategory={selectedCategory}
-          onSelectCategory={(cat) => {
-            setSelectedCategory(cat);
-            router.push('/');
-          }}
-        />
-        <main className="max-w-7xl mx-auto px-4 py-20 text-center flex-1 flex items-center justify-center">
-          <div className="bg-white/90 backdrop-blur-md p-10 rounded-3xl border border-gray-200 shadow-xl max-w-sm mx-auto space-y-4 animate-pulse">
-            <div className="w-14 h-14 bg-orange-100 text-orange-600 rounded-2xl flex items-center justify-center mx-auto shadow-inner">
-              <ShoppingBag className="w-7 h-7 animate-bounce" />
+      <div className="min-h-screen flex flex-col justify-between bg-slate-50/50">
+        <div>
+          <Header
+            searchQuery={searchQuery}
+            setSearchQuery={setSearchQuery}
+            selectedCategory={selectedCategory}
+            onSelectCategory={(cat) => {
+              setSelectedCategory(cat);
+              router.push('/');
+            }}
+          />
+          <main className="max-w-7xl mx-auto px-4 py-20 text-center flex-1 flex items-center justify-center min-h-[60vh]">
+            <div className="bg-white/90 backdrop-blur-md p-10 rounded-3xl border border-gray-200 shadow-xl max-w-sm mx-auto space-y-4 animate-pulse">
+              <div className="w-14 h-14 bg-orange-100 text-orange-600 rounded-2xl flex items-center justify-center mx-auto shadow-inner">
+                <ShoppingBag className="w-7 h-7 animate-bounce" />
+              </div>
+              <p className="text-sm font-extrabold text-slate-800">
+                {language === 'bn' ? 'পণ্য তথ্য লোড হচ্ছে...' : 'Loading product details...'}
+              </p>
             </div>
-            <p className="text-sm font-extrabold text-slate-800">
-              {language === 'bn' ? 'পণ্য তথ্য লোড হচ্ছে...' : 'Loading product details...'}
-            </p>
-          </div>
-        </main>
+          </main>
+        </div>
         <Footer />
       </div>
     );
