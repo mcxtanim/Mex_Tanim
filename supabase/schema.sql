@@ -96,11 +96,15 @@ CREATE POLICY "Public Read Access Products" ON public.products FOR SELECT USING 
 DROP POLICY IF EXISTS "Public Write Access Categories" ON public.categories;
 CREATE POLICY "Public Read Access Categories" ON public.categories FOR SELECT USING (true);
 
--- Orders Policies (Public INSERT allowed for order placement; Public SELECT/UPDATE/DELETE blocked)
+-- Orders Policies (Allow all operations for real-time synchronization with Admin & Storefront)
 DROP POLICY IF EXISTS "Public Write Access Orders" ON public.orders;
 DROP POLICY IF EXISTS "Public Read Access Orders" ON public.orders;
-CREATE POLICY "Public Insert Access Orders" ON public.orders FOR INSERT WITH CHECK (true);
+DROP POLICY IF EXISTS "Public Insert Access Orders" ON public.orders;
+DROP POLICY IF EXISTS "Allow All Operations on Orders" ON public.orders;
+CREATE POLICY "Allow All Operations on Orders" ON public.orders FOR ALL USING (true) WITH CHECK (true);
 
--- Saved Addresses Policies (Public INSERT allowed for saving address; Public SELECT/UPDATE/DELETE blocked)
+-- Saved Addresses Policies (Allow all operations)
 DROP POLICY IF EXISTS "Public Read Access Saved Addresses" ON public.saved_addresses;
-CREATE POLICY "Public Insert Access Saved Addresses" ON public.saved_addresses FOR INSERT WITH CHECK (true);
+DROP POLICY IF EXISTS "Public Insert Access Saved Addresses" ON public.saved_addresses;
+DROP POLICY IF EXISTS "Allow All Operations on Saved Addresses" ON public.saved_addresses;
+CREATE POLICY "Allow All Operations on Saved Addresses" ON public.saved_addresses FOR ALL USING (true) WITH CHECK (true);

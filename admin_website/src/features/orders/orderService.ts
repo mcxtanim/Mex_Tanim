@@ -125,3 +125,82 @@ export async function updateOrderStatus(orderId: string, newStatus: OrderStatus,
 
   return updated;
 }
+
+export async function deleteOrder(orderId: string, existingOrders: Order[]): Promise<Order[]> {
+  const updated = existingOrders.filter((ord) => ord.id !== orderId);
+  saveStoredOrders(updated);
+
+  if (supabase) {
+    try {
+      const { error } = await supabase
+        .from("orders")
+        .delete()
+        .eq("id", orderId);
+      if (error) console.error("Supabase order delete error:", error);
+    } catch (err) {
+      console.error("Supabase order delete exception:", err);
+    }
+  }
+
+  return updated;
+}
+
+export async function fetchOrderById(orderId: string): Promise<Order | null> {
+  const stored = getStoredOrders().find((o) => o.id === orderId || o.orderNumber === orderId);
+  if (!supabase) return stored || null;
+
+  try {
+    const { data, error } = await supabase
+      .from("orders")
+      .select("*")
+      .or(`id.eq.${orderId},order_number.eq.${orderId}`)
+      .maybeSingle();
+
+    if (error || !data) return stored || null;
+
+    const itemsList = Array.isArray(data.items)
+      ? data.items.map((i: any) => ({
+          productId: String(i.productId || i.id || ""),
+          title: i.title || i.name || "Product Item",
+          quantity: Number(i.quantity) || 1,
+          unitPrice: Number(i.unitPrice || i.price) || 0,
+          price: Number(i.price || i.unitPrice) || 0,
+          imageUrl: i.image || i.imageUrl || "",
+        }))
+      : [];
+
+    const shipping = data.shipping_address || {};
+    const addrStreet = data.address || shipping.street || "Delivery Address";
+    const addrCity = shipping.city || data.delivery_area || "City";
+    const addrDistrict = shipping.district || data.delivery_area || "District";
+
+    return {
+      id: String(data.id),
+      orderNumber: data.order_number || `#${data.id}`,
+      customerName: data.customer_name || "Customer",
+      customerEmail: data.customer_email || "",
+      customerPhone: data.phone || data.customer_phone || "",
+      shippingAddress: {
+        address: addrStreet,
+        street: addrStreet,
+        city: addrCity,
+        district: addrDistrict,
+        postalCode: shipping.postalCode || "1200",
+      },
+      items: itemsList,
+      totalAmount: Number(data.total_amount) || 0,
+      shippingCost: Number(data.delivery_charge) || 60,
+      deliveryCharge: Number(data.delivery_charge) || 60,
+      status: data.status || "Pending",
+      paymentMethod: data.payment_method || "Cash on Delivery",
+      paymentStatus: data.payment_status || "Unpaid",
+      createdAt: data.created_at
+        ? new Date(data.created_at).toLocaleString("en-US", { timeZone: "Asia/Dhaka" })
+        : new Date().toLocaleString(),
+    };
+  } catch (err) {
+    console.warn("fetchOrderById exception:", err);
+    return stored || null;
+  }
+}
+

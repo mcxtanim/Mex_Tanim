@@ -1,25 +1,101 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { DashboardStatsCards } from "./DashboardStatsCards";
 import { RecentOrdersList } from "./RecentOrdersList";
-import { getStoredProducts } from "../products/productService";
-import { getStoredOrders } from "../orders/orderService";
+import { getStoredProducts, fetchProductsFromSupabase } from "../products/productService";
+import { getStoredOrders, fetchOrdersFromSupabase } from "../orders/orderService";
 import { Product } from "../products/types";
 import { Order } from "../orders/types";
 import { DashboardStats } from "./types";
-import { Plus, PackagePlus, PackageX } from "lucide-react";
+import { Plus, PackagePlus, PackageX, RefreshCw, CheckCircle2 } from "lucide-react";
 import Link from "next/link";
+import { supabase } from "../../lib/supabase";
 
 export function DashboardView() {
   const [products, setProducts] = useState<Product[]>([]);
   const [orders, setOrders] = useState<Order[]>([]);
   const [timeFilter, setTimeFilter] = useState<"today" | "week" | "month" | "year" | "lifetime">("month");
+  const [isRefreshing, setIsRefreshing] = useState(false);
+  const [lastSynced, setLastSynced] = useState<string>("");
+
+  const loadDashboardData = useCallback(async (showRefreshingSpinner = false) => {
+    if (showRefreshingSpinner) setIsRefreshing(true);
+    try {
+      const [fetchedProducts, fetchedOrders] = await Promise.all([
+        fetchProductsFromSupabase(),
+        fetchOrdersFromSupabase(),
+      ]);
+
+      if (fetchedProducts && fetchedProducts.length > 0) {
+        setProducts(fetchedProducts);
+      } else {
+        setProducts(getStoredProducts());
+      }
+
+      if (fetchedOrders) {
+        setOrders(fetchedOrders);
+      } else {
+        setOrders(getStoredOrders());
+      }
+
+      setLastSynced(new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' }));
+    } catch (err) {
+      console.warn("Dashboard live sync notice:", err);
+      setProducts(getStoredProducts());
+      setOrders(getStoredOrders());
+    } finally {
+      if (showRefreshingSpinner) {
+        setTimeout(() => setIsRefreshing(false), 500);
+      }
+    }
+  }, []);
 
   useEffect(() => {
+    // Initial instant cached state
     setProducts(getStoredProducts());
     setOrders(getStoredOrders());
-  }, []);
+    loadDashboardData();
+
+    // 1. Supabase Realtime Channels
+    const ordersChannel = supabase
+      ?.channel("realtime_dashboard_orders")
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "orders" },
+        () => {
+          loadDashboardData();
+        }
+      )
+      .subscribe();
+
+    const productsChannel = supabase
+      ?.channel("realtime_dashboard_products")
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "products" },
+        () => {
+          loadDashboardData();
+        }
+      )
+      .subscribe();
+
+    // 2. Periodic Polling fallback (every 10 seconds)
+    const interval = setInterval(() => {
+      loadDashboardData();
+    }, 10000);
+
+    window.addEventListener("storage", () => loadDashboardData());
+    window.addEventListener("focus", () => loadDashboardData());
+
+    return () => {
+      if (ordersChannel) supabase?.removeChannel(ordersChannel);
+      if (productsChannel) supabase?.removeChannel(productsChannel);
+      clearInterval(interval);
+      window.removeEventListener("storage", () => loadDashboardData());
+      window.removeEventListener("focus", () => loadDashboardData());
+    };
+  }, [loadDashboardData]);
 
   // Compute live stats
   const totalRevenue = orders
@@ -73,6 +149,24 @@ export function DashboardView() {
               </button>
             ))}
           </div>
+
+          {/* Sync Status & Button */}
+          {lastSynced && (
+            <span className="text-[11px] text-slate-400 hidden xl:inline flex items-center gap-1">
+              <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" />
+              Synced: {lastSynced}
+            </span>
+          )}
+
+          <button
+            onClick={() => loadDashboardData(true)}
+            disabled={isRefreshing}
+            className="px-3 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 border border-slate-800 text-slate-200 hover:text-white font-bold text-xs flex items-center gap-1.5 transition active:scale-95 disabled:opacity-50 cursor-pointer"
+            title="Fetch latest products & orders from Supabase"
+          >
+            <RefreshCw className={`w-3.5 h-3.5 text-emerald-400 ${isRefreshing ? "animate-spin" : ""}`} />
+            <span>{isRefreshing ? "Syncing..." : "Sync"}</span>
+          </button>
 
           {/* Action Buttons */}
           <Link
