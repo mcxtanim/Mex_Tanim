@@ -2,8 +2,23 @@
 
 import { Bell, Search, ExternalLink, LogOut, ShieldCheck } from "lucide-react";
 import { AdminHeaderProps } from "./types";
+import { useAuth } from "@/features/auth/AuthContext";
 
 export function AdminHeader({ title = "Dashboard", subtitle = "" }: AdminHeaderProps) {
+  const { user, adminUser, signOut } = useAuth();
+
+  const displayName =
+    adminUser?.email?.split("@")[0] ||
+    user?.email?.split("@")[0] ||
+    adminUser?.phone ||
+    user?.phone ||
+    "Admin";
+
+  const initials = displayName.slice(0, 2).toUpperCase();
+  const roleLabel = adminUser?.role
+    ? adminUser.role.replace("_", " ").toUpperCase()
+    : "ADMIN";
+
   return (
     <header className="h-16 bg-slate-950/80 backdrop-blur-xl border-b border-slate-800/80 px-6 sm:px-8 flex items-center justify-between sticky top-0 z-20">
       <div>
@@ -34,8 +49,8 @@ export function AdminHeader({ title = "Dashboard", subtitle = "" }: AdminHeaderP
         </div>
 
         {/* Live Notification Indicator */}
-        <button 
-          className="relative p-2 rounded-xl bg-slate-900/80 border border-slate-800 text-slate-300 hover:text-slate-100 hover:bg-slate-800 transition-colors"
+        <button
+          className="relative p-2 rounded-xl bg-slate-900/80 border border-slate-800 text-slate-300 hover:text-slate-100 hover:bg-slate-800 transition-colors cursor-pointer"
           title="Notifications"
         >
           <Bell className="w-4 h-4" />
@@ -46,15 +61,21 @@ export function AdminHeader({ title = "Dashboard", subtitle = "" }: AdminHeaderP
         <div className="flex items-center gap-2.5 pl-3 border-l border-slate-800/80">
           <div className="w-8 h-8 rounded-xl bg-gradient-to-tr from-emerald-500 to-teal-400 p-[1.5px] shadow-sm">
             <div className="w-full h-full rounded-[10px] bg-slate-950 flex items-center justify-center text-emerald-400 font-black text-xs">
-              MT
+              {initials}
             </div>
           </div>
           <div className="hidden lg:block text-left">
-            <p className="text-xs font-bold text-slate-200 leading-tight">Admin</p>
+            <p className="text-xs font-bold text-slate-200 leading-tight truncate max-w-[120px]">
+              {displayName}
+            </p>
+            <p className="text-[10px] text-emerald-400 font-semibold leading-tight">
+              {roleLabel}
+            </p>
           </div>
 
-          <button 
-            className="p-2 text-slate-400 hover:text-rose-400 hover:bg-rose-500/10 rounded-xl transition"
+          <button
+            onClick={() => signOut()}
+            className="p-2 text-slate-400 hover:text-rose-400 hover:bg-rose-500/10 rounded-xl transition cursor-pointer"
             title="Logout"
           >
             <LogOut className="w-4 h-4" />
