@@ -265,12 +265,22 @@ export const Footer: React.FC = () => {
         </div>
 
         {/* Polished Bottom Bar: Copyright */}
-        <div className="border-t border-gray-200/80 pt-6 text-center text-xs sm:text-sm text-gray-600 font-medium">
-          <p>
+        <div className="border-t border-gray-200/80 pt-6 text-center text-xs sm:text-sm text-gray-600 font-medium flex flex-wrap items-center justify-center gap-x-2 gap-y-1">
+          <span>
             {language === 'bn'
-              ? '© ২০২৬ Mex Tanim Store | সর্বস্বত্ব সংরক্ষিত'
+              ? '© ২০২৬ Mex Tanim Store | সর্বস্বত্ব সংরক্ষিত।'
               : '© 2026 Mex Tanim Store. All rights reserved.'}
-          </p>
+          </span>
+          <span className="text-gray-400 hidden sm:inline">•</span>
+          <a
+            href="https://wa.me/8801317170609"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-gray-700 hover:text-emerald-600 transition-colors cursor-pointer inline-flex items-center gap-1 font-medium"
+          >
+            <span>Developed By</span>
+            <span className="text-slate-900 font-bold hover:underline">Atik Tanvir</span>
+          </a>
         </div>
 
       </div>
