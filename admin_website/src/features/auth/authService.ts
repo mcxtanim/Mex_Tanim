@@ -222,3 +222,58 @@ export async function signOutAdmin(): Promise<void> {
     console.error("Error signing out:", error);
   }
 }
+
+export async function resetAdminPassword(
+  email: string
+): Promise<{ success: boolean; error?: string }> {
+  if (!supabase) {
+    return { success: false, error: "Supabase client is not configured." };
+  }
+
+  try {
+    const cleanEmail = email.trim().toLowerCase();
+    if (!cleanEmail || !cleanEmail.includes("@")) {
+      return { success: false, error: "Please enter a valid admin email address." };
+    }
+
+    const origin = typeof window !== "undefined" ? window.location.origin : "http://localhost:3001";
+    const { error } = await supabase.auth.resetPasswordForEmail(cleanEmail, {
+      redirectTo: `${origin}/login?type=recovery`,
+    });
+
+    if (error) {
+      return { success: false, error: error.message };
+    }
+
+    return { success: true };
+  } catch (err: any) {
+    return { success: false, error: err.message || "Failed to send password reset email." };
+  }
+}
+
+export async function updateAdminPassword(
+  newPassword: string
+): Promise<{ success: boolean; error?: string }> {
+  if (!supabase) {
+    return { success: false, error: "Supabase client is not configured." };
+  }
+
+  try {
+    if (!newPassword || newPassword.length < 6) {
+      return { success: false, error: "Password must be at least 6 characters." };
+    }
+
+    const { error } = await supabase.auth.updateUser({
+      password: newPassword,
+    });
+
+    if (error) {
+      return { success: false, error: error.message };
+    }
+
+    return { success: true };
+  } catch (err: any) {
+    return { success: false, error: err.message || "Failed to update password." };
+  }
+}
+
