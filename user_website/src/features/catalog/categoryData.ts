@@ -63,22 +63,10 @@ export const CATEGORY_TRANSLATIONS: Record<string, { en: string; bn: string; bad
   'all': { en: 'ALL CATEGORIES', bn: 'সকল ক্যাটাগরি', badge: 'A' },
 };
 
-export const getCategoryName = (categoryKeyOrSlug: string, lang: 'en' | 'bn' | string = 'en'): string => {
+export const getStaticTranslation = (categoryKeyOrSlug: string, lang: 'en' | 'bn' | string = 'en'): string => {
   if (!categoryKeyOrSlug) return lang === 'bn' ? 'গেমিং গ্যাজেট' : 'Gaming Gadget';
   const clean = categoryKeyOrSlug.toLowerCase().trim().replace(/\s+/g, '-');
 
-  // 1. Check in cached live categories from Supabase
-  const liveList = getCachedCategories();
-  const matchedLive = liveList.find(
-    (c) => c.id.toLowerCase() === clean || isCategorySelected(clean, c.id)
-  );
-  if (matchedLive) {
-    return lang === 'bn'
-      ? (matchedLive.nameBn || matchedLive.nameEn)
-      : matchedLive.nameEn;
-  }
-
-  // 2. Check translation table
   if (CATEGORY_TRANSLATIONS[clean]) {
     return lang === 'bn' ? CATEGORY_TRANSLATIONS[clean].bn : CATEGORY_TRANSLATIONS[clean].en;
   }
@@ -94,6 +82,26 @@ export const getCategoryName = (categoryKeyOrSlug: string, lang: 'en' | 'bn' | s
   }
 
   return categoryKeyOrSlug.replace(/-/g, ' ').toUpperCase();
+};
+
+export const getCategoryName = (categoryKeyOrSlug: string, lang: 'en' | 'bn' | string = 'en'): string => {
+  if (!categoryKeyOrSlug) return lang === 'bn' ? 'গেমিং গ্যাজেট' : 'Gaming Gadget';
+  const clean = categoryKeyOrSlug.toLowerCase().trim().replace(/\s+/g, '-');
+
+  // 1. Check in-memory cache directly (NEVER invoke getCachedCategories to avoid recursion)
+  if (memoryCategoriesCache && memoryCategoriesCache.length > 0) {
+    const matchedLive = memoryCategoriesCache.find(
+      (c) => c.id.toLowerCase() === clean || isCategorySelected(clean, c.id)
+    );
+    if (matchedLive) {
+      return lang === 'bn'
+        ? (matchedLive.nameBn || matchedLive.nameEn)
+        : matchedLive.nameEn;
+    }
+  }
+
+  // 2. Fallback to direct translation table
+  return getStaticTranslation(clean, lang);
 };
 
 export const isCategorySelected = (selectedCategory: string, catId: string): boolean => {
@@ -159,14 +167,16 @@ let lastCategoriesFetchTimestamp = 0;
 let inFlightCategoriesPromise: Promise<CategoryItem[]> | null = null;
 let realtimeInitialized = false;
 
+let isMappingCategories = false;
+
 export function mapRawCategoryToItem(item: any): CategoryItem {
   const rawName = String(item.name || '').trim();
   const slug = String(item.slug || item.id || rawName.toLowerCase().replace(/[^a-z0-9]+/g, '-')).toLowerCase();
   
-  const enName = rawName || getCategoryName(slug, 'en');
+  const enName = rawName || getStaticTranslation(slug, 'en');
   const bnName = (item.name_bn && /[\u0980-\u09FF]/.test(item.name_bn))
     ? item.name_bn
-    : getCategoryName(slug, 'bn');
+    : getStaticTranslation(slug, 'bn');
 
   const badge = rawName ? rawName.charAt(0).toUpperCase() : slug.charAt(0).toUpperCase();
 
@@ -193,15 +203,24 @@ export function getCachedCategories(): CategoryItem[] {
     return memoryCategoriesCache;
   }
 
+  if (isMappingCategories) {
+    return [];
+  }
+
   if (typeof window !== 'undefined') {
     try {
       const stored = localStorage.getItem(STORAGE_KEY) || localStorage.getItem('mex_tanim_admin_categories');
       if (stored) {
         const parsed = JSON.parse(stored);
         if (Array.isArray(parsed) && parsed.length > 0) {
-          const mapped = parsed.map(mapRawCategoryToItem);
-          memoryCategoriesCache = mapped;
-          return mapped;
+          isMappingCategories = true;
+          try {
+            const mapped = parsed.map(mapRawCategoryToItem);
+            memoryCategoriesCache = mapped;
+            return mapped;
+          } finally {
+            isMappingCategories = false;
+          }
         }
       }
     } catch (e) {
@@ -289,7 +308,6 @@ export async function fetchLiveCategories(forceRefresh = false): Promise<Categor
             async () => {
               const updated = await fetchLiveCategories(true);
               window.dispatchEvent(new CustomEvent('categories_updated', { detail: updated }));
-              window.dispatchEvent(new Event('storage'));
             }
           )
           .subscribe();
