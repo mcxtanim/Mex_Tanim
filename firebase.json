@@ -1,4 +1,4 @@
-﻿{
+{
   "hosting": [
     {
       "target": "user_website",
@@ -11,6 +11,10 @@
       "cleanUrls": true,
       "trailingSlash": true,
       "rewrites": [
+        {
+          "source": "/product/**",
+          "destination": "/product/preview/index.html"
+        },
         {
           "source": "**",
           "destination": "/index.html"
@@ -28,6 +32,22 @@
       "cleanUrls": true,
       "trailingSlash": true,
       "rewrites": [
+        {
+          "source": "/banners/edit/**",
+          "destination": "/banners/edit/preview/index.html"
+        },
+        {
+          "source": "/products/edit/**",
+          "destination": "/products/edit/preview/index.html"
+        },
+        {
+          "source": "/categories/edit/**",
+          "destination": "/categories/edit/preview/index.html"
+        },
+        {
+          "source": "/orders/**",
+          "destination": "/orders/preview/index.html"
+        },
         {
           "source": "**",
           "destination": "/index.html"

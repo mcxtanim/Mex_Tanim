@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect, useRef } from 'react';
+import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { fetchLiveProducts } from './productService';
 import { Product } from './types';
@@ -113,27 +114,28 @@ export const ComboOfferSection: React.FC = () => {
         {comboProducts.map((comboProduct) => (
           <div
             key={comboProduct.id}
-            className="min-w-[300px] sm:min-w-[340px] max-w-[350px] shrink-0 snap-start bg-white rounded-3xl border border-gray-200/90 shadow-2xs hover:shadow-xl hover:border-orange-400 transition-all duration-300 flex flex-col justify-between overflow-hidden group cursor-pointer"
-            onClick={() => router.push(`/product/${comboProduct.id}`)}
+            className="min-w-[300px] sm:min-w-[340px] max-w-[350px] shrink-0 snap-start bg-white rounded-3xl border border-gray-200/90 shadow-2xs hover:shadow-xl hover:border-orange-400 transition-all duration-300 flex flex-col justify-between overflow-hidden group"
           >
-            <div className="relative p-3.5 bg-slate-50/70 overflow-hidden border-b border-gray-100">
-              {comboProduct.discountBadge && (
-                <span className="absolute top-3 left-3 bg-gradient-to-r from-red-600 to-orange-500 text-white text-[11px] font-black px-2.5 py-1 rounded-full shadow-md z-20 uppercase tracking-wide">
-                  {comboProduct.discountBadge}
-                </span>
-              )}
+            <Link href={`/product/${comboProduct.id}`} className="block flex-1">
+              <div className="relative p-3.5 bg-slate-50/70 overflow-hidden border-b border-gray-100">
+                {comboProduct.discountBadge && (
+                  <span className="absolute top-3 left-3 bg-gradient-to-r from-red-600 to-orange-500 text-white text-[11px] font-black px-2.5 py-1 rounded-full shadow-md z-20 uppercase tracking-wide">
+                    {comboProduct.discountBadge}
+                  </span>
+                )}
 
-              <div className="w-full h-44 sm:h-48 flex items-center justify-center p-2 pt-6">
-                <img
-                  src={comboProduct.image}
-                  alt={comboProduct.name}
-                  className="max-h-full max-w-full object-contain group-hover:scale-105 transition-transform duration-300 drop-shadow-md"
-                />
+                <div className="w-full h-44 sm:h-48 flex items-center justify-center p-2 pt-6">
+                  <img
+                    src={comboProduct.image}
+                    alt={comboProduct.name}
+                    loading="lazy"
+                    decoding="async"
+                    className="max-h-full max-w-full object-contain group-hover:scale-105 transition-transform duration-300 drop-shadow-md"
+                  />
+                </div>
               </div>
-            </div>
 
-            <div className="p-4 sm:p-5 flex-1 flex flex-col justify-between space-y-3">
-              <div>
+              <div className="p-4 sm:p-5 pb-0">
                 <div className="flex items-center justify-between text-xs text-gray-500 mb-1.5">
                   <span className="bg-orange-50 text-orange-600 font-extrabold text-[10px] uppercase px-2.5 py-0.5 rounded-md border border-orange-200">
                     COMBO BUNDLE
@@ -148,7 +150,9 @@ export const ComboOfferSection: React.FC = () => {
                   {language === 'bn' ? comboProduct.nameBn : comboProduct.name}
                 </h3>
               </div>
+            </Link>
 
+            <div className="p-4 sm:p-5 pt-3">
               <div className="pt-2 border-t border-gray-100 flex items-center justify-between gap-2">
                 <div>
                   <div className="flex items-baseline space-x-1.5">

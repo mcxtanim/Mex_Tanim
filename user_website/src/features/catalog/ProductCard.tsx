@@ -1,6 +1,7 @@
 'use client';
 
 import React from 'react';
+import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { Star, ShoppingBag } from 'lucide-react';
 import { Product } from './types';
@@ -18,10 +19,6 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
   const { addToCart } = useCart();
   const { t, language } = useLanguage();
 
-  const handleCardClick = () => {
-    router.push(`/product/${product.id}`);
-  };
-
   const discountPercent = product.originalPrice
     ? Math.round(((product.originalPrice - product.price) / product.originalPrice) * 100)
     : 0;
@@ -33,13 +30,15 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
     <div className="bg-white/80 backdrop-blur-md border border-white/60 shadow-xl shadow-slate-900/5 rounded-2xl overflow-hidden hover:border-orange-500/40 hover:bg-white/95 hover:shadow-2xl transition-all duration-300 group flex flex-col justify-between">
       
       {/* Product Image & Badges */}
-      <div
-        onClick={handleCardClick}
-        className="relative w-full h-48 sm:h-52 bg-slate-50/80 overflow-hidden cursor-pointer"
+      <Link
+        href={`/product/${product.id}`}
+        className="relative block w-full h-48 sm:h-52 bg-slate-50/80 overflow-hidden cursor-pointer"
       >
         <img
           src={product.image}
           alt={title}
+          loading="lazy"
+          decoding="async"
           className="w-full h-full object-cover group-hover:scale-105 transition duration-500"
         />
 
@@ -60,7 +59,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
         >
           {product.inStock ? t.inStock : t.outOfStock}
         </span>
-      </div>
+      </Link>
 
       {/* Product Information */}
       <div className="p-4 flex-1 flex flex-col justify-between space-y-3">
@@ -77,12 +76,12 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
             </div>
           </div>
 
-          <h3
-            onClick={handleCardClick}
-            className="font-bold text-sm text-slate-900 line-clamp-1 hover:text-orange-600 transition cursor-pointer"
+          <Link
+            href={`/product/${product.id}`}
+            className="font-bold text-sm text-slate-900 line-clamp-1 hover:text-orange-600 transition cursor-pointer block"
           >
             {title}
-          </h3>
+          </Link>
 
           <p className="text-xs text-gray-500 line-clamp-2 mt-1 leading-relaxed">
             {description}

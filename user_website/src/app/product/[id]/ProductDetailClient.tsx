@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect, useRef } from 'react';
-import { useParams, useRouter } from 'next/navigation';
+import { useParams, useRouter, usePathname } from 'next/navigation';
 import Link from 'next/link';
 import {
   X,
@@ -36,7 +36,14 @@ import { useStoreSettings, formatWhatsAppUrl } from '@/features/shared/storeSett
 export default function DedicatedProductPage() {
   const params = useParams();
   const router = useRouter();
-  const productId = params?.id as string;
+  const pathname = usePathname();
+
+  const pathSegments = (pathname || (typeof window !== 'undefined' ? window.location.pathname : '')).split('/').filter(Boolean);
+  const productIdx = pathSegments.indexOf('product');
+  const pathId = productIdx !== -1 && pathSegments[productIdx + 1] && pathSegments[productIdx + 1] !== 'preview' ? pathSegments[productIdx + 1] : '';
+  const paramId = typeof params?.id === 'string' ? params.id : Array.isArray(params?.id) ? params.id[0] : '';
+  const productId = pathId || paramId || '1';
+
   const { addToCart } = useCart();
   const { language } = useLanguage();
   const settings = useStoreSettings();
