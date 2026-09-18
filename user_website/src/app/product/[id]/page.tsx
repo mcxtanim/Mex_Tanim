@@ -30,7 +30,6 @@ import { ProductCard } from '@/features/catalog/ProductCard';
 import { useCart } from '@/features/cart/CartContext';
 import { useLanguage } from '@/features/shared/LanguageContext';
 import { WhatsAppIcon } from '@/features/shared/WhatsAppIcon';
-import { BuyNowModal } from '@/features/checkout/BuyNowModal';
 import { getReviewsForProduct, ProductReview } from '@/features/catalog/reviewService';
 import { useStoreSettings, formatWhatsAppUrl } from '@/features/shared/storeSettingsService';
 
@@ -88,7 +87,6 @@ export default function DedicatedProductPage() {
   const [quantity, setQuantity] = useState(1);
   const [added, setAdded] = useState(false);
   const [activeImage, setActiveImage] = useState<string>('');
-  const [isBuyNowModalOpen, setIsBuyNowModalOpen] = useState(false);
 
   // Zoom States
   const [isZoomed, setIsZoomed] = useState(false);
@@ -194,7 +192,8 @@ export default function DedicatedProductPage() {
   };
 
   const handleBuyNow = () => {
-    setIsBuyNowModalOpen(true);
+    if (!product) return;
+    router.push(`/checkout?productId=${product.id}&quantity=${quantity}`);
   };
 
   const handleWhatsAppOrder = () => {
@@ -588,14 +587,6 @@ export default function DedicatedProductPage() {
 
         </main>
       </div>
-
-      {/* Buy Now Checkout Modal */}
-      <BuyNowModal
-        product={product}
-        isOpen={isBuyNowModalOpen}
-        initialQuantity={quantity}
-        onClose={() => setIsBuyNowModalOpen(false)}
-      />
 
       {/* Site Footer */}
       <Footer />

@@ -3,7 +3,6 @@ import './globals.css';
 import { LanguageProvider } from '@/features/shared/LanguageContext';
 import { CartProvider } from '@/features/cart/CartContext';
 import { AuthProvider } from '@/features/auth/AuthContext';
-import { CartDrawer } from '@/features/cart/CartDrawer';
 import { FloatingChat } from '@/features/shared/FloatingChat';
 
 export const metadata: Metadata = {
@@ -23,7 +22,6 @@ export default function RootLayout({
           <AuthProvider>
             <CartProvider>
               {children}
-              <CartDrawer />
               <FloatingChat />
             </CartProvider>
           </AuthProvider>

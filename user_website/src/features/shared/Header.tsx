@@ -233,9 +233,9 @@ export const Header: React.FC<HeaderProps> = ({
                 </span>
               </Link>
 
-              {/* Official Add to Cart / Bag Icon Button */}
-              <button
-                onClick={openCart}
+              {/* Official Add to Cart / Bag Icon Link to /cart */}
+              <Link
+                href="/cart"
                 className="relative p-2.5 bg-slate-900/90 hover:bg-orange-600/90 backdrop-blur-md text-white rounded-xl shadow-md border border-white/20 transition-all active:scale-95 flex items-center gap-1.5 cursor-pointer"
                 title={t.cart}
               >
@@ -246,7 +246,7 @@ export const Header: React.FC<HeaderProps> = ({
                     {totalItems}
                   </span>
                 )}
-              </button>
+              </Link>
 
               {/* LANGUAGE TOGGLE BUTTON */}
               <div className="pl-1 border-l border-gray-200/60">

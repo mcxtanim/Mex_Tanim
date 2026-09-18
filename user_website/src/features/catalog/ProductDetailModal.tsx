@@ -15,6 +15,7 @@ import {
   Flame,
   Zap,
 } from 'lucide-react';
+import { useRouter } from 'next/navigation';
 import { Product } from './types';
 import { getBrandName, fetchLiveProducts } from './productService';
 import { getCategoryName } from './categoryData';
@@ -22,7 +23,6 @@ import { ProductCard } from './ProductCard';
 import { useCart } from '../cart/CartContext';
 import { useLanguage } from '../shared/LanguageContext';
 import { WhatsAppIcon } from '../shared/WhatsAppIcon';
-import { BuyNowModal } from '../checkout/BuyNowModal';
 import { useStoreSettings, formatWhatsAppUrl } from '../shared/storeSettingsService';
 
 interface ProductDetailModalProps {
@@ -34,6 +34,7 @@ export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
   product: initialProduct,
   onClose,
 }) => {
+  const router = useRouter();
   const { addToCart } = useCart();
   const { language } = useLanguage();
   const settings = useStoreSettings();
@@ -43,7 +44,6 @@ export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
   const [quantity, setQuantity] = useState(1);
   const [added, setAdded] = useState(false);
   const [activeImage, setActiveImage] = useState<string>(initialProduct?.image || '');
-  const [isBuyNowModalOpen, setIsBuyNowModalOpen] = useState(false);
   
   // Image Zoom states
   const [isZoomed, setIsZoomed] = useState(false);
@@ -53,14 +53,37 @@ export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
   const modalContainerRef = useRef<HTMLDivElement>(null);
   const relatedRailRef = useRef<HTMLDivElement>(null);
 
-  // Sync initial product and set active image
+  // Sync state if initialProduct prop updates
+  useEffect(() => {
+    setCurrentProduct(initialProduct);
+    setActiveImage(initialProduct?.image || '');
+    setQuantity(1);
+  }, [initialProduct]);
+
+  // Lock body scroll when modal is open
   useEffect(() => {
     if (initialProduct) {
-      setCurrentProduct(initialProduct);
-      setActiveImage(initialProduct.image);
-      setQuantity(1);
+      document.body.style.overflow = 'hidden';
     }
+    return () => {
+      document.body.style.overflow = '';
+    };
   }, [initialProduct]);
+
+  // ESC key listener to close modal
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        if (isFullscreenImage) {
+          setIsFullscreenImage(false);
+        } else {
+          onClose();
+        }
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isFullscreenImage, onClose]);
 
   // When currentProduct changes, reset active image and scroll modal to top
   useEffect(() => {
@@ -106,7 +129,9 @@ export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
   };
 
   const handleBuyNow = () => {
-    setIsBuyNowModalOpen(true);
+    if (!currentProduct) return;
+    onClose();
+    router.push(`/checkout?productId=${currentProduct.id}&quantity=${quantity}`);
   };
 
   const handleWhatsAppOrder = () => {
@@ -505,13 +530,6 @@ export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
         )}
 
       </div>
-      {/* Buy Now Checkout Modal */}
-      <BuyNowModal
-        product={currentProduct}
-        isOpen={isBuyNowModalOpen}
-        initialQuantity={quantity}
-        onClose={() => setIsBuyNowModalOpen(false)}
-      />
     </div>
   );
 };

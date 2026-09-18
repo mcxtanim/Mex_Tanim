@@ -131,13 +131,13 @@ export const MyAccountView: React.FC = () => {
         </div>
 
         {/* Quick Cart Trigger Pill */}
-        <button
-          onClick={openCart}
+        <Link
+          href="/cart"
           className="bg-white/10 hover:bg-white/20 border border-white/20 px-4 py-2.5 rounded-2xl text-xs font-bold transition flex items-center space-x-2 cursor-pointer active:scale-95"
         >
           <ShoppingBag className="w-4 h-4 text-orange-400" />
           <span>{language === 'bn' ? `আমার কার্ট (${totalCartQty} Items)` : `My Cart (${totalCartQty} Items)`}</span>
-        </button>
+        </Link>
       </div>
 
       {/* 4 TOP SUMMARY CARDS GRID */}
@@ -182,12 +182,12 @@ export const MyAccountView: React.FC = () => {
                 Subtotal: ৳{subtotal}
               </p>
             </div>
-            <button
-              onClick={openCart}
-              className="px-3 py-1.5 bg-slate-900 hover:bg-orange-600 text-white font-extrabold text-xs rounded-xl transition cursor-pointer"
+            <Link
+              href="/cart"
+              className="px-3 py-1.5 bg-slate-900 hover:bg-orange-600 text-white font-extrabold text-xs rounded-xl transition cursor-pointer inline-block"
             >
               {language === 'bn' ? 'খুলুন' : 'View'}
-            </button>
+            </Link>
           </div>
         </div>
 
