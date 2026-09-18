@@ -1,5 +1,6 @@
 ﻿import { Banner } from "./types";
 import { supabase } from "../../lib/supabase";
+import { uploadImageToCloudinary } from "../../lib/cloudinary";
 
 const BANNERS_STORAGE_KEY = "mex_tanim_admin_banners";
 const BROADCAST_CHANNEL_NAME = "mex_tanim_banners_channel";
@@ -87,6 +88,11 @@ export function getStoredBanners(): Banner[] {
   }
 }
 
+export function getBannerById(id: string): Banner | undefined {
+  const all = getStoredBanners();
+  return all.find((b) => String(b.id) === String(id));
+}
+
 export function setStoredBanners(banners: Banner[]) {
   if (typeof window === "undefined") return;
   try {
@@ -119,10 +125,17 @@ function mapDbToBanner(row: any): Banner {
 export async function fetchBannersFromSupabase(): Promise<Banner[]> {
   if (!supabase) return getStoredBanners();
   try {
-    const { data, error } = await supabase
+    const fetchPromise = supabase
       .from("banners")
       .select("*")
       .order("sequence", { ascending: true });
+
+    const timeoutPromise = new Promise<{ data: null; error: any }>((resolve) =>
+      setTimeout(() => resolve({ data: null, error: new Error("Supabase fetch timeout") }), 3000)
+    );
+
+    const result: any = await Promise.race([fetchPromise, timeoutPromise]);
+    const { data, error } = result;
 
     if (error || !data || data.length === 0) {
       return getStoredBanners();
@@ -132,7 +145,7 @@ export async function fetchBannersFromSupabase(): Promise<Banner[]> {
     setStoredBanners(mapped);
     return mapped;
   } catch (err) {
-    console.warn("fetchBannersFromSupabase exception:", err);
+    console.warn("fetchBannersFromSupabase notice:", err);
     return getStoredBanners();
   }
 }
@@ -150,33 +163,36 @@ export async function saveBanner(banner: Banner): Promise<Banner> {
   }
 
   // Sort by sequence
-  updatedList.sort((a, b) => a.sequence - b.sequence);
+  updatedList.sort((a, b) => (a.sequence || 1) - (b.sequence || 1));
+  
+  // 1. Instant 0ms save to local storage and broadcast
   setStoredBanners(updatedList);
 
+  // 2. Background sync to Supabase without blocking the UI
   if (supabase) {
-    try {
-      const payload = {
-        id: banner.id,
-        title: banner.title,
-        title_bn: banner.titleBn,
-        subtitle: banner.subtitle,
-        subtitle_bn: banner.subtitleBn,
-        badge_text: banner.badgeText,
-        button_text: banner.buttonText,
-        button_link: banner.buttonLink,
-        image_url: banner.imageUrl,
-        sequence: banner.sequence,
-        is_active: banner.isActive,
-        updated_at: new Date().toISOString(),
-      };
+    const payload = {
+      id: banner.id,
+      title: banner.title,
+      title_bn: banner.titleBn,
+      subtitle: banner.subtitle,
+      subtitle_bn: banner.subtitleBn,
+      badge_text: banner.badgeText,
+      button_text: banner.buttonText,
+      button_link: banner.buttonLink,
+      image_url: banner.imageUrl,
+      sequence: banner.sequence,
+      is_active: banner.isActive,
+      updated_at: new Date().toISOString(),
+    };
 
-      const { error } = await supabase.from("banners").upsert(payload, { onConflict: "id" });
-      if (error) {
-        console.error("Supabase banner save error:", error);
-      }
-    } catch (err) {
-      console.error("Supabase banner save exception:", err);
-    }
+    const syncPromise = supabase.from("banners").upsert(payload, { onConflict: "id" });
+    const timeoutPromise = new Promise((_, reject) =>
+      setTimeout(() => reject(new Error("Supabase sync timeout")), 2500)
+    );
+
+    Promise.race([syncPromise, timeoutPromise])
+      .then(() => console.log("✓ Banner synced to Supabase:", banner.id))
+      .catch((err) => console.warn("Background banner sync notice:", err?.message));
   }
 
   return banner;
@@ -188,14 +204,14 @@ export async function deleteBanner(id: string): Promise<boolean> {
   setStoredBanners(filtered);
 
   if (supabase) {
-    try {
-      const { error } = await supabase.from("banners").delete().eq("id", id);
-      if (error) {
-        console.error("Supabase banner delete error:", error);
-      }
-    } catch (err) {
-      console.error("Supabase banner delete exception:", err);
-    }
+    const delPromise = supabase.from("banners").delete().eq("id", id);
+    const timeoutPromise = new Promise((_, reject) =>
+      setTimeout(() => reject(new Error("Supabase delete timeout")), 2500)
+    );
+
+    Promise.race([delPromise, timeoutPromise])
+      .then(() => console.log("✓ Banner deleted from Supabase:", id))
+      .catch((err) => console.warn("Background banner delete notice:", err?.message));
   }
 
   return true;
@@ -210,61 +226,35 @@ export async function reorderBanners(orderedBanners: Banner[]): Promise<Banner[]
   setStoredBanners(normalized);
 
   if (supabase) {
-    try {
-      const upsertData = normalized.map((b) => ({
-        id: b.id,
-        title: b.title,
-        title_bn: b.titleBn,
-        subtitle: b.subtitle,
-        subtitle_bn: b.subtitleBn,
-        badge_text: b.badgeText,
-        button_text: b.buttonText,
-        button_link: b.buttonLink,
-        image_url: b.imageUrl,
-        sequence: b.sequence,
-        is_active: b.isActive,
-        updated_at: new Date().toISOString(),
-      }));
+    const upsertData = normalized.map((b) => ({
+      id: b.id,
+      title: b.title,
+      title_bn: b.titleBn,
+      subtitle: b.subtitle,
+      subtitle_bn: b.subtitleBn,
+      badge_text: b.badgeText,
+      button_text: b.buttonText,
+      button_link: b.buttonLink,
+      image_url: b.imageUrl,
+      sequence: b.sequence,
+      is_active: b.isActive,
+      updated_at: new Date().toISOString(),
+    }));
 
-      await supabase.from("banners").upsert(upsertData, { onConflict: "id" });
-    } catch (err) {
-      console.error("Reorder banners exception:", err);
-    }
+    const syncPromise = supabase.from("banners").upsert(upsertData, { onConflict: "id" });
+    const timeoutPromise = new Promise((_, reject) =>
+      setTimeout(() => reject(new Error("Supabase reorder timeout")), 2500)
+    );
+
+    Promise.race([syncPromise, timeoutPromise])
+      .then(() => console.log("✓ Banners reorder synced to Supabase"))
+      .catch((err) => console.warn("Background reorder sync notice:", err?.message));
   }
 
   return normalized;
 }
 
 export async function uploadBannerImage(file: File): Promise<string> {
-  if (supabase) {
-    try {
-      const cleanName = file.name.replace(/[^a-zA-Z0-9.]/g, "_");
-      const filename = `banner_${Date.now()}_${cleanName}`;
-      const { data, error } = await supabase.storage
-        .from("banners")
-        .upload(filename, file, {
-          cacheControl: "3600",
-          upsert: true,
-        });
-
-      if (!error && data) {
-        const { data: urlData } = supabase.storage.from("banners").getPublicUrl(filename);
-        if (urlData?.publicUrl) {
-          return urlData.publicUrl;
-        }
-      } else {
-        console.warn("Supabase storage upload notice:", error?.message);
-      }
-    } catch (err) {
-      console.warn("Storage upload exception:", err);
-    }
-  }
-
-  // Robust client-side fallback to base64 Data URL
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.onload = () => resolve(reader.result as string);
-    reader.onerror = (e) => reject(e);
-    reader.readAsDataURL(file);
-  });
+  // Use high-performance Cloudinary CDN directly
+  return uploadImageToCloudinary(file);
 }

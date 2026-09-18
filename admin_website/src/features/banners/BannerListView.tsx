@@ -1,6 +1,7 @@
-﻿"use client";
+"use client";
 
 import React, { useState, useEffect } from "react";
+import Link from "next/link";
 import {
   Layers,
   Plus,
@@ -23,13 +24,10 @@ import {
   deleteBanner,
   reorderBanners,
 } from "./bannerService";
-import { BannerFormModal } from "./BannerFormModal";
 
 export function BannerListView() {
   const [banners, setBanners] = useState<Banner[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [editingBanner, setEditingBanner] = useState<Banner | null>(null);
   const [successMsg, setSuccessMsg] = useState("");
 
   const loadData = async () => {
@@ -72,16 +70,6 @@ export function BannerListView() {
     };
   }, []);
 
-  const handleCreateNew = () => {
-    setEditingBanner(null);
-    setIsModalOpen(true);
-  };
-
-  const handleEdit = (banner: Banner) => {
-    setEditingBanner(banner);
-    setIsModalOpen(true);
-  };
-
   const handleDelete = async (id: string) => {
     if (!confirm("Are you sure you want to delete this banner?")) return;
     await deleteBanner(id);
@@ -112,20 +100,10 @@ export function BannerListView() {
     showSuccess("Banner sequence updated.");
   };
 
-  const handleSaveModal = async (saved: Banner) => {
-    await saveBanner(saved);
-    await loadData();
-    showSuccess("Banner saved successfully and synced to customer storefront.");
-  };
-
   const showSuccess = (msg: string) => {
     setSuccessMsg(msg);
     setTimeout(() => setSuccessMsg(""), 3500);
   };
-
-  const nextSequence = banners.length > 0
-    ? Math.max(...banners.map((b) => b.sequence || 1)) + 1
-    : 1;
 
   return (
     <div className="space-y-6 max-w-5xl font-sans">
@@ -154,14 +132,13 @@ export function BannerListView() {
             <span className="hidden sm:inline">Refresh</span>
           </button>
 
-          <button
-            type="button"
-            onClick={handleCreateNew}
+          <Link
+            href="/banners/add"
             className="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white font-black text-xs rounded-xl shadow-lg shadow-emerald-600/20 transition active:scale-95 flex items-center gap-1.5 cursor-pointer"
           >
             <Plus className="w-4 h-4" />
             <span>Add New Banner</span>
-          </button>
+          </Link>
         </div>
       </div>
 
@@ -183,14 +160,13 @@ export function BannerListView() {
           <p className="text-xs text-slate-400 max-w-sm mx-auto">
             Add promotional banners to highlight sales, top gaming gadgets, and special deals on the store front.
           </p>
-          <button
-            type="button"
-            onClick={handleCreateNew}
+          <Link
+            href="/banners/add"
             className="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs rounded-xl transition cursor-pointer inline-flex items-center gap-1.5 mt-2"
           >
             <Plus className="w-4 h-4" />
             <span>Create First Banner</span>
-          </button>
+          </Link>
         </div>
       ) : (
         <div className="space-y-3">
@@ -296,14 +272,13 @@ export function BannerListView() {
                 </button>
 
                 {/* Edit Button */}
-                <button
-                  type="button"
-                  onClick={() => handleEdit(item)}
-                  className="p-2 bg-slate-800 hover:bg-slate-700 text-slate-200 rounded-xl border border-slate-700 transition cursor-pointer"
+                <Link
+                  href={`/banners/edit/${item.id}`}
+                  className="p-2 bg-slate-800 hover:bg-slate-700 text-slate-200 rounded-xl border border-slate-700 transition cursor-pointer inline-flex items-center justify-center"
                   title="Edit Banner"
                 >
                   <Edit2 className="w-3.5 h-3.5" />
-                </button>
+                </Link>
 
                 {/* Delete Button */}
                 <button
@@ -320,18 +295,6 @@ export function BannerListView() {
           ))}
         </div>
       )}
-
-      {/* Banner Form Modal */}
-      <BannerFormModal
-        isOpen={isModalOpen}
-        banner={editingBanner}
-        nextSequence={nextSequence}
-        onClose={() => {
-          setIsModalOpen(false);
-          setEditingBanner(null);
-        }}
-        onSave={handleSaveModal}
-      />
 
     </div>
   );
