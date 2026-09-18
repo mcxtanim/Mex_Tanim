@@ -84,7 +84,7 @@ export async function signInWithGoogle(): Promise<{ error?: string }> {
 export async function signInWithEmail(
   email: string,
   pass: string
-): Promise<{ success: boolean; user?: any; error?: string }> {
+): Promise<{ success: boolean; user?: any; adminUser?: AdminUser; error?: string }> {
   if (!supabase) {
     return { success: false, error: "Supabase client is not configured." };
   }
@@ -104,17 +104,41 @@ export async function signInWithEmail(
       return { success: false, error: "No user found with the provided credentials." };
     }
 
-    // Verify admin role
-    const isAdmin = await checkIsAdmin();
-    if (!isAdmin) {
-      await supabase.auth.signOut();
-      return {
-        success: false,
-        error: "Access Denied: This account is not authorized to access the Admin Portal.",
+    // Fast-path: check admin status directly from user app_metadata or email
+    const isAppAdmin =
+      data.user.app_metadata?.role === "super_admin" ||
+      data.user.app_metadata?.is_admin === true ||
+      cleanEmail === "mcxtanim@gmail.com";
+
+    let adminProfile: AdminUser | null = null;
+
+    if (isAppAdmin) {
+      adminProfile = {
+        id: data.user.id,
+        email: data.user.email || cleanEmail,
+        phone: data.user.phone || null,
+        role: (data.user.app_metadata?.role as any) || "super_admin",
+        is_active: true,
+        created_at: data.user.created_at,
       };
+    } else {
+      // Fallback verification for other users
+      const isAdmin = await checkIsAdmin();
+      if (!isAdmin) {
+        await supabase.auth.signOut();
+        return {
+          success: false,
+          error: "Access Denied: This account is not authorized to access the Admin Portal.",
+        };
+      }
+      adminProfile = await fetchCurrentAdminProfile();
     }
 
-    return { success: true, user: data.user };
+    return {
+      success: true,
+      user: data.user,
+      adminUser: adminProfile || undefined,
+    };
   } catch (err: any) {
     return { success: false, error: err.message || "Email login failed." };
   }

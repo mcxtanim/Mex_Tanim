@@ -21,7 +21,10 @@ export interface AuthContextType {
   authError: string | null;
   clearError: () => void;
   signInWithGoogle: () => Promise<{ error?: string }>;
-  signInWithEmail: (email: string, pass: string) => Promise<{ success: boolean; error?: string }>;
+  signInWithEmail: (
+    email: string,
+    pass: string
+  ) => Promise<{ success: boolean; user?: any; adminUser?: AdminUser; error?: string }>;
   sendPhoneOtp: (phone: string) => Promise<{ success: boolean; error?: string }>;
   verifyPhoneOtp: (phone: string, token: string) => Promise<{ success: boolean; error?: string }>;
   signOut: () => Promise<void>;

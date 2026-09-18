@@ -23,16 +23,6 @@ export function AuthGuard({ children }: { children: React.ReactNode }) {
     }
   }, [isLoading, isPublicRoute, user, isAdmin, router]);
 
-  // Fallback timer: if loading is stuck for more than 2 seconds, force redirect to /login
-  useEffect(() => {
-    if (isPublicRoute) return;
-    const fallbackTimer = setTimeout(() => {
-      if (!user || !isAdmin) {
-        router.replace("/login");
-      }
-    }, 2000);
-    return () => clearTimeout(fallbackTimer);
-  }, [isPublicRoute, user, isAdmin, router]);
 
   // Public routes (e.g. /login, /auth/callback) do not need sidebar or guard wrapper
   if (isPublicRoute) {

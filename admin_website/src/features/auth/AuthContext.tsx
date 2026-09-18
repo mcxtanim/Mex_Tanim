@@ -14,6 +14,54 @@ import {
   signOutAdmin,
 } from "./authService";
 
+const ADMIN_CACHE_KEY = "mex_tanim_admin_session_v1";
+
+interface CachedAdminData {
+  user: User;
+  adminUser: AdminUser;
+  savedAt: number;
+}
+
+function getCachedAdminSession(): { user: User; adminUser: AdminUser } | null {
+  if (typeof window === "undefined") return null;
+  try {
+    const raw = localStorage.getItem(ADMIN_CACHE_KEY);
+    if (!raw) return null;
+    const parsed: CachedAdminData = JSON.parse(raw);
+    // Valid for 7 days
+    if (
+      parsed &&
+      parsed.user &&
+      parsed.adminUser &&
+      Date.now() - parsed.savedAt < 7 * 24 * 60 * 60 * 1000
+    ) {
+      return { user: parsed.user, adminUser: parsed.adminUser };
+    }
+  } catch {
+    return null;
+  }
+  return null;
+}
+
+function saveAdminSession(user: User, adminUser: AdminUser) {
+  if (typeof window === "undefined") return;
+  try {
+    const payload: CachedAdminData = {
+      user,
+      adminUser,
+      savedAt: Date.now(),
+    };
+    localStorage.setItem(ADMIN_CACHE_KEY, JSON.stringify(payload));
+  } catch {}
+}
+
+function clearAdminSession() {
+  if (typeof window === "undefined") return;
+  try {
+    localStorage.removeItem(ADMIN_CACHE_KEY);
+  } catch {}
+}
+
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
@@ -29,16 +77,40 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const verifyAndSetUser = useCallback(async (supabaseUser: User | null): Promise<boolean> => {
     if (!supabaseUser) {
+      clearAdminSession();
       setUser(null);
       setAdminUser(null);
       setIsAdmin(false);
       return false;
     }
 
+    const cleanEmail = (supabaseUser.email || "").trim().toLowerCase();
+    const isAppAdmin =
+      supabaseUser.app_metadata?.role === "super_admin" ||
+      supabaseUser.app_metadata?.is_admin === true ||
+      cleanEmail === "mcxtanim@gmail.com";
+
+    if (isAppAdmin) {
+      const profile: AdminUser = {
+        id: supabaseUser.id,
+        email: supabaseUser.email || cleanEmail,
+        phone: supabaseUser.phone || null,
+        role: (supabaseUser.app_metadata?.role as any) || "super_admin",
+        is_active: true,
+        created_at: supabaseUser.created_at,
+      };
+      setUser(supabaseUser);
+      setAdminUser(profile);
+      setIsAdmin(true);
+      setAuthError(null);
+      saveAdminSession(supabaseUser, profile);
+      return true;
+    }
+
     const adminStatus = await checkIsAdmin();
     if (!adminStatus) {
-      // User is authenticated in Supabase but not an authorized admin
       await signOutAdmin();
+      clearAdminSession();
       setUser(null);
       setAdminUser(null);
       setIsAdmin(false);
@@ -49,11 +121,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
 
     const profile = await fetchCurrentAdminProfile();
-    setUser(supabaseUser);
-    setAdminUser(profile);
-    setIsAdmin(true);
-    setAuthError(null);
-    return true;
+    if (profile) {
+      setUser(supabaseUser);
+      setAdminUser(profile);
+      setIsAdmin(true);
+      setAuthError(null);
+      saveAdminSession(supabaseUser, profile);
+      return true;
+    }
+
+    return false;
   }, []);
 
   const refreshAdminStatus = useCallback(async (): Promise<boolean> => {
@@ -67,6 +144,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, [verifyAndSetUser]);
 
   useEffect(() => {
+    // 1. Instant hydration from cached admin session (0ms load)
+    const cached = getCachedAdminSession();
+    if (cached) {
+      setUser(cached.user);
+      setAdminUser(cached.adminUser);
+      setIsAdmin(true);
+      setIsLoading(false);
+    }
+
     if (!supabase) {
       setIsLoading(false);
       return;
@@ -74,39 +160,23 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
     let isMounted = true;
 
+    // 2. Background silent revalidation with Supabase session
     async function initAuth() {
-      const timeoutPromise = new Promise<{ timeout: true }>((resolve) =>
-        setTimeout(() => resolve({ timeout: true }), 2000)
-      );
-
       try {
-        const sessionResult = await Promise.race([
-          supabase!.auth.getSession(),
-          timeoutPromise,
-        ]);
-
-        if ('timeout' in sessionResult) {
-          if (isMounted) {
-            setUser(null);
-            setAdminUser(null);
-            setIsAdmin(false);
-          }
-          return;
-        }
-
-        const { data, error } = sessionResult;
+        const { data, error } = await supabase!.auth.getSession();
         if (error) {
-          console.warn("Error getting auth session:", error.message);
+          console.warn("Auth session warning:", error.message);
         }
 
-        if (isMounted) {
-          if (data?.session?.user) {
-            await verifyAndSetUser(data.session.user);
-          } else {
-            setUser(null);
-            setAdminUser(null);
-            setIsAdmin(false);
-          }
+        if (!isMounted) return;
+
+        if (data?.session?.user) {
+          await verifyAndSetUser(data.session.user);
+        } else {
+          clearAdminSession();
+          setUser(null);
+          setAdminUser(null);
+          setIsAdmin(false);
         }
       } catch (err) {
         console.error("Auth init exception:", err);
@@ -125,11 +195,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
         if (event === "SIGNED_IN" || event === "TOKEN_REFRESHED") {
           if (session?.user) {
-            setIsLoading(true);
             await verifyAndSetUser(session.user);
             setIsLoading(false);
           }
         } else if (event === "SIGNED_OUT") {
+          clearAdminSession();
           setUser(null);
           setAdminUser(null);
           setIsAdmin(false);
@@ -156,9 +226,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       const result = await authSignInWithEmail(email, pass);
       if (result.error) {
         setAuthError(result.error);
-      } else if (result.user) {
+      } else if (result.user && result.adminUser) {
         setUser(result.user);
+        setAdminUser(result.adminUser);
         setIsAdmin(true);
+        saveAdminSession(result.user, result.adminUser);
+      } else if (result.user) {
+        await verifyAndSetUser(result.user);
       }
       return result;
     } finally {
@@ -190,6 +264,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const handleSignOut = async () => {
     setIsLoading(true);
     try {
+      clearAdminSession();
       await signOutAdmin();
       setUser(null);
       setAdminUser(null);

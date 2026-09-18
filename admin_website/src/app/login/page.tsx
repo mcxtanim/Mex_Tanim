@@ -66,7 +66,7 @@ function LoginForm() {
     try {
       const res = await signInWithEmail(email, password);
       if (res.success) {
-        window.location.href = "/";
+        router.replace("/");
         return;
       } else if (res.error) {
         setLocalError(res.error);
