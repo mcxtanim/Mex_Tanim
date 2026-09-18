@@ -10,6 +10,7 @@ import {
   fetchProductsFromSupabase,
   deleteProduct,
 } from "./productService";
+import { supabase } from "../../lib/supabase";
 
 export function ProductsView() {
   const [products, setProducts] = useState<Product[]>([]);
@@ -25,6 +26,36 @@ export function ProductsView() {
       }
     };
     loadProducts();
+
+    // Supabase Realtime channel for products
+    const channel = supabase
+      ?.channel("realtime_admin_products_view")
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "products" },
+        async () => {
+          const fresh = await fetchProductsFromSupabase();
+          if (fresh) setProducts(fresh);
+        }
+      )
+      .subscribe();
+
+    const handleLocalUpdate = (e: any) => {
+      if (e.detail && Array.isArray(e.detail)) {
+        setProducts(e.detail);
+      } else {
+        loadProducts();
+      }
+    };
+
+    window.addEventListener("products_updated", handleLocalUpdate);
+    window.addEventListener("storage", loadProducts);
+
+    return () => {
+      if (channel) supabase?.removeChannel(channel);
+      window.removeEventListener("products_updated", handleLocalUpdate);
+      window.removeEventListener("storage", loadProducts);
+    };
   }, []);
 
   const categories = ["All", ...Array.from(new Set(products.map((p) => p.category)))];

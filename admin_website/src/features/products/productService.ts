@@ -132,6 +132,21 @@ export async function fetchProductById(id: string): Promise<Product | null> {
   return stored.find((p) => p.id === id) || null;
 }
 
+function notifyProductsUpdated(products: Product[]) {
+  if (typeof window !== "undefined") {
+    try {
+      window.dispatchEvent(new CustomEvent("products_updated", { detail: products }));
+    } catch {}
+    if ("BroadcastChannel" in window) {
+      try {
+        const bc = new BroadcastChannel("mex_tanim_store_sync");
+        bc.postMessage({ type: "PRODUCTS_UPDATED" });
+        bc.close();
+      } catch {}
+    }
+  }
+}
+
 export async function createProduct(
   formData: ProductFormData,
   existingProducts: Product[]
@@ -151,6 +166,7 @@ export async function createProduct(
 
   const updated = [newProduct, ...existingProducts];
   saveStoredProducts(updated);
+  notifyProductsUpdated(updated);
 
   if (supabase) {
     try {
@@ -200,6 +216,7 @@ export async function updateProduct(
     p.id === id ? { ...p, ...formData, category: categorySlug } : p
   );
   saveStoredProducts(updated);
+  notifyProductsUpdated(updated);
 
   if (supabase) {
     try {
@@ -242,6 +259,7 @@ export async function deleteProduct(
 ): Promise<Product[]> {
   const updated = existingProducts.filter((p) => p.id !== id);
   saveStoredProducts(updated);
+  notifyProductsUpdated(updated);
 
   if (supabase) {
     try {

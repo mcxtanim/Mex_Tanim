@@ -150,6 +150,21 @@ export async function fetchCategoryById(id: string): Promise<Category | null> {
   return stored.find((c) => c.id === id || c.slug === id) || null;
 }
 
+function notifyCategoriesUpdated(categories: Category[]) {
+  if (typeof window !== "undefined") {
+    try {
+      window.dispatchEvent(new CustomEvent("categories_updated", { detail: categories }));
+    } catch {}
+    if ("BroadcastChannel" in window) {
+      try {
+        const bc = new BroadcastChannel("mex_tanim_store_sync");
+        bc.postMessage({ type: "CATEGORIES_UPDATED" });
+        bc.close();
+      } catch {}
+    }
+  }
+}
+
 export async function createCategory(
   formData: CategoryFormData,
   existingCategories: Category[]
@@ -168,6 +183,7 @@ export async function createCategory(
 
   const updated = [newCat, ...existingCategories];
   saveStoredCategories(updated);
+  notifyCategoriesUpdated(updated);
 
   if (supabase) {
     try {
@@ -201,6 +217,7 @@ export async function updateCategory(
       : cat
   );
   saveStoredCategories(updated);
+  notifyCategoriesUpdated(updated);
 
   if (supabase) {
     try {
@@ -229,6 +246,7 @@ export async function deleteCategory(
 ): Promise<Category[]> {
   const updated = existingCategories.filter((c) => c.id !== id);
   saveStoredCategories(updated);
+  notifyCategoriesUpdated(updated);
 
   if (supabase) {
     try {

@@ -22,9 +22,15 @@ export const CategoryShowcase: React.FC<CategoryShowcaseProps> = ({
   const router = useRouter();
   const scrollRef = useRef<HTMLDivElement>(null);
   const isHoveredRef = useRef(false);
-  const [categories, setCategories] = useState<CategoryItem[]>(() => getCachedCategories());
+  const [categories, setCategories] = useState<CategoryItem[]>([]);
 
   useEffect(() => {
+    // 1. Client-side cache hydration (prevents SSR hydration mismatch)
+    const cached = getCachedCategories();
+    if (cached.length > 0) {
+      setCategories(cached);
+    }
+
     const loadCategories = async () => {
       const liveCats = await fetchLiveCategories();
       setCategories(liveCats);

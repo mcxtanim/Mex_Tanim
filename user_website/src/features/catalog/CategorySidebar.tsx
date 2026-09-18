@@ -4,7 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { ChevronRight } from 'lucide-react';
 import { useLanguage } from '../shared/LanguageContext';
 import { CategoryItem, fetchLiveCategories, getCachedCategories, getCategoryProductCount, isCategorySelected, getCategoryName } from './categoryData';
-import { fetchLiveProducts } from './productService';
+import { fetchLiveProducts, getCachedProducts } from './productService';
 import { Product } from './types';
 
 interface CategorySidebarProps {
@@ -17,10 +17,16 @@ export const CategorySidebar: React.FC<CategorySidebarProps> = ({
   onSelectCategory,
 }) => {
   const { language } = useLanguage();
-  const [categories, setCategories] = useState<CategoryItem[]>(() => getCachedCategories());
+  const [categories, setCategories] = useState<CategoryItem[]>([]);
   const [products, setProducts] = useState<Product[]>([]);
 
   useEffect(() => {
+    // 1. Client-side cache hydration (prevents SSR hydration mismatch)
+    const cachedCats = getCachedCategories();
+    const cachedProds = getCachedProducts();
+    if (cachedCats.length > 0) setCategories(cachedCats);
+    if (cachedProds.length > 0) setProducts(cachedProds);
+
     const loadCategoriesAndProducts = async () => {
       const [liveCats, liveProds] = await Promise.all([
         fetchLiveCategories(),
@@ -39,10 +45,20 @@ export const CategorySidebar: React.FC<CategorySidebarProps> = ({
       }
     };
 
+    const handleProductsUpdate = (e: any) => {
+      if (e.detail && Array.isArray(e.detail)) {
+        setProducts(e.detail);
+      } else {
+        loadCategoriesAndProducts();
+      }
+    };
+
     window.addEventListener('categories_updated', handleCategoriesUpdate);
+    window.addEventListener('products_updated', handleProductsUpdate);
     window.addEventListener('storage', loadCategoriesAndProducts);
     return () => {
       window.removeEventListener('categories_updated', handleCategoriesUpdate);
+      window.removeEventListener('products_updated', handleProductsUpdate);
       window.removeEventListener('storage', loadCategoriesAndProducts);
     };
   }, []);

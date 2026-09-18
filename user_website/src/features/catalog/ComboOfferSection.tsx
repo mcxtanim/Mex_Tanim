@@ -24,8 +24,12 @@ export const ComboOfferSection: React.FC = () => {
     };
     loadCombos();
 
+    window.addEventListener('products_updated', loadCombos);
     window.addEventListener('storage', loadCombos);
-    return () => window.removeEventListener('storage', loadCombos);
+    return () => {
+      window.removeEventListener('products_updated', loadCombos);
+      window.removeEventListener('storage', loadCombos);
+    };
   }, []);
 
   useEffect(() => {

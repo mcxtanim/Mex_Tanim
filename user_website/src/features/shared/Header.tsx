@@ -48,9 +48,15 @@ export const Header: React.FC<HeaderProps> = ({
   const router = useRouter();
 
   const [isCategoryDrawerOpen, setIsCategoryDrawerOpen] = useState(false);
-  const [categories, setCategories] = useState<CategoryItem[]>(() => getCachedCategories());
+  const [categories, setCategories] = useState<CategoryItem[]>([]);
 
   useEffect(() => {
+    // 1. Client-side cache hydration (prevents SSR hydration mismatch)
+    const cached = getCachedCategories();
+    if (cached.length > 0) {
+      setCategories(cached);
+    }
+
     const loadCategories = async () => {
       const liveCats = await fetchLiveCategories();
       setCategories(liveCats);

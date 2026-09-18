@@ -17,11 +17,17 @@ import { RotateCcw } from 'lucide-react';
 export default function Home() {
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
   const [searchQuery, setSearchQuery] = useState<string>('');
-  const [products, setProducts] = useState<Product[]>(() => getCachedProducts());
-  const [categories, setCategories] = useState<CategoryItem[]>(() => getCachedCategories());
+  const [products, setProducts] = useState<Product[]>([]);
+  const [categories, setCategories] = useState<CategoryItem[]>([]);
   const { language } = useLanguage();
 
   useEffect(() => {
+    // 1. Client-side cache hydration (prevents SSR hydration mismatch)
+    const cachedProds = getCachedProducts();
+    const cachedCats = getCachedCategories();
+    if (cachedProds.length > 0) setProducts(cachedProds);
+    if (cachedCats.length > 0) setCategories(cachedCats);
+
     const loadData = async () => {
       const [prods, cats] = await Promise.all([
         fetchLiveProducts(),
@@ -40,10 +46,20 @@ export default function Home() {
       }
     };
 
+    const handleProductsUpdate = (e: any) => {
+      if (e.detail && Array.isArray(e.detail)) {
+        setProducts(e.detail);
+      } else {
+        loadData();
+      }
+    };
+
     window.addEventListener('categories_updated', handleCategoriesUpdate);
+    window.addEventListener('products_updated', handleProductsUpdate);
     window.addEventListener('storage', loadData);
     return () => {
       window.removeEventListener('categories_updated', handleCategoriesUpdate);
+      window.removeEventListener('products_updated', handleProductsUpdate);
       window.removeEventListener('storage', loadData);
     };
   }, []);

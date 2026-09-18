@@ -138,11 +138,17 @@ const CategoryRailRow: React.FC<CategoryRailProps> = ({
 
 export const ProductTabsSection: React.FC = () => {
   const [activeTab, setActiveTab] = useState<TabType>('featured');
-  const [allProducts, setAllProducts] = useState<Product[]>(() => getCachedProducts());
-  const [categories, setCategories] = useState<CategoryItem[]>(() => getCachedCategories());
+  const [allProducts, setAllProducts] = useState<Product[]>([]);
+  const [categories, setCategories] = useState<CategoryItem[]>([]);
   const { language } = useLanguage();
 
   useEffect(() => {
+    // 1. Client-side cache hydration (prevents SSR hydration mismatch)
+    const cachedCats = getCachedCategories();
+    const cachedProds = getCachedProducts();
+    if (cachedCats.length > 0) setCategories(cachedCats);
+    if (cachedProds.length > 0) setAllProducts(cachedProds);
+
     const loadData = async () => {
       const [prods, cats] = await Promise.all([
         fetchLiveProducts(),
@@ -161,10 +167,20 @@ export const ProductTabsSection: React.FC = () => {
       }
     };
 
+    const handleProductsUpdate = (e: any) => {
+      if (e.detail && Array.isArray(e.detail)) {
+        setAllProducts(e.detail);
+      } else {
+        loadData();
+      }
+    };
+
     window.addEventListener('categories_updated', handleCategoriesUpdate);
+    window.addEventListener('products_updated', handleProductsUpdate);
     window.addEventListener('storage', loadData);
     return () => {
       window.removeEventListener('categories_updated', handleCategoriesUpdate);
+      window.removeEventListener('products_updated', handleProductsUpdate);
       window.removeEventListener('storage', loadData);
     };
   }, []);

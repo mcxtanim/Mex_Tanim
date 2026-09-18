@@ -11,6 +11,7 @@ import {
   fetchCategoriesFromSupabase,
   deleteCategory,
 } from "./categoryService";
+import { supabase } from "../../lib/supabase";
 
 export function CategoriesView() {
   const [categories, setCategories] = useState<Category[]>([]);
@@ -26,6 +27,36 @@ export function CategoriesView() {
       }
     };
     loadCategories();
+
+    // Supabase Realtime channel for categories
+    const channel = supabase
+      ?.channel("realtime_admin_categories_view")
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "categories" },
+        async () => {
+          const fresh = await fetchCategoriesFromSupabase();
+          if (fresh) setCategories(fresh);
+        }
+      )
+      .subscribe();
+
+    const handleLocalUpdate = (e: any) => {
+      if (e.detail && Array.isArray(e.detail)) {
+        setCategories(e.detail);
+      } else {
+        loadCategories();
+      }
+    };
+
+    window.addEventListener("categories_updated", handleLocalUpdate);
+    window.addEventListener("storage", loadCategories);
+
+    return () => {
+      if (channel) supabase?.removeChannel(channel);
+      window.removeEventListener("categories_updated", handleLocalUpdate);
+      window.removeEventListener("storage", loadCategories);
+    };
   }, []);
 
   const handleDeleteCategory = async (id: string) => {

@@ -142,7 +142,53 @@ export async function fetchLiveProducts(forceRefresh = false): Promise<Product[]
     inFlightPromise = null;
   });
 
+  // Initialize Realtime subscription in browser once
+  if (supabase && typeof window !== 'undefined' && !productsRealtimeInitialized) {
+    initProductsRealtime();
+  }
+
   return inFlightPromise;
+}
+
+let productsRealtimeInitialized = false;
+
+export function initProductsRealtime(): void {
+  if (!supabase || typeof window === 'undefined' || productsRealtimeInitialized) {
+    return;
+  }
+  productsRealtimeInitialized = true;
+
+  try {
+    supabase
+      .channel('public:products_live_sync')
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: 'products' },
+        async (payload) => {
+          memoryProductsCache = null;
+          lastFetchTimestamp = 0;
+          const fresh = await fetchLiveProducts(true);
+          window.dispatchEvent(new CustomEvent('products_updated', { detail: fresh }));
+        }
+      )
+      .subscribe();
+  } catch (err) {
+    console.warn('Realtime products subscription notice:', err);
+  }
+
+  if ('BroadcastChannel' in window) {
+    try {
+      const bc = new BroadcastChannel('mex_tanim_store_sync');
+      bc.onmessage = async (event) => {
+        if (event.data?.type === 'PRODUCTS_UPDATED') {
+          memoryProductsCache = null;
+          lastFetchTimestamp = 0;
+          const fresh = await fetchLiveProducts(true);
+          window.dispatchEvent(new CustomEvent('products_updated', { detail: fresh }));
+        }
+      };
+    } catch {}
+  }
 }
 
 /**

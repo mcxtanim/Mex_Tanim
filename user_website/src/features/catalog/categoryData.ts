@@ -306,11 +306,25 @@ export async function fetchLiveCategories(forceRefresh = false): Promise<Categor
             'postgres_changes',
             { event: '*', schema: 'public', table: 'categories' },
             async () => {
+              memoryCategoriesCache = null;
+              lastCategoriesFetchTimestamp = 0;
               const updated = await fetchLiveCategories(true);
               window.dispatchEvent(new CustomEvent('categories_updated', { detail: updated }));
             }
           )
           .subscribe();
+
+        if ('BroadcastChannel' in window) {
+          const bc = new BroadcastChannel('mex_tanim_store_sync');
+          bc.onmessage = async (event) => {
+            if (event.data?.type === 'CATEGORIES_UPDATED') {
+              memoryCategoriesCache = null;
+              lastCategoriesFetchTimestamp = 0;
+              const updated = await fetchLiveCategories(true);
+              window.dispatchEvent(new CustomEvent('categories_updated', { detail: updated }));
+            }
+          };
+        }
       } catch (subErr) {
         console.warn('Supabase Realtime subscription notice for categories:', subErr);
       }

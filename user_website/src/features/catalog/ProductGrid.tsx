@@ -48,10 +48,17 @@ export const ProductGrid: React.FC<ProductGridProps> = ({
   onSelectCategory,
 }) => {
   const { t, language } = useLanguage();
-  const [products, setProducts] = useState<Product[]>(() => getCachedProducts());
-  const [loading, setLoading] = useState(() => getCachedProducts().length === 0);
+  const [products, setProducts] = useState<Product[]>([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    // 1. Client-side cache hydration (prevents SSR hydration mismatch)
+    const cached = getCachedProducts();
+    if (cached.length > 0) {
+      setProducts(cached);
+      setLoading(false);
+    }
+
     const loadData = async () => {
       const data = await fetchLiveProducts();
       setProducts(data);
@@ -59,8 +66,21 @@ export const ProductGrid: React.FC<ProductGridProps> = ({
     };
     loadData();
 
+    const handleProductsUpdate = (e: any) => {
+      if (e.detail && Array.isArray(e.detail)) {
+        setProducts(e.detail);
+        setLoading(false);
+      } else {
+        loadData();
+      }
+    };
+
+    window.addEventListener('products_updated', handleProductsUpdate);
     window.addEventListener('storage', loadData);
-    return () => window.removeEventListener('storage', loadData);
+    return () => {
+      window.removeEventListener('products_updated', handleProductsUpdate);
+      window.removeEventListener('storage', loadData);
+    };
   }, []);
 
   const filteredProducts = products.filter((product) => {
