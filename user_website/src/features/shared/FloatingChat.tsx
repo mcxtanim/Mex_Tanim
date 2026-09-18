@@ -15,7 +15,7 @@ export const FloatingChat: React.FC = () => {
   }
 
   const showMessenger = settings.enableMessengerChat && (settings.messengerLink || settings.messengerUsername);
-  const showWhatsApp = settings.enableWhatsappChat && settings.whatsappNumber;
+  const showWhatsApp = settings.enableWhatsappChat !== false;
   const showTelegram = settings.enableTelegramChat && (settings.telegramLink || settings.telegramUsername);
 
   // If no chat options are enabled, do not render
@@ -25,7 +25,11 @@ export const FloatingChat: React.FC = () => {
 
   const handleWhatsAppClick = () => {
     const url = formatWhatsAppUrl(settings.whatsappNumber);
-    if (url) window.open(url, '_blank', 'noopener,noreferrer');
+    if (url) {
+      window.open(url, '_blank', 'noopener,noreferrer');
+    } else {
+      window.open('https://wa.me/', '_blank', 'noopener,noreferrer');
+    }
   };
 
   const handleMessengerClick = () => {

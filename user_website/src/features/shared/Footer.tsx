@@ -209,9 +209,9 @@ export const Footer: React.FC = () => {
               )}
 
               {/* Channel 2: WhatsApp Support */}
-              {whatsappUrl && (
+              {settings.enableWhatsappChat !== false && (
                 <a
-                  href={whatsappUrl}
+                  href={whatsappUrl || 'https://wa.me/'}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="group bg-white p-4 rounded-2xl border border-gray-200/90 shadow-2xs hover:shadow-md hover:border-emerald-300 transition-all duration-300 flex items-center space-x-4 cursor-pointer"
