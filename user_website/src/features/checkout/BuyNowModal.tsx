@@ -30,6 +30,7 @@ import {
   getDistrictsByDivision,
   getUpazilasByDistrict,
 } from './bangladeshAddressData';
+import { SearchableAddressSelect } from './SearchableAddressSelect';
 import { supabase } from '../../lib/supabase';
 import { useStoreSettings } from '../shared/storeSettingsService';
 
@@ -135,21 +136,26 @@ export const BuyNowModal: React.FC<BuyNowModalProps> = ({
   const availableUpazilas = division && district ? getUpazilasByDistrict(division, district) : [];
 
   // Reset child dropdowns when parent changes
-  const handleDivisionChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    setDivision(e.target.value);
+  const handleDivisionChange = (val: string) => {
+    setDivision(val);
     setDistrict('');
     setUpazila('');
   };
 
-  const handleDistrictChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    setDistrict(e.target.value);
+  const handleDistrictChange = (val: string) => {
+    setDistrict(val);
     setUpazila('');
   };
 
   // Delivery charge calculation (Dhaka Division vs Outside Dhaka with free delivery threshold)
   const insideFee = Number(settings.insideDhakaFee) || 60;
   const outsideFee = Number(settings.outsideDhakaFee) || 120;
-  const rawDeliveryCharge = division === 'dhaka' ? insideFee : outsideFee;
+  const isDhakaDivision =
+    division === 'dhaka' ||
+    division === '3' ||
+    division.toLowerCase() === 'dhaka' ||
+    division === 'ঢাকা';
+  const rawDeliveryCharge = isDhakaDivision ? insideFee : outsideFee;
   const itemTotal = product.price * quantity;
   const isFreeDelivery = settings.freeDeliveryThreshold > 0 && itemTotal >= settings.freeDeliveryThreshold;
   const deliveryCharge = isFreeDelivery ? 0 : rawDeliveryCharge;
@@ -202,9 +208,27 @@ export const BuyNowModal: React.FC<BuyNowModalProps> = ({
     setIsSubmitting(true);
 
     try {
-      const selectedDivData = BANGLADESH_ADDRESS_DATA.find((d) => d.id === division);
-      const selectedDistData = availableDistricts.find((d) => d.id === district);
-      const selectedUpaData = availableUpazilas.find((u) => u.id === upazila);
+      const selectedDivData = BANGLADESH_ADDRESS_DATA.find(
+        (d) =>
+          d.id === division ||
+          d.nameEn.toLowerCase() === division.toLowerCase() ||
+          d.nameBn === division ||
+          (division === 'chittagong' && d.id === 'chittagong')
+      );
+      const selectedDistData = availableDistricts.find(
+        (d) =>
+          d.id === district ||
+          d.nameEn.toLowerCase() === district.toLowerCase() ||
+          d.nameBn === district ||
+          d.id.replace(/-dist$/, '') === district.toLowerCase().replace(/-dist$/, '')
+      );
+      const selectedUpaData = availableUpazilas.find(
+        (u) =>
+          u.id === upazila ||
+          u.nameEn.toLowerCase() === upazila.toLowerCase() ||
+          u.nameBn === upazila ||
+          u.id.replace(/-(ctg|gaz|din)$/, '') === upazila.toLowerCase().replace(/-(ctg|gaz|din)$/, '')
+      );
 
       const divLabel = selectedDivData ? (language === 'bn' ? selectedDivData.nameBn : selectedDivData.nameEn) : division;
       const distLabel = selectedDistData ? (language === 'bn' ? selectedDistData.nameBn : selectedDistData.nameEn) : district;
@@ -721,80 +745,47 @@ export const BuyNowModal: React.FC<BuyNowModalProps> = ({
                   </div>
                 </div>
 
-                {/* Hierarchical Address Selection: Division -> District -> Upazila */}
+                {/* Hierarchical Address Selection: Division -> District -> Upazila with Fast Live Search */}
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4">
                   {/* Division */}
-                  <div className="space-y-1">
-                    <label className="text-xs font-extrabold text-slate-800 flex items-center space-x-1">
-                      <Building className="w-3.5 h-3.5 text-gray-500" />
-                      <span>{language === 'bn' ? 'বিভাগ *' : 'Division *'}</span>
-                    </label>
-                    <select
-                      value={division}
-                      onChange={handleDivisionChange}
-                      required
-                      className="w-full px-3 py-2.5 bg-slate-50 border border-gray-300 rounded-xl text-xs font-semibold text-slate-900 focus:bg-white focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20 outline-none transition cursor-pointer"
-                    >
-                      <option value="">{language === 'bn' ? '-- বিভাগ সিলেক্ট করুন --' : '-- Select Division --'}</option>
-                      {BANGLADESH_ADDRESS_DATA.map((div) => (
-                        <option key={div.id} value={div.id}>
-                          {language === 'bn' ? div.nameBn : div.nameEn}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
+                  <SearchableAddressSelect
+                    label={language === 'bn' ? 'বিভাগ *' : 'Division *'}
+                    icon={<Building className="w-3.5 h-3.5 text-gray-500" />}
+                    value={division}
+                    options={BANGLADESH_ADDRESS_DATA}
+                    placeholder={language === 'bn' ? '-- বিভাগ সিলেক্ট করুন --' : '-- Select Division --'}
+                    language={language}
+                    required
+                    onChange={handleDivisionChange}
+                  />
 
                   {/* District */}
-                  <div className="space-y-1">
-                    <label className="text-xs font-extrabold text-slate-800 flex items-center space-x-1">
-                      <Navigation className="w-3.5 h-3.5 text-gray-500" />
-                      <span>{language === 'bn' ? 'জেলা *' : 'District *'}</span>
-                    </label>
-                    <select
-                      value={district}
-                      onChange={handleDistrictChange}
-                      disabled={!division}
-                      required
-                      className="w-full px-3 py-2.5 bg-slate-50 border border-gray-300 rounded-xl text-xs font-semibold text-slate-900 focus:bg-white focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20 outline-none transition cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
-                    >
-                      <option value="">
-                        {!division
-                          ? (language === 'bn' ? 'আগে বিভাগ সিলেক্ট করুন' : 'Select Division First')
-                          : (language === 'bn' ? '-- জেলা সিলেক্ট করুন --' : '-- Select District --')}
-                      </option>
-                      {availableDistricts.map((dist) => (
-                        <option key={dist.id} value={dist.id}>
-                          {language === 'bn' ? dist.nameBn : dist.nameEn}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
+                  <SearchableAddressSelect
+                    label={language === 'bn' ? 'জেলা *' : 'District *'}
+                    icon={<Navigation className="w-3.5 h-3.5 text-gray-500" />}
+                    value={district}
+                    options={availableDistricts}
+                    placeholder={language === 'bn' ? '-- জেলা সিলেক্ট করুন --' : '-- Select District --'}
+                    disabledPlaceholder={language === 'bn' ? 'আগে বিভাগ সিলেক্ট করুন' : 'Select Division First'}
+                    disabled={!division}
+                    language={language}
+                    required
+                    onChange={handleDistrictChange}
+                  />
 
                   {/* Upazila */}
-                  <div className="space-y-1">
-                    <label className="text-xs font-extrabold text-slate-800 flex items-center space-x-1">
-                      <MapPin className="w-3.5 h-3.5 text-gray-500" />
-                      <span>{language === 'bn' ? 'উপজেলা *' : 'Upazila *'}</span>
-                    </label>
-                    <select
-                      value={upazila}
-                      onChange={(e) => setUpazila(e.target.value)}
-                      disabled={!district}
-                      required
-                      className="w-full px-3 py-2.5 bg-slate-50 border border-gray-300 rounded-xl text-xs font-semibold text-slate-900 focus:bg-white focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20 outline-none transition cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
-                    >
-                      <option value="">
-                        {!district
-                          ? (language === 'bn' ? 'আগে জেলা সিলেক্ট করুন' : 'Select District First')
-                          : (language === 'bn' ? '-- উপজেলা সিলেক্ট করুন --' : '-- Select Upazila --')}
-                      </option>
-                      {availableUpazilas.map((upa) => (
-                        <option key={upa.id} value={upa.id}>
-                          {language === 'bn' ? upa.nameBn : upa.nameEn}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
+                  <SearchableAddressSelect
+                    label={language === 'bn' ? 'উপজেলা / থানা *' : 'Upazila / Thana *'}
+                    icon={<MapPin className="w-3.5 h-3.5 text-gray-500" />}
+                    value={upazila}
+                    options={availableUpazilas}
+                    placeholder={language === 'bn' ? '-- উপজেলা / থানা সিলেক্ট করুন --' : '-- Select Upazila / Thana --'}
+                    disabledPlaceholder={language === 'bn' ? 'আগে জেলা সিলেক্ট করুন' : 'Select District First'}
+                    disabled={!district}
+                    language={language}
+                    required
+                    onChange={(val) => setUpazila(val)}
+                  />
                 </div>
 
                 {/* Area / Specific Location Input */}
