@@ -20,6 +20,7 @@ import {
   ToggleLeft,
   ToggleRight,
   Send,
+  SlidersHorizontal,
 } from "lucide-react";
 import { StoreSettings } from "./types";
 import {
@@ -98,9 +99,7 @@ export function SettingsView() {
           </div>
           <div>
             <h1 className="text-lg font-black text-slate-100 tracking-tight">Store Settings</h1>
-            <p className="text-xs text-slate-400">
-              Configure communication channels, store information, and order workflows
-            </p>
+            <p className="text-xs text-slate-400">Store preferences & details</p>
           </div>
         </div>
 
@@ -174,6 +173,16 @@ export function SettingsView() {
             </button>
           );
         })}
+
+        <a
+          href="/banners"
+          className="ml-auto px-3.5 py-2 rounded-xl text-xs font-bold text-emerald-400 hover:text-emerald-300 hover:bg-emerald-500/10 border border-emerald-500/20 transition-all flex items-center gap-1.5 whitespace-nowrap shrink-0 cursor-pointer"
+          title="Go to Hero Banner Manager"
+        >
+          <SlidersHorizontal className="w-3.5 h-3.5" />
+          <span className="hidden sm:inline">Hero Banners →</span>
+          <span className="sm:hidden">Banners →</span>
+        </a>
       </div>
 
       {/* Settings Form Body */}

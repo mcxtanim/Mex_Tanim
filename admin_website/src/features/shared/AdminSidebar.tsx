@@ -13,6 +13,7 @@ import {
   Star,
   ChevronRight,
   TrendingUp,
+  SlidersHorizontal,
 } from "lucide-react";
 
 interface NavSection {
@@ -51,6 +52,7 @@ export function AdminSidebar() {
     {
       title: "SETTINGS",
       items: [
+        { name: "Hero Banners", href: "/banners", icon: SlidersHorizontal },
         { name: "Settings", href: "/settings", icon: Settings },
       ]
     }
@@ -84,7 +86,9 @@ export function AdminSidebar() {
               </p>
               <nav className="space-y-0.5">
                 {section.items.map((item) => {
-                  const isActive = pathname === item.href || (item.href !== "/" && pathname.startsWith(item.href));
+                  const cleanPath = (pathname || "").replace(/\/$/, "");
+                  const cleanHref = (item.href || "").replace(/\/$/, "");
+                  const isActive = cleanPath === cleanHref || (cleanHref !== "" && cleanPath.startsWith(cleanHref));
                   const Icon = item.icon;
                   return (
                     <Link
