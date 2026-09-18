@@ -75,8 +75,26 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     let isMounted = true;
 
     async function initAuth() {
+      const timeoutPromise = new Promise<{ timeout: true }>((resolve) =>
+        setTimeout(() => resolve({ timeout: true }), 2000)
+      );
+
       try {
-        const { data, error } = await supabase!.auth.getSession();
+        const sessionResult = await Promise.race([
+          supabase!.auth.getSession(),
+          timeoutPromise,
+        ]);
+
+        if ('timeout' in sessionResult) {
+          if (isMounted) {
+            setUser(null);
+            setAdminUser(null);
+            setIsAdmin(false);
+          }
+          return;
+        }
+
+        const { data, error } = sessionResult;
         if (error) {
           console.warn("Error getting auth session:", error.message);
         }
