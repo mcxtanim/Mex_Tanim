@@ -84,7 +84,7 @@ export async function signInWithGoogle(): Promise<{ error?: string }> {
 export async function signInWithEmail(
   email: string,
   pass: string
-): Promise<{ success: boolean; error?: string }> {
+): Promise<{ success: boolean; user?: any; error?: string }> {
   if (!supabase) {
     return { success: false, error: "Supabase client is not configured." };
   }
@@ -114,7 +114,7 @@ export async function signInWithEmail(
       };
     }
 
-    return { success: true };
+    return { success: true, user: data.user };
   } catch (err: any) {
     return { success: false, error: err.message || "Email login failed." };
   }

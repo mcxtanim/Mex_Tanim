@@ -156,8 +156,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       const result = await authSignInWithEmail(email, pass);
       if (result.error) {
         setAuthError(result.error);
-      } else {
-        await refreshAdminStatus();
+      } else if (result.user) {
+        setUser(result.user);
+        setIsAdmin(true);
       }
       return result;
     } finally {

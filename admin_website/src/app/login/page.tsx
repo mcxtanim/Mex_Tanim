@@ -66,13 +66,14 @@ function LoginForm() {
     try {
       const res = await signInWithEmail(email, password);
       if (res.success) {
-        router.replace("/");
+        window.location.href = "/";
+        return;
       } else if (res.error) {
         setLocalError(res.error);
+        setIsSubmitting(false);
       }
     } catch (err: any) {
       setLocalError(err.message || "Email authentication failed.");
-    } finally {
       setIsSubmitting(false);
     }
   };
