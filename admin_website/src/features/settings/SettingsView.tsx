@@ -193,33 +193,6 @@ export function SettingsView() {
         {/* ========================================================================= */}
         {activeTab === "connect" && (
           <div className="space-y-4 animate-in fade-in duration-150">
-            {/* Master Floating Widget Switch */}
-            <div className="bg-slate-900/60 backdrop-blur-md p-5 rounded-2xl border border-slate-800 shadow-md flex items-center justify-between">
-              <div className="space-y-0.5">
-                <h3 className="text-sm font-black text-slate-100 flex items-center gap-2">
-                  <MessageCircle className="w-4 h-4 text-emerald-400" />
-                  <span>Floating Chat Bubble (Bottom-Right)</span>
-                </h3>
-                <p className="text-xs text-slate-400">
-                  Show or hide the floating customer support bubble on the customer storefront
-                </p>
-              </div>
-
-              <button
-                type="button"
-                onClick={() => setSettings({ ...settings, enableFloatingChat: !settings.enableFloatingChat })}
-                className={`p-1 rounded-full transition-colors cursor-pointer ${
-                  settings.enableFloatingChat ? "text-emerald-400" : "text-slate-600"
-                }`}
-              >
-                {settings.enableFloatingChat ? (
-                  <ToggleRight className="w-9 h-9 fill-current" />
-                ) : (
-                  <ToggleLeft className="w-9 h-9 fill-current" />
-                )}
-              </button>
-            </div>
-
             {/* 1. WHATSAPP CONNECT CARD */}
             <div className="bg-slate-900/60 backdrop-blur-md p-5 rounded-2xl border border-slate-800 shadow-md space-y-4">
               <div className="flex items-center justify-between border-b border-slate-800 pb-3">

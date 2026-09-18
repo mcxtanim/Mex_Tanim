@@ -9,11 +9,6 @@ export const FloatingChat: React.FC = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const settings = useStoreSettings();
 
-  // If floating chat is disabled in Admin Settings, do not render
-  if (!settings.enableFloatingChat) {
-    return null;
-  }
-
   const showMessenger = settings.enableMessengerChat && (settings.messengerLink || settings.messengerUsername);
   const showWhatsApp = settings.enableWhatsappChat !== false;
   const showTelegram = settings.enableTelegramChat && (settings.telegramLink || settings.telegramUsername);
