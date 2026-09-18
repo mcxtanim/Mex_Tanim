@@ -11,7 +11,6 @@ import {
   Store,
   MessageCircle,
   Share2,
-  CreditCard,
   ExternalLink,
   RefreshCw,
   Clock,
@@ -20,7 +19,6 @@ import {
   HelpCircle,
   ToggleLeft,
   ToggleRight,
-  ShieldCheck,
   Send,
 } from "lucide-react";
 import { StoreSettings } from "./types";
@@ -34,7 +32,7 @@ import {
   formatTelegramUrl,
 } from "./settingsService";
 
-type SettingsTab = "connect" | "profile" | "social" | "delivery" | "payment" | "announcement";
+type SettingsTab = "connect" | "profile" | "social" | "delivery" | "announcement";
 
 export function SettingsView() {
   const [settings, setSettings] = useState<StoreSettings>(DEFAULT_SETTINGS);
@@ -87,7 +85,6 @@ export function SettingsView() {
     { id: "profile", label: "Store Profile", icon: Store },
     { id: "social", label: "Social Media", icon: Share2 },
     { id: "delivery", label: "Delivery & Shipping", icon: Truck },
-    { id: "payment", label: "Payment & Courier", icon: CreditCard },
     { id: "announcement", label: "Announcement Bar", icon: Megaphone },
   ];
 
@@ -684,118 +681,7 @@ export function SettingsView() {
         )}
 
         {/* ========================================================================= */}
-        {/* TAB 5: PAYMENT METHODS & COURIER API                                      */}
-        {/* ========================================================================= */}
-        {activeTab === "payment" && (
-          <div className="space-y-4 animate-in fade-in duration-150">
-            {/* Payment Methods Card */}
-            <div className="bg-slate-900/60 backdrop-blur-md p-5 rounded-2xl border border-slate-800 shadow-md space-y-4">
-              <div className="flex items-center space-x-2 border-b border-slate-800 pb-3">
-                <CreditCard className="w-4 h-4 text-emerald-400" />
-                <h2 className="text-xs font-bold text-slate-200 uppercase tracking-wider">
-                  Payment Methods
-                </h2>
-              </div>
-
-              <div className="flex items-center justify-between p-3 bg-slate-800/40 rounded-xl border border-slate-700/60">
-                <div>
-                  <h3 className="text-xs font-bold text-slate-200">Cash on Delivery (COD)</h3>
-                  <p className="text-[11px] text-slate-400">Allow customers to pay cash when product is delivered</p>
-                </div>
-                <button
-                  type="button"
-                  onClick={() => setSettings({ ...settings, enableCashOnDelivery: !settings.enableCashOnDelivery })}
-                  className={`p-1 rounded-full transition-colors cursor-pointer ${
-                    settings.enableCashOnDelivery ? "text-emerald-400" : "text-slate-600"
-                  }`}
-                >
-                  {settings.enableCashOnDelivery ? (
-                    <ToggleRight className="w-8 h-8 fill-current" />
-                  ) : (
-                    <ToggleLeft className="w-8 h-8 fill-current" />
-                  )}
-                </button>
-              </div>
-
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div className="space-y-1">
-                  <label className="text-xs font-semibold text-slate-300">bKash Merchant / Personal Number</label>
-                  <input
-                    type="text"
-                    placeholder="e.g. 01XXXXXXXXX"
-                    value={settings.bkashNumber}
-                    onChange={(e) => setSettings({ ...settings, bkashNumber: e.target.value })}
-                    className="w-full bg-slate-800/80 border border-slate-700/80 rounded-xl px-3 py-2 text-xs text-slate-100 focus:outline-none focus:border-emerald-500/60 font-mono"
-                  />
-                </div>
-
-                <div className="space-y-1">
-                  <label className="text-xs font-semibold text-slate-300">Nagad Merchant / Personal Number</label>
-                  <input
-                    type="text"
-                    placeholder="e.g. 01XXXXXXXXX"
-                    value={settings.nagadNumber}
-                    onChange={(e) => setSettings({ ...settings, nagadNumber: e.target.value })}
-                    className="w-full bg-slate-800/80 border border-slate-700/80 rounded-xl px-3 py-2 text-xs text-slate-100 focus:outline-none focus:border-emerald-500/60 font-mono"
-                  />
-                </div>
-              </div>
-            </div>
-
-            {/* Courier API Card */}
-            <div className="bg-slate-900/60 backdrop-blur-md p-5 rounded-2xl border border-slate-800 shadow-md space-y-4">
-              <div className="flex items-center justify-between border-b border-slate-800 pb-3">
-                <div className="flex items-center space-x-2">
-                  <ShieldCheck className="w-4 h-4 text-cyan-400" />
-                  <h2 className="text-xs font-bold text-slate-200 uppercase tracking-wider">
-                    Steadfast Courier Integration
-                  </h2>
-                </div>
-
-                <button
-                  type="button"
-                  onClick={() => setSettings({ ...settings, enableSteadfastCourier: !settings.enableSteadfastCourier })}
-                  className={`p-1 rounded-full transition-colors cursor-pointer ${
-                    settings.enableSteadfastCourier ? "text-cyan-400" : "text-slate-600"
-                  }`}
-                >
-                  {settings.enableSteadfastCourier ? (
-                    <ToggleRight className="w-8 h-8 fill-current" />
-                  ) : (
-                    <ToggleLeft className="w-8 h-8 fill-current" />
-                  )}
-                </button>
-              </div>
-
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div className="space-y-1">
-                  <label className="text-xs font-semibold text-slate-300">Steadfast API Key</label>
-                  <input
-                    type="text"
-                    placeholder="Your Steadfast API Key"
-                    value={settings.steadfastApiKey}
-                    onChange={(e) => setSettings({ ...settings, steadfastApiKey: e.target.value })}
-                    className="w-full bg-slate-800/80 border border-slate-700/80 rounded-xl px-3 py-2 text-xs text-slate-100 focus:outline-none focus:border-cyan-500/60 font-mono"
-                  />
-                </div>
-
-                <div className="space-y-1">
-                  <label className="text-xs font-semibold text-slate-300">Steadfast Secret Key</label>
-                  <input
-                    type="password"
-                    placeholder="Your Steadfast Secret Key"
-                    value={settings.steadfastSecretKey}
-                    onChange={(e) => setSettings({ ...settings, steadfastSecretKey: e.target.value })}
-                    className="w-full bg-slate-800/80 border border-slate-700/80 rounded-xl px-3 py-2 text-xs text-slate-100 focus:outline-none focus:border-cyan-500/60 font-mono"
-                  />
-                </div>
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* ========================================================================= */}
-        {/* TAB 6: BANNER ANNOUNCEMENTS                                               */}
+        {/* TAB 5: BANNER ANNOUNCEMENTS                                               */}
         {/* ========================================================================= */}
         {activeTab === "announcement" && (
           <div className="bg-slate-900/60 backdrop-blur-md p-5 rounded-2xl border border-slate-800 shadow-md space-y-4 animate-in fade-in duration-150">
