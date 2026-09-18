@@ -1,8 +1,8 @@
 'use client';
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useLanguage } from '../shared/LanguageContext';
-import { CATEGORIES, isCategorySelected } from './categoryData';
+import { CategoryItem, fetchLiveCategories, getCachedCategories, isCategorySelected } from './categoryData';
 import { CategoryThumbnail } from './CategoryThumbnail';
 
 interface CategoryGridProps {
@@ -17,6 +17,30 @@ export const CategoryGrid: React.FC<CategoryGridProps> = ({
   onCloseBrowser,
 }) => {
   const { t } = useLanguage();
+  const [categories, setCategories] = useState<CategoryItem[]>(() => getCachedCategories());
+
+  useEffect(() => {
+    const loadCategories = async () => {
+      const liveCats = await fetchLiveCategories();
+      setCategories(liveCats);
+    };
+    loadCategories();
+
+    const handleCategoriesUpdate = (e: any) => {
+      if (e.detail && Array.isArray(e.detail)) {
+        setCategories(e.detail);
+      } else {
+        loadCategories();
+      }
+    };
+
+    window.addEventListener('categories_updated', handleCategoriesUpdate);
+    window.addEventListener('storage', loadCategories);
+    return () => {
+      window.removeEventListener('categories_updated', handleCategoriesUpdate);
+      window.removeEventListener('storage', loadCategories);
+    };
+  }, []);
 
   return (
     <section id="categories" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
@@ -47,7 +71,7 @@ export const CategoryGrid: React.FC<CategoryGridProps> = ({
 
       {/* Categories Grid */}
       <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-9 gap-2.5 sm:gap-3">
-        {CATEGORIES.map((cat) => {
+        {categories.map((cat) => {
           const isSelected = isCategorySelected(selectedCategory, cat.id);
 
           return (

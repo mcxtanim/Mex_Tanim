@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { ChevronRight } from 'lucide-react';
 import { useLanguage } from '../shared/LanguageContext';
-import { CATEGORIES, CategoryItem, fetchLiveCategories, getCategoryProductCount, isCategorySelected, getCategoryName } from './categoryData';
+import { CategoryItem, fetchLiveCategories, getCachedCategories, getCategoryProductCount, isCategorySelected, getCategoryName } from './categoryData';
 import { fetchLiveProducts } from './productService';
 import { Product } from './types';
 
@@ -17,7 +17,7 @@ export const CategorySidebar: React.FC<CategorySidebarProps> = ({
   onSelectCategory,
 }) => {
   const { language } = useLanguage();
-  const [categories, setCategories] = useState<CategoryItem[]>(CATEGORIES);
+  const [categories, setCategories] = useState<CategoryItem[]>(() => getCachedCategories());
   const [products, setProducts] = useState<Product[]>([]);
 
   useEffect(() => {
@@ -31,8 +31,20 @@ export const CategorySidebar: React.FC<CategorySidebarProps> = ({
     };
     loadCategoriesAndProducts();
 
+    const handleCategoriesUpdate = (e: any) => {
+      if (e.detail && Array.isArray(e.detail)) {
+        setCategories(e.detail);
+      } else {
+        loadCategoriesAndProducts();
+      }
+    };
+
+    window.addEventListener('categories_updated', handleCategoriesUpdate);
     window.addEventListener('storage', loadCategoriesAndProducts);
-    return () => window.removeEventListener('storage', loadCategoriesAndProducts);
+    return () => {
+      window.removeEventListener('categories_updated', handleCategoriesUpdate);
+      window.removeEventListener('storage', loadCategoriesAndProducts);
+    };
   }, []);
 
   return (

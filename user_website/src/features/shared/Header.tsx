@@ -8,7 +8,7 @@ import { useCart } from '../cart/CartContext';
 import { useAuth } from '../auth/AuthContext';
 import { useLanguage } from './LanguageContext';
 import { CategorySidebar } from '../catalog/CategorySidebar';
-import { CATEGORIES, CategoryItem, fetchLiveCategories } from '../catalog/categoryData';
+import { CategoryItem, fetchLiveCategories, getCachedCategories } from '../catalog/categoryData';
 import { useStoreSettings } from './storeSettingsService';
 
 interface HeaderProps {
@@ -48,7 +48,7 @@ export const Header: React.FC<HeaderProps> = ({
   const router = useRouter();
 
   const [isCategoryDrawerOpen, setIsCategoryDrawerOpen] = useState(false);
-  const [categories, setCategories] = useState<CategoryItem[]>(CATEGORIES);
+  const [categories, setCategories] = useState<CategoryItem[]>(() => getCachedCategories());
 
   useEffect(() => {
     const loadCategories = async () => {
@@ -57,8 +57,20 @@ export const Header: React.FC<HeaderProps> = ({
     };
     loadCategories();
 
+    const handleCategoriesUpdate = (e: any) => {
+      if (e.detail && Array.isArray(e.detail)) {
+        setCategories(e.detail);
+      } else {
+        loadCategories();
+      }
+    };
+
+    window.addEventListener('categories_updated', handleCategoriesUpdate);
     window.addEventListener('storage', loadCategories);
-    return () => window.removeEventListener('storage', loadCategories);
+    return () => {
+      window.removeEventListener('categories_updated', handleCategoriesUpdate);
+      window.removeEventListener('storage', loadCategories);
+    };
   }, []);
 
   // Keyboard listener for Escape key to close left category drawer

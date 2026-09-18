@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { CategoryItem, getCategoryName } from './categoryData';
+import { CategoryItem, getCategoryName, getSvgImageForSlug } from './categoryData';
 import { useLanguage } from '../shared/LanguageContext';
 
 export interface CategoryThumbnailProps {
@@ -26,6 +26,10 @@ export const CategoryThumbnail: React.FC<CategoryThumbnailProps> = ({
     ? (category.nameBn || getCategoryName(category.id, 'bn'))
     : (category.nameEn || getCategoryName(category.id, 'en'));
 
+  const handleImageError = (e: React.SyntheticEvent<HTMLImageElement, Event>) => {
+    e.currentTarget.src = getSvgImageForSlug(category.id);
+  };
+
   if (variant === 'icon') {
     return (
       <div
@@ -38,6 +42,7 @@ export const CategoryThumbnail: React.FC<CategoryThumbnailProps> = ({
         <img
           src={category.image}
           alt={category.nameEn}
+          onError={handleImageError}
           className="w-12 h-12 sm:w-14 sm:h-14 object-contain group-hover:scale-110 transition-transform"
         />
       </div>
@@ -60,6 +65,7 @@ export const CategoryThumbnail: React.FC<CategoryThumbnailProps> = ({
         <img
           src={category.image}
           alt={category.nameEn}
+          onError={handleImageError}
           className="relative z-10 w-24 h-24 sm:w-32 sm:h-32 object-contain group-hover:scale-105 transition-transform drop-shadow-md"
         />
       </div>

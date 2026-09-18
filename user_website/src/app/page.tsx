@@ -10,52 +10,49 @@ import { ComboOfferSection } from '@/features/catalog/ComboOfferSection';
 import { Footer } from '@/features/shared/Footer';
 import { useLanguage } from '@/features/shared/LanguageContext';
 import { fetchLiveProducts, getCachedProducts } from '@/features/catalog/productService';
-import { getCategoryName, isCategorySelected } from '@/features/catalog/categoryData';
+import { CategoryItem, fetchLiveCategories, getCachedCategories, getCategoryName, isCategorySelected } from '@/features/catalog/categoryData';
 import { Product } from '@/features/catalog/types';
 import { RotateCcw } from 'lucide-react';
-
-const CATEGORY_META: Record<string, { en: string; bn: string; badge: string }> = {
-  'gaming-cooler': { en: 'Gaming Cooler', bn: 'গেমিং কুলার', badge: 'G' },
-  cooler: { en: 'Gaming Cooler', bn: 'গেমিং কুলার', badge: 'G' },
-  'gaming-mice': { en: 'Gaming Mice', bn: 'গেমিং মাউস', badge: 'M' },
-  mice: { en: 'Gaming Mice', bn: 'গেমিং মাউস', badge: 'M' },
-  'mechanical-keyboards': { en: 'Mechanical Keyboards', bn: 'মেকানিক্যাল কিবোর্ড', badge: 'K' },
-  keyboards: { en: 'Mechanical Keyboards', bn: 'মেকানিক্যাল কিবোর্ড', badge: 'K' },
-  'gaming-headsets': { en: 'Gaming Headsets', bn: 'গেমিং হেডসেট', badge: 'H' },
-  headphones: { en: 'Gaming Headsets', bn: 'গেমিং হেডসেট', badge: 'H' },
-  'gaming-earphone': { en: 'Gaming Earphone', bn: 'গেমিং ইয়ারফোন', badge: 'E' },
-  chargers: { en: 'Fast Chargers', bn: 'ফাস্ট চার্জার', badge: 'F' },
-  'fast-chargers': { en: 'Fast Chargers', bn: 'ফাস্ট চার্জার', badge: 'F' },
-  'finger-sleeves': { en: 'Finger Sleeves', bn: 'ফিঙ্গার স্লিকস', badge: 'S' },
-  sleeves: { en: 'Finger Sleeves', bn: 'ফিঙ্গার স্লিকস', badge: 'S' },
-  cables: { en: 'Cables', bn: 'কেবলস', badge: 'C' },
-  soundboxes: { en: 'Soundboxes', bn: 'সাউন্ডবক্স', badge: 'S' },
-  soundbox: { en: 'Soundboxes', bn: 'সাউন্ডবক্স', badge: 'S' },
-  trimmers: { en: 'Trimmers', bn: 'ট্রিমার', badge: 'T' },
-  'combo-offers': { en: 'Combo Offers', bn: 'কম্বো অফার', badge: 'C' },
-};
 
 export default function Home() {
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [products, setProducts] = useState<Product[]>(() => getCachedProducts());
+  const [categories, setCategories] = useState<CategoryItem[]>(() => getCachedCategories());
   const { language } = useLanguage();
 
   useEffect(() => {
     const loadData = async () => {
-      const data = await fetchLiveProducts();
-      setProducts(data);
+      const [prods, cats] = await Promise.all([
+        fetchLiveProducts(),
+        fetchLiveCategories(),
+      ]);
+      setProducts(prods);
+      setCategories(cats);
     };
     loadData();
 
+    const handleCategoriesUpdate = (e: any) => {
+      if (e.detail && Array.isArray(e.detail)) {
+        setCategories(e.detail);
+      } else {
+        loadData();
+      }
+    };
+
+    window.addEventListener('categories_updated', handleCategoriesUpdate);
     window.addEventListener('storage', loadData);
-    return () => window.removeEventListener('storage', loadData);
+    return () => {
+      window.removeEventListener('categories_updated', handleCategoriesUpdate);
+      window.removeEventListener('storage', loadData);
+    };
   }, []);
 
-  const currentMeta = CATEGORY_META[selectedCategory] || {
-    en: getCategoryName(selectedCategory, 'en'),
-    bn: getCategoryName(selectedCategory, 'bn'),
-    badge: selectedCategory.charAt(0).toUpperCase(),
+  const matchedCategory = categories.find((c) => isCategorySelected(selectedCategory, c.id));
+  const currentMeta = {
+    en: matchedCategory ? matchedCategory.nameEn : (selectedCategory === 'all' ? 'All Categories' : getCategoryName(selectedCategory, 'en')),
+    bn: matchedCategory ? matchedCategory.nameBn : (selectedCategory === 'all' ? 'সকল ক্যাটাগরি' : getCategoryName(selectedCategory, 'bn')),
+    badge: matchedCategory ? matchedCategory.badge : (selectedCategory === 'all' ? 'A' : selectedCategory.charAt(0).toUpperCase()),
   };
 
   const productCount = products.filter(

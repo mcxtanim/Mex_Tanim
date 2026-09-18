@@ -4,7 +4,7 @@ import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import { Home, ChevronRight, ShoppingBag } from 'lucide-react';
-import { CATEGORIES, CategoryItem, fetchLiveCategories, getCategoryProductCount, isCategorySelected, getCachedCategories, getCategoryName } from './categoryData';
+import { CategoryItem, fetchLiveCategories, getCategoryProductCount, isCategorySelected, getCachedCategories, getCategoryName } from './categoryData';
 import { fetchLiveProducts, getCachedProducts } from './productService';
 import { Product } from './types';
 import { ProductCard } from './ProductCard';
@@ -34,8 +34,20 @@ export const CategoriesView: React.FC<CategoriesViewProps> = ({ initialCategory 
     };
     loadData();
 
+    const handleCategoriesUpdate = (e: any) => {
+      if (e.detail && Array.isArray(e.detail)) {
+        setCategories(e.detail);
+      } else {
+        loadData();
+      }
+    };
+
+    window.addEventListener('categories_updated', handleCategoriesUpdate);
     window.addEventListener('storage', loadData);
-    return () => window.removeEventListener('storage', loadData);
+    return () => {
+      window.removeEventListener('categories_updated', handleCategoriesUpdate);
+      window.removeEventListener('storage', loadData);
+    };
   }, []);
 
   useEffect(() => {

@@ -4,7 +4,7 @@ import React, { useRef, useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { ChevronLeft, ChevronRight, ArrowRight } from 'lucide-react';
 import { useLanguage } from '../shared/LanguageContext';
-import { CATEGORIES, CategoryItem, fetchLiveCategories, isCategorySelected, getCachedCategories } from './categoryData';
+import { CategoryItem, fetchLiveCategories, isCategorySelected, getCachedCategories } from './categoryData';
 import { CategoryThumbnail } from './CategoryThumbnail';
 
 interface CategoryShowcaseProps {
@@ -31,8 +31,20 @@ export const CategoryShowcase: React.FC<CategoryShowcaseProps> = ({
     };
     loadCategories();
 
+    const handleCategoriesUpdate = (e: any) => {
+      if (e.detail && Array.isArray(e.detail)) {
+        setCategories(e.detail);
+      } else {
+        loadCategories();
+      }
+    };
+
+    window.addEventListener('categories_updated', handleCategoriesUpdate);
     window.addEventListener('storage', loadCategories);
-    return () => window.removeEventListener('storage', loadCategories);
+    return () => {
+      window.removeEventListener('categories_updated', handleCategoriesUpdate);
+      window.removeEventListener('storage', loadCategories);
+    };
   }, []);
 
   useEffect(() => {
@@ -136,18 +148,30 @@ export const CategoryShowcase: React.FC<CategoryShowcaseProps> = ({
         className="overflow-x-auto scrollbar-none flex space-x-3 sm:space-x-4 snap-x touch-pan-x py-2 px-0.5"
         style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
       >
-        {categories.map((cat) => {
-          const selected = isCategorySelected(selectedCategory, cat.id);
+        {categories.length > 0 ? (
+          categories.map((cat) => {
+            const selected = isCategorySelected(selectedCategory, cat.id);
 
-          return (
-            <CategoryThumbnail
-              key={cat.id}
-              category={cat}
-              isSelected={selected}
-              onClick={() => onSelectCategory(cat.id)}
-            />
-          );
-        })}
+            return (
+              <CategoryThumbnail
+                key={cat.id}
+                category={cat}
+                isSelected={selected}
+                onClick={() => onSelectCategory(cat.id)}
+              />
+            );
+          })
+        ) : (
+          [...Array(6)].map((_, i) => (
+            <div
+              key={i}
+              className="snap-start shrink-0 flex-none rounded-3xl p-5 sm:p-6 min-w-[180px] sm:min-w-[210px] md:min-w-[240px] h-[220px] sm:h-[250px] md:h-[270px] bg-white/60 animate-pulse border border-white/60 shadow-xs flex flex-col items-center justify-between"
+            >
+              <div className="w-24 h-24 rounded-full bg-slate-100 mt-4" />
+              <div className="w-24 h-4 bg-slate-100 rounded-full mb-2" />
+            </div>
+          ))
+        )}
       </div>
     </section>
   );

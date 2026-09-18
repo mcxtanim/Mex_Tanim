@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import { ProductCard } from './ProductCard';
-import { CATEGORIES, CategoryItem, fetchLiveCategories, isCategorySelected, getCachedCategories, getCategoryName } from './categoryData';
+import { CategoryItem, fetchLiveCategories, isCategorySelected, getCachedCategories, getCategoryName } from './categoryData';
 import { fetchLiveProducts, getCachedProducts } from './productService';
 import { Product } from './types';
 import { useLanguage } from '../shared/LanguageContext';
@@ -153,8 +153,20 @@ export const ProductTabsSection: React.FC = () => {
     };
     loadData();
 
+    const handleCategoriesUpdate = (e: any) => {
+      if (e.detail && Array.isArray(e.detail)) {
+        setCategories(e.detail);
+      } else {
+        loadData();
+      }
+    };
+
+    window.addEventListener('categories_updated', handleCategoriesUpdate);
     window.addEventListener('storage', loadData);
-    return () => window.removeEventListener('storage', loadData);
+    return () => {
+      window.removeEventListener('categories_updated', handleCategoriesUpdate);
+      window.removeEventListener('storage', loadData);
+    };
   }, []);
 
   const activeTabProducts = allProducts.filter((p) => {
