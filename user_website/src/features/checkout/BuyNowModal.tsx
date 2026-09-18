@@ -291,14 +291,15 @@ export const BuyNowModal: React.FC<BuyNowModalProps> = ({
         }
       }
 
+      const updatedOrders = [adminOrderObj, ...existingOrders];
       try {
-        const updatedOrders = [adminOrderObj, ...existingOrders];
         localStorage.setItem(ADMIN_ORDERS_KEY, JSON.stringify(updatedOrders));
-        if (typeof window !== 'undefined') {
-          window.dispatchEvent(new Event('storage'));
-        }
-      } catch (storageErr) {
-        console.warn('Could not save order to localStorage (quota exceeded or restricted):', storageErr);
+      } catch (err) {
+        console.warn('Could not cache order in localStorage:', err);
+      }
+
+      if (typeof window !== 'undefined') {
+        window.dispatchEvent(new Event('storage'));
       }
 
       // Save Order to Supabase Database
@@ -348,11 +349,10 @@ export const BuyNowModal: React.FC<BuyNowModalProps> = ({
           upazila,
           area: area.trim(),
         };
-
         try {
           localStorage.setItem(SAVED_ADDRESS_KEY, JSON.stringify(addressToSave));
-        } catch (addrErr) {
-          console.warn('Could not save address to localStorage:', addrErr);
+        } catch (err) {
+          console.warn('Could not cache saved address in localStorage:', err);
         }
 
         if (supabase) {

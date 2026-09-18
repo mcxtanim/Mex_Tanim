@@ -49,7 +49,9 @@ export function getAllReviews(): ProductReview[] {
   try {
     const raw = localStorage.getItem(REVIEWS_STORAGE_KEY);
     if (!raw) {
-      localStorage.setItem(REVIEWS_STORAGE_KEY, JSON.stringify(INITIAL_SEED_REVIEWS));
+      try {
+        localStorage.setItem(REVIEWS_STORAGE_KEY, JSON.stringify(INITIAL_SEED_REVIEWS));
+      } catch (e) {}
       return INITIAL_SEED_REVIEWS;
     }
     const parsed = JSON.parse(raw);
@@ -102,7 +104,9 @@ export function addReview(data: {
 
   const updated = [newReview, ...all];
   if (typeof window !== 'undefined') {
-    localStorage.setItem(REVIEWS_STORAGE_KEY, JSON.stringify(updated));
+    try {
+      localStorage.setItem(REVIEWS_STORAGE_KEY, JSON.stringify(updated));
+    } catch (e) {}
     window.dispatchEvent(new Event('storage'));
   }
 

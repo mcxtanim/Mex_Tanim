@@ -234,7 +234,9 @@ export function useStoreSettings() {
                 const mapped = mapDbToSettings(payload.new);
                 setSettings(mapped);
                 if (typeof window !== 'undefined') {
-                  localStorage.setItem(SETTINGS_STORAGE_KEY, JSON.stringify(mapped));
+                  try {
+                    localStorage.setItem(SETTINGS_STORAGE_KEY, JSON.stringify(mapped));
+                  } catch (err) {}
                 }
               }
             }
