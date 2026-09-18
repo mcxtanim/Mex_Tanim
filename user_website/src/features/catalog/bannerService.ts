@@ -1,4 +1,4 @@
-﻿import { supabase } from "../../lib/supabase";
+import { supabase } from "../../lib/supabase";
 
 export interface Banner {
   id: string;
@@ -178,7 +178,28 @@ export function subscribeToBannerUpdates(onUpdate: (banners: Banner[]) => void):
     }
   }
 
-  // 3. Supabase Realtime Subscription
+  // 3. Re-fetch on window focus (e.g. when user returns to store tab after adding banner in admin)
+  const handleFocus = async () => {
+    const fresh = await fetchLiveBanners();
+    if (fresh && fresh.length > 0) {
+      onUpdate(fresh);
+    }
+  };
+
+  if (typeof window !== "undefined") {
+    window.addEventListener("focus", handleFocus);
+    window.addEventListener("visibilitychange", handleFocus);
+  }
+
+  // 4. Background polling (every 8 seconds) for guaranteed cross-device real-time sync
+  const pollTimer = setInterval(async () => {
+    const fresh = await fetchLiveBanners();
+    if (fresh && fresh.length > 0) {
+      onUpdate(fresh);
+    }
+  }, 8000);
+
+  // 5. Supabase Realtime Subscription
   let realtimeChannel: any = null;
   if (supabase) {
     try {
@@ -202,7 +223,10 @@ export function subscribeToBannerUpdates(onUpdate: (banners: Banner[]) => void):
     if (typeof window !== "undefined") {
       window.removeEventListener("banners_updated", handleLocalUpdate);
       window.removeEventListener("storage", handleLocalUpdate);
+      window.removeEventListener("focus", handleFocus);
+      window.removeEventListener("visibilitychange", handleFocus);
     }
+    clearInterval(pollTimer);
     if (broadcastChannel) broadcastChannel.close();
     if (realtimeChannel && supabase) supabase.removeChannel(realtimeChannel);
   };

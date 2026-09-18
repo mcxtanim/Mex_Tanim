@@ -6,43 +6,45 @@ import { useLanguage } from '../shared/LanguageContext';
 import { Banner, getStoredBanners, fetchLiveBanners, subscribeToBannerUpdates } from './bannerService';
 
 export const HeroBanner: React.FC = () => {
-  const [banners, setBanners] = useState<Banner[]>([]);
+  const [banners, setBanners] = useState<Banner[]>(getStoredBanners);
   const [currentSlide, setCurrentSlide] = useState(0);
-  const [isHovered, setIsHovered] = useState(false);
   const { language, t } = useLanguage();
-  const timerRef = useRef<NodeJS.Timeout | null>(null);
+  const bannersRef = useRef<Banner[]>(banners);
 
+  // Keep bannersRef always synchronized with current banners state
+  bannersRef.current = banners;
+
+  // 1. Initial preloading & Live updates
   useEffect(() => {
-    // 1. Instant 0ms cached render (renders existing banners immediately)
     const initial = getStoredBanners();
     setBanners(initial);
 
-    // 2. Preload images for smooth zero-flicker transitions
-    initial.forEach((b) => {
-      if (typeof window !== 'undefined' && b.imageUrl) {
-        const img = new Image();
-        img.src = b.imageUrl;
-      }
-    });
+    // Preload images for smooth zero-flicker transitions
+    const preload = (list: Banner[]) => {
+      if (typeof window === 'undefined') return;
+      list.forEach((b) => {
+        if (b.imageUrl) {
+          const img = new Image();
+          img.src = b.imageUrl;
+        }
+      });
+    };
 
-    // 3. Fetch live banners from Supabase
+    preload(initial);
+
+    // Fetch fresh banners from Supabase
     fetchLiveBanners().then((live) => {
       if (live && live.length > 0) {
         setBanners(live);
-        // Preload any newly fetched images
-        live.forEach((b) => {
-          if (typeof window !== 'undefined' && b.imageUrl) {
-            const img = new Image();
-            img.src = b.imageUrl;
-          }
-        });
+        preload(live);
       }
     });
 
-    // 4. Real-time subscription
+    // Real-time subscription (Supabase Realtime + BroadcastChannel + window focus + polling)
     const unsubscribe = subscribeToBannerUpdates((updated) => {
       if (updated && updated.length > 0) {
         setBanners(updated);
+        preload(updated);
       }
     });
 
@@ -51,32 +53,37 @@ export const HeroBanner: React.FC = () => {
     };
   }, []);
 
-  // Safe slide index clamping
-  const totalSlides = banners.length;
-  const safeSlideIndex = totalSlides > 0 ? currentSlide % totalSlides : 0;
-  const currentBanner = banners[safeSlideIndex];
-
-  // Autoplay timer with pause on hover
+  // 2. UNSTOPPABLE Continuous Autoplay (changes slide every 3.5 seconds automatically)
   useEffect(() => {
-    if (totalSlides <= 1 || isHovered) return;
+    const interval = setInterval(() => {
+      const list = bannersRef.current;
+      if (list && list.length > 1) {
+        setCurrentSlide((prev) => (prev + 1) % list.length);
+      }
+    }, 3500);
 
-    timerRef.current = setInterval(() => {
-      setCurrentSlide((prev) => (prev + 1) % totalSlides);
-    }, 4500);
+    return () => clearInterval(interval);
+  }, []);
 
-    return () => {
-      if (timerRef.current) clearInterval(timerRef.current);
-    };
-  }, [totalSlides, isHovered]);
+  const totalSlides = banners.length;
+  const safeIndex = totalSlides > 0 ? currentSlide % totalSlides : 0;
+  const currentBanner = banners[safeIndex];
 
-  const nextSlide = () => {
+  const nextSlide = (e?: React.MouseEvent) => {
+    e?.stopPropagation();
     if (totalSlides <= 1) return;
     setCurrentSlide((prev) => (prev + 1) % totalSlides);
   };
 
-  const prevSlide = () => {
+  const prevSlide = (e?: React.MouseEvent) => {
+    e?.stopPropagation();
     if (totalSlides <= 1) return;
     setCurrentSlide((prev) => (prev - 1 + totalSlides) % totalSlides);
+  };
+
+  const handleDotClick = (index: number, e: React.MouseEvent) => {
+    e.stopPropagation();
+    setCurrentSlide(index);
   };
 
   if (!banners || banners.length === 0) {
@@ -98,20 +105,16 @@ export const HeroBanner: React.FC = () => {
   return (
     <section id="hero" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-4 sm:pt-6 pb-2 select-none">
       {/* Full-Bleed Hero Banner Slider Container */}
-      <div
-        onMouseEnter={() => setIsHovered(true)}
-        onMouseLeave={() => setIsHovered(false)}
-        className="relative rounded-3xl overflow-hidden bg-slate-950 shadow-2xl border border-slate-800 aspect-[21/9] sm:aspect-[24/9] md:aspect-[27/9] min-h-[260px] sm:min-h-[360px] md:min-h-[420px] group flex items-center justify-center"
-      >
+      <div className="relative rounded-3xl overflow-hidden bg-slate-950 shadow-2xl border border-slate-800 aspect-[21/9] sm:aspect-[24/9] md:aspect-[27/9] min-h-[260px] sm:min-h-[360px] md:min-h-[420px] group flex items-center justify-center">
         
         {/* Banner Images Carousel - Spanning 100% Full Area with Smooth Transition */}
         {banners.map((item, index) => {
-          const isActive = index === safeSlideIndex;
+          const isActive = index === safeIndex;
           return (
             <div
               key={item.id || index}
-              className={`absolute inset-0 w-full h-full transition-all duration-700 ease-in-out ${
-                isActive ? 'opacity-100 z-10 scale-100' : 'opacity-0 z-0 scale-105 pointer-events-none'
+              className={`absolute inset-0 w-full h-full transition-opacity duration-1000 ease-in-out ${
+                isActive ? 'opacity-100 z-10' : 'opacity-0 z-0 pointer-events-none'
               }`}
             >
               <img
@@ -194,9 +197,9 @@ export const HeroBanner: React.FC = () => {
               <button
                 key={index}
                 type="button"
-                onClick={() => setCurrentSlide(index)}
+                onClick={(e) => handleDotClick(index, e)}
                 className={`h-2.5 rounded-full transition-all duration-300 cursor-pointer ${
-                  safeSlideIndex === index
+                  safeIndex === index
                     ? 'w-8 bg-orange-500 shadow-md shadow-orange-500/80 scale-105'
                     : 'w-2.5 bg-white/40 hover:bg-white/70'
                 }`}
