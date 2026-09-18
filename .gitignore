@@ -8,8 +8,15 @@ node_modules/
 *.tsbuildinfo
 **/*.tsbuildinfo
 
+# Next.js export out & Firebase cache
+out/
+**/out/
+.firebase/
+**/.firebase/
+
 # Logs & OS files
 *.log
 npm-debug.log*
 .DS_Store
 Thumbs.db
+

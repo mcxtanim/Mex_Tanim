@@ -1,0 +1,17 @@
+﻿{
+  "projects": {
+    "default": "mcx-tanim"
+  },
+  "targets": {
+    "mcx-tanim": {
+      "hosting": {
+        "user_website": [
+          "mcx-tanim"
+        ],
+        "admin_website": [
+          "mcx-tanim-admin"
+        ]
+      }
+    }
+  }
+}
