@@ -223,16 +223,23 @@ export function formatWhatsAppUrl(numberOrUrl: string): string {
   if (!numberOrUrl) return "";
   const clean = numberOrUrl.trim();
   if (clean.startsWith("http://") || clean.startsWith("https://")) return clean;
-  const digits = clean.replace(/[^0-9]/g, "");
-  return `https://wa.me/${digits}`;
+  let digits = clean.replace(/[^0-9]/g, "");
+  if (digits.startsWith("01") && digits.length === 11) {
+    digits = "88" + digits;
+  }
+  return digits ? `https://wa.me/${digits}` : "";
 }
 
 export function formatMessengerUrl(userOrUrl: string): string {
   if (!userOrUrl) return "";
   const clean = userOrUrl.trim();
+  if (clean.includes("facebook.com/")) {
+    const parts = clean.split("facebook.com/")[1].split("/")[0].split("?")[0];
+    return `https://m.me/${parts}`;
+  }
   if (clean.startsWith("http://") || clean.startsWith("https://")) return clean;
   const user = clean.replace(/^@/, "").replace(/^m\.me\//, "");
-  return `https://m.me/${user}`;
+  return user ? `https://m.me/${user}` : "";
 }
 
 export function formatTelegramUrl(userOrUrl: string): string {
@@ -240,6 +247,6 @@ export function formatTelegramUrl(userOrUrl: string): string {
   const clean = userOrUrl.trim();
   if (clean.startsWith("http://") || clean.startsWith("https://")) return clean;
   const user = clean.replace(/^@/, "").replace(/^t\.me\//, "");
-  return `https://t.me/${user}`;
+  return user ? `https://t.me/${user}` : "";
 }
 

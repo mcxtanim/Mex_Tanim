@@ -232,42 +232,41 @@ export function SettingsView() {
               <div className="grid grid-cols-1 sm:grid-cols-12 gap-3 items-end">
                 <div className="sm:col-span-8 space-y-1">
                   <label className="text-xs font-semibold text-slate-300">
-                    WhatsApp Number (with Country Code)
+                    WhatsApp Number or Direct Link
                   </label>
                   <div className="relative">
                     <Phone className="w-4 h-4 text-[#25D366] absolute left-3.5 top-1/2 -translate-y-1/2" />
                     <input
                       type="text"
                       required
-                      placeholder="e.g. 8801XXXXXXXXX"
+                      placeholder="e.g. 017XXXXXXXX, +88017XXXXXXXX or https://wa.me/..."
                       value={settings.whatsappNumber}
                       onChange={(e) => setSettings({ ...settings, whatsappNumber: e.target.value })}
                       className="w-full bg-slate-800/80 border border-slate-700/80 rounded-xl pl-10 pr-3 py-2 text-xs text-slate-100 focus:outline-none focus:border-[#25D366]/60 font-mono"
                     />
                   </div>
-                  <p className="text-[11px] text-slate-500">
-                    Format: 8801XXXXXXXXX. Used for WhatsApp floating chat, product direct orders, and footer support.
+                  <p className="text-[11px] text-slate-400">
+                    কাস্টমার সাইটে হোয়াটসঅ্যাপে ক্লিক করলে সরাসরি আপনার এই নাম্বারে মেসেজ চলে আসবে।
                   </p>
                 </div>
 
                 <div className="sm:col-span-4 flex items-center gap-2">
                   <a
-                    href={formatWhatsAppUrl(settings.whatsappNumber)}
+                    href={formatWhatsAppUrl(settings.whatsappNumber) || "#"}
                     target="_blank"
                     rel="noopener noreferrer"
+                    onClick={(e) => {
+                      if (!settings.whatsappNumber) {
+                        e.preventDefault();
+                        alert("Please enter a WhatsApp number first.");
+                      }
+                    }}
                     className="w-full px-3 py-2 rounded-xl bg-[#25D366]/15 hover:bg-[#25D366]/25 border border-[#25D366]/30 text-[#25D366] text-xs font-bold transition flex items-center justify-center gap-1.5 active:scale-95 shadow-xs"
                   >
-                    <span>Test WhatsApp</span>
+                    <span>Test Open WhatsApp</span>
                     <ExternalLink className="w-3.5 h-3.5" />
                   </a>
                 </div>
-              </div>
-
-              <div className="p-3 bg-slate-800/40 rounded-xl border border-slate-700/50 flex items-center justify-between text-xs">
-                <span className="text-slate-400">Generated URL:</span>
-                <span className="font-mono text-emerald-400 font-medium truncate max-w-[280px] sm:max-w-md">
-                  {formatWhatsAppUrl(settings.whatsappNumber)}
-                </span>
               </div>
             </div>
 
@@ -310,50 +309,46 @@ export function SettingsView() {
               <div className="grid grid-cols-1 sm:grid-cols-12 gap-3 items-end">
                 <div className="sm:col-span-8 space-y-1">
                   <label className="text-xs font-semibold text-slate-300">
-                    Messenger Username or Direct Link
+                    Facebook Page Link or Username
                   </label>
                   <div className="relative">
-                    <span className="text-[#0084FF] font-bold text-xs absolute left-3.5 top-1/2 -translate-y-1/2">
-                      m.me/
-                    </span>
                     <input
                       type="text"
-                      placeholder="e.g. mextanimstore"
-                      value={settings.messengerUsername}
+                      placeholder="e.g. https://facebook.com/mextanimstore or mextanimstore"
+                      value={settings.messengerLink || settings.messengerUsername}
                       onChange={(e) => {
                         const val = e.target.value;
                         setSettings({
                           ...settings,
                           messengerUsername: val,
-                          messengerLink: formatMessengerUrl(val),
+                          messengerLink: val,
                         });
                       }}
-                      className="w-full bg-slate-800/80 border border-slate-700/80 rounded-xl pl-16 pr-3 py-2 text-xs text-slate-100 focus:outline-none focus:border-[#0084FF]/60 font-mono"
+                      className="w-full bg-slate-800/80 border border-slate-700/80 rounded-xl px-3.5 py-2 text-xs text-slate-100 focus:outline-none focus:border-[#0084FF]/60 font-mono"
                     />
                   </div>
-                  <p className="text-[11px] text-slate-500">
-                    Enter Facebook Page username (e.g. mextanimstore) or full link (https://m.me/yourpage).
+                  <p className="text-[11px] text-slate-400">
+                    কাস্টমার সাইটে মেসেঞ্জারে ক্লিক করলে সরাসরি আপনার ফেসবুক পেজের ইনবক্স ওপেন হবে।
                   </p>
                 </div>
 
                 <div className="sm:col-span-4 flex items-center gap-2">
                   <a
-                    href={formatMessengerUrl(settings.messengerUsername || settings.messengerLink)}
+                    href={formatMessengerUrl(settings.messengerLink || settings.messengerUsername) || "#"}
                     target="_blank"
                     rel="noopener noreferrer"
+                    onClick={(e) => {
+                      if (!settings.messengerLink && !settings.messengerUsername) {
+                        e.preventDefault();
+                        alert("Please enter your Facebook Page link or username first.");
+                      }
+                    }}
                     className="w-full px-3 py-2 rounded-xl bg-[#0084FF]/15 hover:bg-[#0084FF]/25 border border-[#0084FF]/30 text-[#0084FF] text-xs font-bold transition flex items-center justify-center gap-1.5 active:scale-95 shadow-xs"
                   >
-                    <span>Test Messenger</span>
+                    <span>Test Open Messenger</span>
                     <ExternalLink className="w-3.5 h-3.5" />
                   </a>
                 </div>
-              </div>
-
-              <div className="p-3 bg-slate-800/40 rounded-xl border border-slate-700/50 flex items-center justify-between text-xs">
-                <span className="text-slate-400">Generated URL:</span>
-                <span className="font-mono text-blue-400 font-medium truncate max-w-[280px] sm:max-w-md">
-                  {formatMessengerUrl(settings.messengerUsername || settings.messengerLink)}
-                </span>
               </div>
             </div>
 
@@ -394,50 +389,46 @@ export function SettingsView() {
               <div className="grid grid-cols-1 sm:grid-cols-12 gap-3 items-end">
                 <div className="sm:col-span-8 space-y-1">
                   <label className="text-xs font-semibold text-slate-300">
-                    Telegram Username or Direct Link
+                    Telegram Link or Username
                   </label>
                   <div className="relative">
-                    <span className="text-[#0088cc] font-bold text-xs absolute left-3.5 top-1/2 -translate-y-1/2">
-                      t.me/
-                    </span>
                     <input
                       type="text"
-                      placeholder="e.g. mextanimstore"
-                      value={settings.telegramUsername}
+                      placeholder="e.g. https://t.me/mextanimstore or mextanimstore"
+                      value={settings.telegramLink || settings.telegramUsername}
                       onChange={(e) => {
                         const val = e.target.value;
                         setSettings({
                           ...settings,
                           telegramUsername: val,
-                          telegramLink: formatTelegramUrl(val),
+                          telegramLink: val,
                         });
                       }}
-                      className="w-full bg-slate-800/80 border border-slate-700/80 rounded-xl pl-14 pr-3 py-2 text-xs text-slate-100 focus:outline-none focus:border-[#0088cc]/60 font-mono"
+                      className="w-full bg-slate-800/80 border border-slate-700/80 rounded-xl px-3.5 py-2 text-xs text-slate-100 focus:outline-none focus:border-[#0088cc]/60 font-mono"
                     />
                   </div>
-                  <p className="text-[11px] text-slate-500">
-                    Enter Telegram username (e.g. mextanimstore) or full link (https://t.me/yourusername).
+                  <p className="text-[11px] text-slate-400">
+                    কাস্টমার সাইটে টেলিগ্রামে ক্লিক করলে সরাসরি আপনার টেলিগ্রামে চ্যাট ওপেন হবে।
                   </p>
                 </div>
 
                 <div className="sm:col-span-4 flex items-center gap-2">
                   <a
-                    href={formatTelegramUrl(settings.telegramUsername || settings.telegramLink)}
+                    href={formatTelegramUrl(settings.telegramLink || settings.telegramUsername) || "#"}
                     target="_blank"
                     rel="noopener noreferrer"
+                    onClick={(e) => {
+                      if (!settings.telegramLink && !settings.telegramUsername) {
+                        e.preventDefault();
+                        alert("Please enter your Telegram link or username first.");
+                      }
+                    }}
                     className="w-full px-3 py-2 rounded-xl bg-[#0088cc]/15 hover:bg-[#0088cc]/25 border border-[#0088cc]/30 text-[#0088cc] text-xs font-bold transition flex items-center justify-center gap-1.5 active:scale-95 shadow-xs"
                   >
-                    <span>Test Telegram</span>
+                    <span>Test Open Telegram</span>
                     <ExternalLink className="w-3.5 h-3.5" />
                   </a>
                 </div>
-              </div>
-
-              <div className="p-3 bg-slate-800/40 rounded-xl border border-slate-700/50 flex items-center justify-between text-xs">
-                <span className="text-slate-400">Generated URL:</span>
-                <span className="font-mono text-sky-400 font-medium truncate max-w-[280px] sm:max-w-md">
-                  {formatTelegramUrl(settings.telegramUsername || settings.telegramLink)}
-                </span>
               </div>
             </div>
           </div>
