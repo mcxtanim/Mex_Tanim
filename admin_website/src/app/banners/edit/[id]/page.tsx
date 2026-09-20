@@ -1,7 +1,9 @@
 import { AdminHeader } from "@/features/shared/AdminHeader";
 import BannerEditClient from "./BannerEditClient";
 
-export const dynamic = "force-dynamic";
+export function generateStaticParams() {
+  return [{ id: "preview" }];
+}
 
 export default function EditBannerPage() {
   return (

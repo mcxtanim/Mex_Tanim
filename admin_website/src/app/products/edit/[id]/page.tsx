@@ -1,6 +1,8 @@
 import ProductEditClient from "./ProductEditClient";
 
-export const dynamic = "force-dynamic";
+export function generateStaticParams() {
+  return [{ id: "preview" }];
+}
 
 export default function EditProductPage() {
   return <ProductEditClient />;

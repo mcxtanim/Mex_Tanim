@@ -1,9 +1,23 @@
 import type { Metadata } from "next";
 import DedicatedProductPage from "./ProductDetailClient";
-import { fetchProductById } from "@/features/catalog/productService";
+import { fetchProductById, fetchLiveProducts } from "@/features/catalog/productService";
 
 interface Props {
   params: Promise<{ id: string }>;
+}
+
+export async function generateStaticParams() {
+  const ids = new Set<string>();
+  ids.add("preview");
+  try {
+    const products = await fetchLiveProducts();
+    if (Array.isArray(products)) {
+      products.forEach((p) => {
+        if (p?.id) ids.add(String(p.id));
+      });
+    }
+  } catch {}
+  return Array.from(ids).map((id) => ({ id }));
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
