@@ -284,9 +284,12 @@ function CheckoutPageContent() {
         console.warn('LocalStorage order save notice:', err);
       }
 
-      if (typeof window !== 'undefined') {
+      // Cross-tab sync via BroadcastChannel if available
+      if (typeof window !== 'undefined' && 'BroadcastChannel' in window) {
         try {
-          window.dispatchEvent(new Event('storage'));
+          const bc = new BroadcastChannel('mex_tanim_store_sync');
+          bc.postMessage({ type: 'ORDER_PLACED', orderId });
+          bc.close();
         } catch {}
       }
 

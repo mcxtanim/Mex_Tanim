@@ -53,37 +53,7 @@ export const CategoryShowcase: React.FC<CategoryShowcaseProps> = ({
     };
   }, []);
 
-  useEffect(() => {
-    const el = scrollRef.current;
-    if (!el) return;
 
-    const handleMouseEnter = () => {
-      isHoveredRef.current = true;
-    };
-    const handleMouseLeave = () => {
-      isHoveredRef.current = false;
-    };
-
-    el.addEventListener('mouseenter', handleMouseEnter);
-    el.addEventListener('mouseleave', handleMouseLeave);
-
-    const intervalId = setInterval(() => {
-      if (isHoveredRef.current || !scrollRef.current) return;
-      const container = scrollRef.current;
-      const maxScroll = container.scrollWidth - container.clientWidth;
-      if (container.scrollLeft >= maxScroll - 10) {
-        container.scrollTo({ left: 0, behavior: 'smooth' });
-      } else {
-        container.scrollBy({ left: 360, behavior: 'smooth' });
-      }
-    }, 2500);
-
-    return () => {
-      clearInterval(intervalId);
-      el.removeEventListener('mouseenter', handleMouseEnter);
-      el.removeEventListener('mouseleave', handleMouseLeave);
-    };
-  }, []);
 
   const handleScroll = (direction: 'left' | 'right') => {
     if (scrollRef.current) {

@@ -44,7 +44,6 @@ export function saveAdminMessages(messages: AdminChatMessage[]): void {
   if (typeof window === "undefined") return;
   try {
     localStorage.setItem(MESSAGES_STORAGE_KEY, JSON.stringify(messages));
-    window.dispatchEvent(new Event("storage"));
   } catch (err) {
     console.error("Error saving messages in admin:", err);
   }
@@ -66,5 +65,4 @@ export function sendAdminReply(replyText: string, currentMessages: AdminChatMess
 export function clearAdminMessages(): void {
   if (typeof window === "undefined") return;
   localStorage.removeItem(MESSAGES_STORAGE_KEY);
-  window.dispatchEvent(new Event("storage"));
 }

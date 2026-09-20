@@ -55,25 +55,6 @@ const CategoryRailRow: React.FC<CategoryRailProps> = ({
 }) => {
   const { language } = useLanguage();
   const railRef = useRef<HTMLDivElement>(null);
-  const [isHovered, setIsHovered] = useState(false);
-
-  useEffect(() => {
-    if (isHovered || !railRef.current) return;
-
-    const interval = setInterval(() => {
-      if (railRef.current) {
-        const { scrollLeft, scrollWidth, clientWidth } = railRef.current;
-        if (scrollLeft + clientWidth >= scrollWidth - 10) {
-          railRef.current.scrollTo({ left: 0, behavior: 'smooth' });
-        } else {
-          railRef.current.scrollBy({ left: 260, behavior: 'smooth' });
-        }
-      }
-    }, 3000);
-
-    return () => clearInterval(interval);
-  }, [isHovered, products]);
-
   const handleScroll = (direction: 'left' | 'right') => {
     if (railRef.current) {
       const scrollAmount = direction === 'left' ? -320 : 320;
@@ -118,8 +99,6 @@ const CategoryRailRow: React.FC<CategoryRailProps> = ({
 
       <div
         ref={railRef}
-        onMouseEnter={() => setIsHovered(true)}
-        onMouseLeave={() => setIsHovered(false)}
         className="flex space-x-4 overflow-x-auto scrollbar-none py-2 px-1 snap-x touch-pan-x"
       >
         {products.map((product, idx) => (

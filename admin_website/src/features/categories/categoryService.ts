@@ -10,11 +10,22 @@ export interface LinkedProduct {
   image: string;
 }
 
+let memoryCategoriesCache: Category[] | null = null;
+let lastCategoriesFetchTimestamp = 0;
+let inFlightCategoriesPromise: Promise<Category[]> | null = null;
+
 export function getStoredCategories(): Category[] {
+  if (memoryCategoriesCache && memoryCategoriesCache.length > 0) {
+    return memoryCategoriesCache;
+  }
   if (typeof window === "undefined") return [];
   try {
     const data = localStorage.getItem(STORAGE_KEY);
-    return data ? JSON.parse(data) : [];
+    const parsed = data ? JSON.parse(data) : [];
+    if (Array.isArray(parsed) && parsed.length > 0) {
+      memoryCategoriesCache = parsed;
+    }
+    return parsed;
   } catch (error) {
     console.error("Error reading categories from localStorage", error);
     return [];
@@ -22,10 +33,10 @@ export function getStoredCategories(): Category[] {
 }
 
 export function saveStoredCategories(categories: Category[]): void {
+  memoryCategoriesCache = categories;
   if (typeof window === "undefined") return;
   try {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(categories));
-    window.dispatchEvent(new Event("storage"));
   } catch (error) {
     console.warn("localStorage quota exceeded for categories, saving lightweight cache...", error);
     try {
@@ -37,7 +48,6 @@ export function saveStoredCategories(categories: Category[]): void {
     } catch (e) {
       console.warn("Could not save categories to localStorage, skipping local cache.", e);
     }
-    window.dispatchEvent(new Event("storage"));
   }
 }
 
@@ -70,57 +80,78 @@ export async function fetchLinkedProductsForCategory(
   }
 }
 
-export async function fetchCategoriesFromSupabase(): Promise<Category[]> {
-  if (!supabase) return getStoredCategories();
-  try {
-    const [catRes, prodRes] = await Promise.all([
-      supabase.from("categories").select("*").order("name", { ascending: true }),
-      supabase.from("products").select("category"),
-    ]);
+export async function fetchCategoriesFromSupabase(forceRefresh = false): Promise<Category[]> {
+  if (!forceRefresh && memoryCategoriesCache && memoryCategoriesCache.length > 0 && Date.now() - lastCategoriesFetchTimestamp < 60000) {
+    return memoryCategoriesCache;
+  }
 
-    if (catRes.error) {
-      console.warn("Supabase categories fetch error:", catRes.error);
+  if (inFlightCategoriesPromise) {
+    return inFlightCategoriesPromise;
+  }
+
+  inFlightCategoriesPromise = (async () => {
+    if (!supabase) return getStoredCategories();
+    try {
+      const [catRes, prodRes] = await Promise.all([
+        supabase.from("categories").select("*").order("name", { ascending: true }),
+        supabase.from("products").select("category"),
+      ]);
+
+      if (catRes.error) {
+        console.warn("Supabase categories fetch error:", catRes.error);
+        return getStoredCategories();
+      }
+
+      const catData = catRes.data || [];
+      const prodData = prodRes.data || [];
+
+      let productMap: Record<string, number> = {};
+      if (Array.isArray(prodData)) {
+        prodData.forEach((p: any) => {
+          const catKey = String(p.category || "").toLowerCase();
+          if (catKey) {
+            productMap[catKey] = (productMap[catKey] || 0) + 1;
+          }
+        });
+      }
+
+      const mapped: Category[] = catData.map((item: any) => {
+        const slug = item.slug || item.name.toLowerCase().replace(/[^a-z0-9]+/g, "-");
+        const catId = String(item.id);
+        const realCount = (productMap[slug.toLowerCase()] || 0) + (productMap[catId.toLowerCase()] || 0);
+
+        return {
+          id: catId,
+          name: item.name || "",
+          name_bn: item.name_bn || "",
+          slug: slug,
+          description: item.description || "",
+          image: item.image_url || item.image || "",
+          productCount: realCount > 0 ? realCount : Number(item.product_count || item.productCount) || 0,
+        };
+      });
+
+      lastCategoriesFetchTimestamp = Date.now();
+      saveStoredCategories(mapped);
+      return mapped;
+    } catch (err) {
+      console.warn("Supabase fetch categories error:", err);
       return getStoredCategories();
     }
+  })().finally(() => {
+    inFlightCategoriesPromise = null;
+  });
 
-    const catData = catRes.data || [];
-    const prodData = prodRes.data || [];
-
-    let productMap: Record<string, number> = {};
-    if (Array.isArray(prodData)) {
-      prodData.forEach((p: any) => {
-        const catKey = String(p.category || "").toLowerCase();
-        if (catKey) {
-          productMap[catKey] = (productMap[catKey] || 0) + 1;
-        }
-      });
-    }
-
-    const mapped: Category[] = catData.map((item: any) => {
-      const slug = item.slug || item.name.toLowerCase().replace(/[^a-z0-9]+/g, "-");
-      const catId = String(item.id);
-      const realCount = (productMap[slug.toLowerCase()] || 0) + (productMap[catId.toLowerCase()] || 0);
-
-      return {
-        id: catId,
-        name: item.name || "",
-        name_bn: item.name_bn || "",
-        slug: slug,
-        description: item.description || "",
-        image: item.image_url || item.image || "",
-        productCount: realCount > 0 ? realCount : Number(item.product_count || item.productCount) || 0,
-      };
-    });
-
-    saveStoredCategories(mapped);
-    return mapped;
-  } catch (err) {
-    console.warn("Supabase fetch categories error:", err);
-    return getStoredCategories();
-  }
+  return inFlightCategoriesPromise;
 }
 
 export async function fetchCategoryById(id: string): Promise<Category | null> {
+  const stored = getStoredCategories();
+  const found = stored.find((c) => c.id === id || c.slug === id);
+  if (found) {
+    return found;
+  }
+
   if (supabase) {
     try {
       const { data, error } = await supabase
@@ -131,7 +162,7 @@ export async function fetchCategoryById(id: string): Promise<Category | null> {
 
       if (!error && data) {
         const slug = data.slug || data.name.toLowerCase().replace(/[^a-z0-9]+/g, "-");
-        return {
+        const mapped: Category = {
           id: String(data.id),
           name: data.name || "",
           name_bn: data.name_bn || "",
@@ -140,14 +171,19 @@ export async function fetchCategoryById(id: string): Promise<Category | null> {
           image: data.image_url || data.image || "",
           productCount: Number(data.product_count) || 0,
         };
+        if (memoryCategoriesCache) {
+          memoryCategoriesCache = [mapped, ...memoryCategoriesCache.filter((c) => c.id !== mapped.id)];
+        } else {
+          memoryCategoriesCache = [mapped];
+        }
+        return mapped;
       }
     } catch (err) {
       console.warn("fetchCategoryById exception:", err);
     }
   }
 
-  const stored = getStoredCategories();
-  return stored.find((c) => c.id === id || c.slug === id) || null;
+  return null;
 }
 
 function notifyCategoriesUpdated(categories: Category[]) {

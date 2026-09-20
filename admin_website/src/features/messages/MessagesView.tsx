@@ -81,7 +81,6 @@ export const MessagesView: React.FC = () => {
   const handleResetSeed = () => {
     if (typeof window !== "undefined") {
       localStorage.removeItem("mex_tanim_chat_messages");
-      window.dispatchEvent(new Event("storage"));
       loadMessages();
     }
   };

@@ -1,12 +1,12 @@
-﻿'use client';
+'use client';
 
 import React, { useState, useEffect, useRef } from 'react';
 import { ChevronLeft, ChevronRight, ShoppingBag, Flame } from 'lucide-react';
 import { useLanguage } from '../shared/LanguageContext';
-import { Banner, getStoredBanners, fetchLiveBanners, subscribeToBannerUpdates } from './bannerService';
+import { Banner, DEFAULT_BANNERS, getStoredBanners, fetchLiveBanners, subscribeToBannerUpdates } from './bannerService';
 
 export const HeroBanner: React.FC = () => {
-  const [banners, setBanners] = useState<Banner[]>(getStoredBanners);
+  const [banners, setBanners] = useState<Banner[]>(DEFAULT_BANNERS);
   const [currentSlide, setCurrentSlide] = useState(0);
   const { language, t } = useLanguage();
   const bannersRef = useRef<Banner[]>(banners);

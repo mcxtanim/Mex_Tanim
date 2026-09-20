@@ -52,7 +52,6 @@ export function saveCosts(costs: CostItem[]): void {
   if (typeof window === "undefined") return;
   try {
     localStorage.setItem(COSTS_STORAGE_KEY, JSON.stringify(costs));
-    window.dispatchEvent(new Event("storage"));
   } catch (err) {
     console.error("Error saving costs in admin:", err);
   }

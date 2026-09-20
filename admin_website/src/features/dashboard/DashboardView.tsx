@@ -80,20 +80,12 @@ export function DashboardView() {
       )
       .subscribe();
 
-    // 2. Periodic Polling fallback (every 10 seconds)
-    const interval = setInterval(() => {
-      loadDashboardData();
-    }, 10000);
-
     window.addEventListener("storage", () => loadDashboardData());
-    window.addEventListener("focus", () => loadDashboardData());
 
     return () => {
       if (ordersChannel) supabase?.removeChannel(ordersChannel);
       if (productsChannel) supabase?.removeChannel(productsChannel);
-      clearInterval(interval);
       window.removeEventListener("storage", () => loadDashboardData());
-      window.removeEventListener("focus", () => loadDashboardData());
     };
   }, [loadDashboardData]);
 

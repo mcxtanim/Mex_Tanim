@@ -33,7 +33,11 @@ import { WhatsAppIcon } from '@/features/shared/WhatsAppIcon';
 import { getReviewsForProduct, ProductReview } from '@/features/catalog/reviewService';
 import { useStoreSettings, formatWhatsAppUrl } from '@/features/shared/storeSettingsService';
 
-export default function DedicatedProductPage() {
+interface DedicatedProductPageProps {
+  initialProduct?: Product | null;
+}
+
+export default function DedicatedProductPage({ initialProduct }: DedicatedProductPageProps = {}) {
   const params = useParams();
   const router = useRouter();
   const pathname = usePathname();
@@ -42,7 +46,7 @@ export default function DedicatedProductPage() {
   const productIdx = pathSegments.indexOf('product');
   const pathId = productIdx !== -1 && pathSegments[productIdx + 1] && pathSegments[productIdx + 1] !== 'preview' ? pathSegments[productIdx + 1] : '';
   const paramId = typeof params?.id === 'string' ? params.id : Array.isArray(params?.id) ? params.id[0] : '';
-  const productId = pathId || paramId || '1';
+  const productId = pathId || paramId || (initialProduct?.id ? String(initialProduct.id) : '1');
 
   const { addToCart } = useCart();
   const { language } = useLanguage();
@@ -52,8 +56,8 @@ export default function DedicatedProductPage() {
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [isMounted, setIsMounted] = useState(false);
   const [allProducts, setAllProducts] = useState<Product[]>([]);
-  const [product, setProduct] = useState<Product | undefined>(undefined);
-  const [isLoading, setIsLoading] = useState(true);
+  const [product, setProduct] = useState<Product | undefined>(initialProduct || undefined);
+  const [isLoading, setIsLoading] = useState(!initialProduct);
 
   useEffect(() => {
     setIsMounted(true);

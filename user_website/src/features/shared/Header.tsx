@@ -94,39 +94,11 @@ export const Header: React.FC<HeaderProps> = ({
     };
   }, [isCategoryDrawerOpen]);
 
-  // Typewriter effect state for interactive search placeholder
-  const [suggestionIndex, setSuggestionIndex] = useState(0);
-  const [displayText, setDisplayText] = useState('');
-  const [isDeleting, setIsDeleting] = useState(false);
-
-  useEffect(() => {
-    const suggestions = language === 'bn' ? SEARCH_SUGGESTIONS_BN : SEARCH_SUGGESTIONS_EN;
-    const currentFullText = suggestions[suggestionIndex % suggestions.length];
-    
-    const typingSpeed = isDeleting ? 40 : 85;
-
-    const timer = setTimeout(() => {
-      if (!isDeleting && displayText === currentFullText) {
-        setTimeout(() => setIsDeleting(true), 1800);
-      } else if (isDeleting && displayText === '') {
-        setIsDeleting(false);
-        setSuggestionIndex((prev) => (prev + 1) % suggestions.length);
-      } else {
-        const nextChar = isDeleting
-          ? currentFullText.substring(0, displayText.length - 1)
-          : currentFullText.substring(0, displayText.length + 1);
-        setDisplayText(nextChar);
-      }
-    }, typingSpeed);
-
-    return () => clearTimeout(timer);
-  }, [displayText, isDeleting, suggestionIndex, language]);
-
   const animatedPlaceholder = searchQuery
     ? ''
     : language === 'bn'
-    ? `খুঁজুন "${displayText}"...`
-    : `Search "${displayText}"...`;
+    ? 'গেমিং গ্যাজেট খুঁজুন...'
+    : 'Search gaming gadgets...';
 
   return (
     <>
@@ -214,6 +186,7 @@ export const Header: React.FC<HeaderProps> = ({
               {/* Dedicated Category Page Link */}
               <Link
                 href="/categories"
+                prefetch={false}
                 className="hidden lg:flex items-center space-x-1.5 px-3 py-2 bg-orange-500/10 hover:bg-orange-500/20 text-orange-600 border border-orange-500/30 rounded-xl text-xs font-extrabold transition cursor-pointer"
                 title="View Category Catalog"
               >
@@ -224,6 +197,7 @@ export const Header: React.FC<HeaderProps> = ({
               {/* My Orders Button */}
               <Link
                 href="/orders"
+                prefetch={false}
                 className="p-2 sm:px-3 sm:py-2 bg-white/80 backdrop-blur-md hover:bg-slate-900 hover:text-white text-slate-800 rounded-xl border border-white/60 shadow-2xs transition-all active:scale-95 flex items-center gap-1.5 cursor-pointer font-extrabold text-xs shrink-0"
                 title={language === 'bn' ? 'আমার অর্ডার ও ট্র্যাকিং' : 'My Orders & Tracking'}
               >
@@ -236,6 +210,7 @@ export const Header: React.FC<HeaderProps> = ({
               {/* Official Add to Cart / Bag Icon Link to /cart */}
               <Link
                 href="/cart"
+                prefetch={false}
                 className="relative p-2.5 bg-slate-900/90 hover:bg-orange-600/90 backdrop-blur-md text-white rounded-xl shadow-md border border-white/20 transition-all active:scale-95 flex items-center gap-1.5 cursor-pointer"
                 title={t.cart}
               >

@@ -1,4 +1,4 @@
-﻿import { Banner } from "./types";
+import { Banner } from "./types";
 import { supabase } from "../../lib/supabase";
 import { uploadImageToCloudinary } from "../../lib/cloudinary";
 
@@ -97,7 +97,6 @@ export function setStoredBanners(banners: Banner[]) {
   if (typeof window === "undefined") return;
   try {
     localStorage.setItem(BANNERS_STORAGE_KEY, JSON.stringify(banners));
-    window.dispatchEvent(new Event("storage"));
     broadcastChange();
   } catch (err) {
     console.error("Error writing stored banners:", err);

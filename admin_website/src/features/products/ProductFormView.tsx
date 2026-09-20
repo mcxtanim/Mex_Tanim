@@ -9,7 +9,7 @@ import { getStoredProducts, fetchProductsFromSupabase, fetchProductById, createP
 import { ImageDropzone } from "../shared/ImageDropzone";
 
 import { Category } from "../categories/types";
-import { fetchCategoriesFromSupabase } from "../categories/categoryService";
+import { getStoredCategories, fetchCategoriesFromSupabase } from "../categories/categoryService";
 
 interface ProductFormViewProps {
   productId?: string;
@@ -17,28 +17,57 @@ interface ProductFormViewProps {
 
 export function ProductFormView({ productId }: ProductFormViewProps) {
   const router = useRouter();
-  const [products, setProducts] = useState<Product[]>([]);
-  const [categoriesList, setCategoriesList] = useState<Category[]>([]);
-  const [isLoadingProduct, setIsLoadingProduct] = useState<boolean>(Boolean(productId));
+  const initialProduct = productId
+    ? getStoredProducts().find((p) => p.id === productId)
+    : null;
 
-  const [formData, setFormData] = useState<ProductFormData>({
-    title: "",
-    titleBn: "",
-    brand: "",
-    category: "gaming-mice",
-    price: 0,
-    originalPrice: 0,
-    discount: 0,
-    stock: 10,
-    description: "",
-    descriptionBn: "",
-    specs: "",
-    imageUrl: "",
-    is_featured: true,
-    is_popular: false,
-    is_bestseller: false,
-    is_new_arrival: true,
-    is_combo: false,
+  const [products, setProducts] = useState<Product[]>(() => getStoredProducts());
+  const [categoriesList, setCategoriesList] = useState<Category[]>(() => getStoredCategories());
+  const [isLoadingProduct, setIsLoadingProduct] = useState<boolean>(
+    Boolean(productId && !initialProduct)
+  );
+
+  const [formData, setFormData] = useState<ProductFormData>(() => {
+    if (initialProduct) {
+      return {
+        title: initialProduct.title || "",
+        titleBn: initialProduct.titleBn || "",
+        brand: initialProduct.brand || "",
+        category: initialProduct.category || "gaming-mice",
+        price: initialProduct.price || 0,
+        originalPrice: initialProduct.originalPrice || 0,
+        discount: initialProduct.discount || 0,
+        stock: initialProduct.stock || 10,
+        description: initialProduct.description || "",
+        descriptionBn: initialProduct.descriptionBn || "",
+        specs: initialProduct.specs || "",
+        imageUrl: initialProduct.imageUrl || "",
+        is_featured: initialProduct.is_featured ?? true,
+        is_popular: initialProduct.is_popular ?? false,
+        is_bestseller: initialProduct.is_bestseller ?? false,
+        is_new_arrival: initialProduct.is_new_arrival ?? true,
+        is_combo: initialProduct.is_combo ?? false,
+      };
+    }
+    return {
+      title: "",
+      titleBn: "",
+      brand: "",
+      category: "gaming-mice",
+      price: 0,
+      originalPrice: 0,
+      discount: 0,
+      stock: 10,
+      description: "",
+      descriptionBn: "",
+      specs: "",
+      imageUrl: "",
+      is_featured: true,
+      is_popular: false,
+      is_bestseller: false,
+      is_new_arrival: true,
+      is_combo: false,
+    };
   });
 
   const [isSaving, setIsSaving] = useState(false);
@@ -49,16 +78,6 @@ export function ProductFormView({ productId }: ProductFormViewProps) {
 
     const loadInitialData = async () => {
       try {
-        const cats = await fetchCategoriesFromSupabase();
-        if (isMounted && cats && cats.length > 0) {
-          setCategoriesList(cats);
-        }
-
-        const allProds = await fetchProductsFromSupabase();
-        if (isMounted && allProds) {
-          setProducts(allProds);
-        }
-
         if (productId) {
           const existing = await fetchProductById(productId);
           if (isMounted && existing) {
@@ -70,18 +89,28 @@ export function ProductFormView({ productId }: ProductFormViewProps) {
               price: existing.price || 0,
               originalPrice: existing.originalPrice || 0,
               discount: existing.discount || 0,
-              stock: existing.stock ?? 10,
+              stock: existing.stock || 10,
               description: existing.description || "",
               descriptionBn: existing.descriptionBn || "",
               specs: existing.specs || "",
               imageUrl: existing.imageUrl || "",
-              is_featured: Boolean(existing.is_featured),
-              is_popular: Boolean(existing.is_popular),
-              is_bestseller: Boolean(existing.is_bestseller),
-              is_new_arrival: Boolean(existing.is_new_arrival),
-              is_combo: Boolean(existing.is_combo),
+              is_featured: existing.is_featured ?? true,
+              is_popular: existing.is_popular ?? false,
+              is_bestseller: existing.is_bestseller ?? false,
+              is_new_arrival: existing.is_new_arrival ?? true,
+              is_combo: existing.is_combo ?? false,
             });
           }
+        }
+
+        const cats = await fetchCategoriesFromSupabase();
+        if (isMounted && cats && cats.length > 0) {
+          setCategoriesList(cats);
+        }
+
+        const allProds = await fetchProductsFromSupabase();
+        if (isMounted && allProds) {
+          setProducts(allProds);
         }
       } catch (err) {
         console.error("Error loading product edit data:", err);

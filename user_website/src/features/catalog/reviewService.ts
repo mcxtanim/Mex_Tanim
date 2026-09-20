@@ -107,7 +107,6 @@ export function addReview(data: {
     try {
       localStorage.setItem(REVIEWS_STORAGE_KEY, JSON.stringify(updated));
     } catch (e) {}
-    window.dispatchEvent(new Event('storage'));
   }
 
   return newReview;

@@ -1,9 +1,7 @@
 import { AdminHeader } from "@/features/shared/AdminHeader";
 import BannerEditClient from "./BannerEditClient";
 
-export function generateStaticParams() {
-  return [{ id: "preview" }];
-}
+export const dynamic = "force-dynamic";
 
 export default function EditBannerPage() {
   return (
@@ -15,3 +13,5 @@ export default function EditBannerPage() {
     </>
   );
 }
+
+

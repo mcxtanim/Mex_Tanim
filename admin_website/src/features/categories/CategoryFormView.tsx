@@ -14,13 +14,31 @@ interface CategoryFormViewProps {
 
 export function CategoryFormView({ categoryId }: CategoryFormViewProps) {
   const router = useRouter();
-  const [categories, setCategories] = useState<Category[]>([]);
-  const [isLoadingCategory, setIsLoadingCategory] = useState<boolean>(Boolean(categoryId));
-  const [formData, setFormData] = useState<CategoryFormData>({
-    name: "",
-    name_bn: "",
-    description: "",
-    image: "",
+  const [categories, setCategories] = useState<Category[]>(() => getStoredCategories());
+  
+  const initialCategory = categoryId
+    ? getStoredCategories().find((c) => c.id === categoryId || c.slug === categoryId)
+    : null;
+
+  const [isLoadingCategory, setIsLoadingCategory] = useState<boolean>(
+    Boolean(categoryId && !initialCategory)
+  );
+
+  const [formData, setFormData] = useState<CategoryFormData>(() => {
+    if (initialCategory) {
+      return {
+        name: initialCategory.name || "",
+        name_bn: initialCategory.name_bn || "",
+        description: initialCategory.description || "",
+        image: initialCategory.image || "",
+      };
+    }
+    return {
+      name: "",
+      name_bn: "",
+      description: "",
+      image: "",
+    };
   });
 
   const [isSaving, setIsSaving] = useState(false);
@@ -31,11 +49,6 @@ export function CategoryFormView({ categoryId }: CategoryFormViewProps) {
 
     const loadInitialData = async () => {
       try {
-        const allCats = await fetchCategoriesFromSupabase();
-        if (isMounted && allCats) {
-          setCategories(allCats);
-        }
-
         if (categoryId) {
           const existing = await fetchCategoryById(categoryId);
           if (isMounted && existing) {
@@ -46,6 +59,11 @@ export function CategoryFormView({ categoryId }: CategoryFormViewProps) {
               image: existing.image || "",
             });
           }
+        }
+
+        const allCats = await fetchCategoriesFromSupabase();
+        if (isMounted && allCats) {
+          setCategories(allCats);
         }
       } catch (err) {
         console.error("Error loading category edit data:", err);

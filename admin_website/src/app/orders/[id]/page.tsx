@@ -1,9 +1,8 @@
-﻿import OrderDetailClient from "./OrderDetailClient";
+import OrderDetailClient from "./OrderDetailClient";
 
-export function generateStaticParams() {
-  return [{ id: "preview" }];
-}
+export const dynamic = "force-dynamic";
 
 export default function OrderDetailPage() {
   return <OrderDetailClient />;
 }
+

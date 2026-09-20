@@ -322,8 +322,13 @@ export const BuyNowModal: React.FC<BuyNowModalProps> = ({
         console.warn('Could not cache order in localStorage:', err);
       }
 
-      if (typeof window !== 'undefined') {
-        window.dispatchEvent(new Event('storage'));
+      // Cross-tab sync via BroadcastChannel if available
+      if (typeof window !== 'undefined' && 'BroadcastChannel' in window) {
+        try {
+          const bc = new BroadcastChannel('mex_tanim_store_sync');
+          bc.postMessage({ type: 'ORDER_PLACED', orderId: fullOrder.id });
+          bc.close();
+        } catch {}
       }
 
       // Save Order to Supabase Database

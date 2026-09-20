@@ -199,10 +199,13 @@ export async function fetchStoreSettings(): Promise<StoreSettings> {
 
 // React Hook for dynamic store settings
 export function useStoreSettings() {
-  const [settings, setSettings] = useState<StoreSettings>(() => getStoredSettings());
+  const [settings, setSettings] = useState<StoreSettings>(DEFAULT_SETTINGS);
 
   useEffect(() => {
-    // 1. Initial fetch from Supabase
+    // 1. Initial cached settings rehydration after client mount
+    setSettings(getStoredSettings());
+
+    // 2. Fetch fresh settings from Supabase
     fetchStoreSettings().then((live) => {
       setSettings(live);
     });

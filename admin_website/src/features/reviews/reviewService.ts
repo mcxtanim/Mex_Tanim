@@ -52,7 +52,6 @@ export function saveAdminReviews(reviews: AdminProductReview[]): void {
   if (typeof window === "undefined") return;
   try {
     localStorage.setItem(REVIEWS_STORAGE_KEY, JSON.stringify(reviews));
-    window.dispatchEvent(new Event("storage"));
   } catch (err) {
     console.error("Error saving reviews in admin:", err);
   }

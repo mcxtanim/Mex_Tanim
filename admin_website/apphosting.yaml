@@ -1,0 +1,19 @@
+# Firebase App Hosting configuration for Mex Tanim Store (Admin Website)
+runConfig:
+  minInstances: 0
+  maxInstances: 2
+  concurrency: 80
+  cpu: 1
+  memoryMiB: 512
+
+env:
+  - variable: NEXT_PUBLIC_SUPABASE_URL
+    value: https://mbchiojrtufgmchyuxpp.supabase.co
+  - variable: NEXT_PUBLIC_SUPABASE_ANON_KEY
+    value: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1iY2hpb2pydHVmZ21jaHl1eHBwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODkyMTM2MTAsImV4cCI6MjEwNDc4OTYxMH0.i0RGz8eDzV9LylQ65_yMoG1OhoAmUuUZwZ4_kvAyZqs
+  - variable: NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY
+    value: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1iY2hpb2pydHVmZ21jaHl1eHBwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODkyMTM2MTAsImV4cCI6MjEwNDc4OTYxMH0.i0RGz8eDzV9LylQ65_yMoG1OhoAmUuUZwZ4_kvAyZqs
+  - variable: NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME
+    value: nc5hyaab
+  - variable: NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET
+    value: ml_default

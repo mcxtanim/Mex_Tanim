@@ -1,8 +1,6 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  output: 'export',
-  trailingSlash: true,
-  reactStrictMode: true,
+  reactStrictMode: false,
   images: {
     unoptimized: true,
     remotePatterns: [
@@ -13,6 +11,10 @@ const nextConfig = {
       {
         protocol: 'https',
         hostname: 'm.media-amazon.com',
+      },
+      {
+        protocol: 'https',
+        hostname: 'res.cloudinary.com',
       },
     ],
   },

@@ -19,16 +19,19 @@ export function ImageDropzone({
 }: ImageDropzoneProps) {
   const [isDragging, setIsDragging] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
+  const [uploadError, setUploadError] = useState<string | null>(null);
   const dropzoneRef = useRef<HTMLDivElement>(null);
 
   const processFile = async (file: File) => {
     if (!file.type.startsWith("image/")) return;
     setIsUploading(true);
+    setUploadError(null);
     try {
       const url = await uploadImageToCloudinary(file);
       onChange(url);
-    } catch (err) {
+    } catch (err: any) {
       console.error("Dropzone upload error:", err);
+      setUploadError(err?.message || "Failed to upload image to Cloudinary");
     } finally {
       setIsUploading(false);
     }
@@ -171,6 +174,12 @@ export function ImageDropzone({
           </label>
         )}
       </div>
+
+      {uploadError && (
+        <p className="text-[11px] text-rose-400 font-medium bg-rose-500/10 p-2 rounded-xl border border-rose-500/20">
+          {uploadError}
+        </p>
+      )}
     </div>
   );
 }

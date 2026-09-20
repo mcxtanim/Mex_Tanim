@@ -18,7 +18,6 @@ export function saveStoredOrders(orders: Order[]): void {
   if (typeof window === "undefined") return;
   try {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(orders));
-    window.dispatchEvent(new Event("storage"));
   } catch (error) {
     console.warn("localStorage quota exceeded for orders, saving lightweight cache...", error);
     try {
@@ -37,7 +36,6 @@ export function saveStoredOrders(orders: Order[]): void {
     } catch (e) {
       console.warn("Could not save orders to localStorage, skipping local cache.", e);
     }
-    window.dispatchEvent(new Event("storage"));
   }
 }
 

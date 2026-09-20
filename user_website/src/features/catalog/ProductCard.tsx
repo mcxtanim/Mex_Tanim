@@ -1,7 +1,6 @@
 'use client';
 
 import React from 'react';
-import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { Star, ShoppingBag } from 'lucide-react';
 import { Product } from './types';
@@ -19,6 +18,10 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
   const { addToCart } = useCart();
   const { t, language } = useLanguage();
 
+  const handleCardClick = () => {
+    router.push(`/product/${product.id}`);
+  };
+
   const discountPercent = product.originalPrice
     ? Math.round(((product.originalPrice - product.price) / product.originalPrice) * 100)
     : 0;
@@ -27,13 +30,13 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
   const description = language === 'bn' ? (product.descriptionBn || product.description) : product.description;
 
   return (
-    <div className="bg-white/80 backdrop-blur-md border border-white/60 shadow-xl shadow-slate-900/5 rounded-2xl overflow-hidden hover:border-orange-500/40 hover:bg-white/95 hover:shadow-2xl transition-all duration-300 group flex flex-col justify-between">
+    <div
+      onClick={handleCardClick}
+      className="bg-white/80 backdrop-blur-md border border-white/60 shadow-xl shadow-slate-900/5 rounded-2xl overflow-hidden hover:border-orange-500/40 hover:bg-white/95 hover:shadow-2xl transition-all duration-300 group flex flex-col justify-between cursor-pointer"
+    >
       
       {/* Product Image & Badges */}
-      <Link
-        href={`/product/${product.id}`}
-        className="relative block w-full h-48 sm:h-52 bg-slate-50/80 overflow-hidden cursor-pointer"
-      >
+      <div className="relative block w-full h-48 sm:h-52 bg-slate-50/80 overflow-hidden cursor-pointer">
         <img
           src={product.image}
           alt={title}
@@ -59,7 +62,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
         >
           {product.inStock ? t.inStock : t.outOfStock}
         </span>
-      </Link>
+      </div>
 
       {/* Product Information */}
       <div className="p-4 flex-1 flex flex-col justify-between space-y-3">
@@ -76,12 +79,9 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
             </div>
           </div>
 
-          <Link
-            href={`/product/${product.id}`}
-            className="font-bold text-sm text-slate-900 line-clamp-1 hover:text-orange-600 transition cursor-pointer block"
-          >
+          <h3 className="font-bold text-sm text-slate-900 line-clamp-1 hover:text-orange-600 transition cursor-pointer block">
             {title}
-          </Link>
+          </h3>
 
           <p className="text-xs text-gray-500 line-clamp-2 mt-1 leading-relaxed">
             {description}

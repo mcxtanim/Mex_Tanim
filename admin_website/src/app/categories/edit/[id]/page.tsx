@@ -1,9 +1,8 @@
-﻿import CategoryEditClient from "./CategoryEditClient";
+import CategoryEditClient from "./CategoryEditClient";
 
-export function generateStaticParams() {
-  return [{ id: "preview" }];
-}
+export const dynamic = "force-dynamic";
 
 export default function EditCategoryPage() {
   return <CategoryEditClient />;
 }
+

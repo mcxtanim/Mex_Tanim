@@ -177,7 +177,6 @@ export async function fetchSettingsFromSupabase(): Promise<StoreSettings> {
     const mapped = mapDbToSettings(data);
     if (typeof window !== "undefined") {
       localStorage.setItem(SETTINGS_STORAGE_KEY, JSON.stringify(mapped));
-      window.dispatchEvent(new Event("storage"));
     }
     return mapped;
   } catch (err) {
@@ -191,7 +190,6 @@ export async function saveStoredSettings(settings: StoreSettings): Promise<Store
   if (typeof window !== "undefined") {
     try {
       localStorage.setItem(SETTINGS_STORAGE_KEY, JSON.stringify(settings));
-      window.dispatchEvent(new Event("storage"));
     } catch (err) {
       console.error("Error saving store settings to localStorage:", err);
     }

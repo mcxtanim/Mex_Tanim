@@ -63,7 +63,6 @@ export function CheckoutModal({ isOpen, onClose }: CheckoutModalProps) {
       const existing = localStorage.getItem(LOCAL_STORAGE_ORDERS_KEY);
       const orders = existing ? JSON.parse(existing) : [];
       localStorage.setItem(LOCAL_STORAGE_ORDERS_KEY, JSON.stringify([newOrder, ...orders]));
-      window.dispatchEvent(new Event('storage'));
     } catch (err) {
       console.warn('Error saving mock order:', err);
     }

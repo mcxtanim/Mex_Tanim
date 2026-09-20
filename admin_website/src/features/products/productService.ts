@@ -14,11 +14,22 @@ export function normalizeCategorySlug(rawCat: string): string {
   return slug || "gaming-mice";
 }
 
+let memoryProductsCache: Product[] | null = null;
+let lastProductsFetchTimestamp = 0;
+let inFlightProductsPromise: Promise<Product[]> | null = null;
+
 export function getStoredProducts(): Product[] {
+  if (memoryProductsCache && memoryProductsCache.length > 0) {
+    return memoryProductsCache;
+  }
   if (typeof window === "undefined") return [];
   try {
     const data = localStorage.getItem(STORAGE_KEY);
-    return data ? JSON.parse(data) : [];
+    const parsed = data ? JSON.parse(data) : [];
+    if (Array.isArray(parsed) && parsed.length > 0) {
+      memoryProductsCache = parsed;
+    }
+    return parsed;
   } catch (error) {
     console.error("Error reading products from localStorage", error);
     return [];
@@ -26,10 +37,10 @@ export function getStoredProducts(): Product[] {
 }
 
 export function saveStoredProducts(products: Product[]): void {
+  memoryProductsCache = products;
   if (typeof window === "undefined") return;
   try {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(products));
-    window.dispatchEvent(new Event("storage"));
   } catch (error) {
     console.warn("localStorage quota exceeded, saving lightweight product cache...", error);
     try {
@@ -42,56 +53,76 @@ export function saveStoredProducts(products: Product[]): void {
     } catch (e) {
       console.warn("Could not save to localStorage, skipping local cache.", e);
     }
-    window.dispatchEvent(new Event("storage"));
   }
 }
 
-export async function fetchProductsFromSupabase(): Promise<Product[]> {
-  if (!supabase) return getStoredProducts();
-  try {
-    const { data, error } = await supabase
-      .from("products")
-      .select("*")
-      .order("created_at", { ascending: false });
+export async function fetchProductsFromSupabase(forceRefresh = false): Promise<Product[]> {
+  if (!forceRefresh && memoryProductsCache && memoryProductsCache.length > 0 && Date.now() - lastProductsFetchTimestamp < 60000) {
+    return memoryProductsCache;
+  }
 
-    if (error) {
-      console.warn("Supabase products fetch error:", error.message || error);
+  if (inFlightProductsPromise) {
+    return inFlightProductsPromise;
+  }
+
+  inFlightProductsPromise = (async () => {
+    if (!supabase) return getStoredProducts();
+    try {
+      const { data, error } = await supabase
+        .from("products")
+        .select("*")
+        .order("created_at", { ascending: false });
+
+      if (error) {
+        console.warn("Supabase products fetch error:", error.message || error);
+        return getStoredProducts();
+      }
+
+      if (!data) return [];
+
+      const mapped: Product[] = data.map((item: any) => ({
+        id: String(item.id),
+        title: item.title || "",
+        titleBn: item.title_bn || item.titleBn || "",
+        brand: item.brand || "",
+        category: item.category || "gaming-mice",
+        price: Number(item.price) || 0,
+        originalPrice: Number(item.original_price || item.originalPrice) || 0,
+        discount: Number(item.discount) || 0,
+        stock: Number(item.stock) || 0,
+        description: item.description || "",
+        descriptionBn: item.description_bn || item.descriptionBn || "",
+        specs: Array.isArray(item.specs) ? item.specs.join(", ") : (item.specs || ""),
+        imageUrl: item.image_url || item.imageUrl || "",
+        is_featured: Boolean(item.is_featured),
+        is_popular: Boolean(item.is_popular),
+        is_bestseller: Boolean(item.is_bestseller),
+        is_new_arrival: Boolean(item.is_new_arrival),
+        is_combo: Boolean(item.is_combo),
+        createdAt: item.created_at || new Date().toISOString().split("T")[0],
+      }));
+
+      lastProductsFetchTimestamp = Date.now();
+      saveStoredProducts(mapped);
+      return mapped;
+    } catch (err) {
+      console.warn("Supabase fetch products exception:", err);
       return getStoredProducts();
     }
+  })().finally(() => {
+    inFlightProductsPromise = null;
+  });
 
-    if (!data) return [];
-
-    const mapped: Product[] = data.map((item: any) => ({
-      id: String(item.id),
-      title: item.title || "",
-      titleBn: item.title_bn || item.titleBn || "",
-      brand: item.brand || "",
-      category: item.category || "gaming-mice",
-      price: Number(item.price) || 0,
-      originalPrice: Number(item.original_price || item.originalPrice) || 0,
-      discount: Number(item.discount) || 0,
-      stock: Number(item.stock) || 0,
-      description: item.description || "",
-      descriptionBn: item.description_bn || item.descriptionBn || "",
-      specs: Array.isArray(item.specs) ? item.specs.join(", ") : (item.specs || ""),
-      imageUrl: item.image_url || item.imageUrl || "",
-      is_featured: Boolean(item.is_featured),
-      is_popular: Boolean(item.is_popular),
-      is_bestseller: Boolean(item.is_bestseller),
-      is_new_arrival: Boolean(item.is_new_arrival),
-      is_combo: Boolean(item.is_combo),
-      createdAt: item.created_at || new Date().toISOString().split("T")[0],
-    }));
-
-    saveStoredProducts(mapped);
-    return mapped;
-  } catch (err) {
-    console.warn("Supabase fetch products exception:", err);
-    return getStoredProducts();
-  }
+  return inFlightProductsPromise;
 }
 
 export async function fetchProductById(id: string): Promise<Product | null> {
+  const stored = getStoredProducts();
+  const found = stored.find((p) => String(p.id) === String(id));
+  if (found) {
+    return found;
+  }
+
   if (supabase) {
     try {
       const { data, error } = await supabase
@@ -101,7 +132,7 @@ export async function fetchProductById(id: string): Promise<Product | null> {
         .maybeSingle();
 
       if (!error && data) {
-        return {
+        const mapped: Product = {
           id: String(data.id),
           title: data.title || "",
           titleBn: data.title_bn || data.titleBn || "",
@@ -122,14 +153,19 @@ export async function fetchProductById(id: string): Promise<Product | null> {
           is_combo: Boolean(data.is_combo),
           createdAt: data.created_at || new Date().toISOString().split("T")[0],
         };
+        if (memoryProductsCache) {
+          memoryProductsCache = [mapped, ...memoryProductsCache.filter((p) => p.id !== mapped.id)];
+        } else {
+          memoryProductsCache = [mapped];
+        }
+        return mapped;
       }
     } catch (err) {
       console.warn("fetchProductById exception:", err);
     }
   }
 
-  const stored = getStoredProducts();
-  return stored.find((p) => p.id === id) || null;
+  return null;
 }
 
 function notifyProductsUpdated(products: Product[]) {
