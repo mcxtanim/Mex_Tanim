@@ -102,10 +102,35 @@ export const HeroBanner: React.FC = () => {
   const buttonText = currentBanner?.buttonText || t.addToCart;
   const buttonLink = currentBanner?.buttonLink || '#products';
 
+  const touchStartX = useRef<number>(0);
+  const touchStartY = useRef<number>(0);
+
+  const handleTouchStart = (e: React.TouchEvent) => {
+    touchStartX.current = e.touches[0].clientX;
+    touchStartY.current = e.touches[0].clientY;
+  };
+
+  const handleTouchEnd = (e: React.TouchEvent) => {
+    const deltaX = e.changedTouches[0].clientX - touchStartX.current;
+    const deltaY = e.changedTouches[0].clientY - touchStartY.current;
+    // Only trigger slide change if swipe is predominantly horizontal and > 45px
+    if (Math.abs(deltaX) > 45 && Math.abs(deltaX) > Math.abs(deltaY)) {
+      if (deltaX < 0) {
+        nextSlide();
+      } else {
+        prevSlide();
+      }
+    }
+  };
+
   return (
-    <section id="hero" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-4 sm:pt-6 pb-2 select-none">
+    <section id="hero" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-3 sm:pt-6 pb-2 select-none">
       {/* Full-Bleed Hero Banner Slider Container */}
-      <div className="relative rounded-3xl overflow-hidden bg-slate-950 shadow-2xl border border-slate-800 aspect-[21/9] sm:aspect-[24/9] md:aspect-[27/9] min-h-[260px] sm:min-h-[360px] md:min-h-[420px] group flex items-center justify-center">
+      <div
+        onTouchStart={handleTouchStart}
+        onTouchEnd={handleTouchEnd}
+        className="relative rounded-2xl sm:rounded-3xl overflow-hidden bg-slate-950 shadow-xl sm:shadow-2xl border border-slate-800 aspect-[16/9] sm:aspect-[24/9] md:aspect-[27/9] min-h-[190px] sm:min-h-[360px] md:min-h-[420px] group flex items-center justify-center"
+      >
         
         {/* Banner Images Carousel - Spanning 100% Full Area with Smooth Transition */}
         {banners.map((item, index) => {
@@ -120,7 +145,7 @@ export const HeroBanner: React.FC = () => {
               <img
                 src={item.imageUrl}
                 alt={item.title || `Banner ${index + 1}`}
-                className="w-full h-full object-cover object-center rounded-3xl"
+                className="w-full h-full object-cover object-center rounded-2xl sm:rounded-3xl"
                 loading={index === 0 ? 'eager' : 'lazy'}
               />
               {/* Subtle Gradient Overlay for visual contrast and text readability */}
@@ -131,14 +156,14 @@ export const HeroBanner: React.FC = () => {
 
         {/* Dynamic Title / Subtitle Text Overlay (if custom title or subtitle is configured) */}
         {(titleText || subtitleText) && (
-          <div className="absolute top-8 left-6 sm:top-12 sm:left-10 md:left-12 z-20 max-w-xl pointer-events-none space-y-1.5 animate-in fade-in duration-300">
+          <div className="absolute top-4 left-4 sm:top-12 sm:left-10 md:left-12 z-20 max-w-xl pointer-events-none space-y-1 sm:space-y-1.5 animate-in fade-in duration-300">
             {titleText && (
-              <h2 className="text-lg sm:text-2xl md:text-3xl lg:text-4xl font-black text-white tracking-tight drop-shadow-[0_2px_12px_rgba(0,0,0,0.8)] leading-tight">
+              <h2 className="text-sm sm:text-2xl md:text-3xl lg:text-4xl font-black text-white tracking-tight drop-shadow-[0_2px_12px_rgba(0,0,0,0.8)] leading-tight">
                 {titleText}
               </h2>
             )}
             {subtitleText && (
-              <p className="text-xs sm:text-sm md:text-base font-semibold text-slate-200 drop-shadow-[0_1px_8px_rgba(0,0,0,0.8)] line-clamp-2">
+              <p className="text-[11px] sm:text-sm md:text-base font-semibold text-slate-200 drop-shadow-[0_1px_8px_rgba(0,0,0,0.8)] line-clamp-1 sm:line-clamp-2">
                 {subtitleText}
               </p>
             )}
@@ -147,9 +172,9 @@ export const HeroBanner: React.FC = () => {
 
         {/* Bottom-Left Floating Badge */}
         {badgeText && (
-          <div className="absolute bottom-6 left-6 sm:bottom-8 sm:left-8 z-20 flex items-center space-x-2 bg-slate-950/85 backdrop-blur-md px-4 py-2 rounded-full border border-orange-500/40 shadow-xl transition-all">
-            <Flame className="w-4 h-4 text-orange-400 animate-pulse" />
-            <span className="text-xs font-black text-white tracking-wider">
+          <div className="absolute bottom-3 left-3 sm:bottom-8 sm:left-8 z-20 flex items-center space-x-1.5 sm:space-x-2 bg-slate-950/85 backdrop-blur-md px-2.5 py-1 sm:px-4 sm:py-2 rounded-full border border-orange-500/40 shadow-xl transition-all">
+            <Flame className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-orange-400 animate-pulse" />
+            <span className="text-[10px] sm:text-xs font-black text-white tracking-wider">
               Mex Tanim <span className="text-orange-400">{badgeText}</span>
             </span>
           </div>
@@ -166,24 +191,24 @@ export const HeroBanner: React.FC = () => {
           </a>
         </div>
 
-        {/* Left Arrow Button (shown if multiple banners) */}
+        {/* Left Arrow Button (Desktop only - hidden on mobile so it doesn't cover text) */}
         {totalSlides > 1 && (
           <button
             onClick={prevSlide}
             type="button"
-            className="absolute left-3 sm:left-5 top-1/2 -translate-y-1/2 p-2.5 sm:p-3 rounded-full bg-slate-950/70 hover:bg-orange-500 text-white backdrop-blur-md border border-white/20 transition-all z-20 shadow-xl opacity-90 hover:opacity-100 hover:scale-110 active:scale-95 cursor-pointer"
+            className="hidden sm:flex absolute left-3 sm:left-5 top-1/2 -translate-y-1/2 p-2.5 sm:p-3 rounded-full bg-slate-950/70 hover:bg-orange-500 text-white backdrop-blur-md border border-white/20 transition-all z-20 shadow-xl opacity-90 hover:opacity-100 hover:scale-110 active:scale-95 cursor-pointer"
             aria-label="Previous Slide"
           >
             <ChevronLeft className="w-5 h-5 sm:w-6 sm:h-6" />
           </button>
         )}
 
-        {/* Right Arrow Button (shown if multiple banners) */}
+        {/* Right Arrow Button (Desktop only - hidden on mobile so it doesn't cover text) */}
         {totalSlides > 1 && (
           <button
             onClick={nextSlide}
             type="button"
-            className="absolute right-3 sm:right-5 top-1/2 -translate-y-1/2 p-2.5 sm:p-3 rounded-full bg-slate-950/70 hover:bg-orange-500 text-white backdrop-blur-md border border-white/20 transition-all z-20 shadow-xl opacity-90 hover:opacity-100 hover:scale-110 active:scale-95 cursor-pointer"
+            className="hidden sm:flex absolute right-3 sm:right-5 top-1/2 -translate-y-1/2 p-2.5 sm:p-3 rounded-full bg-slate-950/70 hover:bg-orange-500 text-white backdrop-blur-md border border-white/20 transition-all z-20 shadow-xl opacity-90 hover:opacity-100 hover:scale-110 active:scale-95 cursor-pointer"
             aria-label="Next Slide"
           >
             <ChevronRight className="w-5 h-5 sm:w-6 sm:h-6" />
@@ -192,16 +217,16 @@ export const HeroBanner: React.FC = () => {
 
         {/* Live Sliding Pagination Indicators Bar (shown if multiple banners) */}
         {totalSlides > 1 && (
-          <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex items-center space-x-2.5 z-20 bg-slate-950/60 backdrop-blur-md px-3.5 py-1.5 rounded-full border border-white/10">
+          <div className="absolute bottom-3 sm:bottom-4 left-1/2 -translate-x-1/2 flex items-center space-x-1.5 sm:space-x-2.5 z-20 bg-slate-950/60 backdrop-blur-md px-2.5 py-1 sm:px-3.5 sm:py-1.5 rounded-full border border-white/10">
             {banners.map((_, index) => (
               <button
                 key={index}
                 type="button"
                 onClick={(e) => handleDotClick(index, e)}
-                className={`h-2.5 rounded-full transition-all duration-300 cursor-pointer ${
+                className={`h-2 sm:h-2.5 rounded-full transition-all duration-300 cursor-pointer ${
                   safeIndex === index
-                    ? 'w-8 bg-orange-500 shadow-md shadow-orange-500/80 scale-105'
-                    : 'w-2.5 bg-white/40 hover:bg-white/70'
+                    ? 'w-6 sm:w-8 bg-orange-500 shadow-md shadow-orange-500/80 scale-105'
+                    : 'w-2 sm:w-2.5 bg-white/40 hover:bg-white/70'
                 }`}
                 aria-label={`Slide ${index + 1}`}
               />

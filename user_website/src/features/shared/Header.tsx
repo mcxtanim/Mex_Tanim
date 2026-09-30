@@ -112,7 +112,8 @@ export const Header: React.FC<HeaderProps> = ({
           </div>
         )}
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-20 sm:h-24 gap-3">
+          {/* Desktop & Tablet Layout (sm and up) - 100% UNCHANGED */}
+          <div className="hidden sm:flex items-center justify-between h-20 sm:h-24 gap-3">
             
             {/* Left section: Left Hamburger Button + Active Category Pill + Logo */}
             <div className="flex items-center space-x-2 sm:space-x-3">
@@ -238,6 +239,115 @@ export const Header: React.FC<HeaderProps> = ({
               </div>
 
             </div>
+          </div>
+
+          {/* Dedicated Mobile Layout (< sm): Clean, Non-colliding, Two-Row Structure */}
+          <div className="sm:hidden py-2.5 space-y-2">
+            {/* Mobile Row 1: Left Menu + Centered/Left Logo + Right Actions (Language, Orders, Cart) */}
+            <div className="flex items-center justify-between gap-1.5">
+              <div className="flex items-center space-x-2 shrink-0">
+                {/* Mobile Menu Button */}
+                <button
+                  onClick={() => setIsCategoryDrawerOpen(true)}
+                  className="relative w-9 h-9 rounded-full bg-gray-100 hover:bg-gray-200 text-black flex items-center justify-center border border-gray-200 shadow-2xs active:scale-95 shrink-0 cursor-pointer"
+                  title="Product Categories"
+                  aria-label="Toggle Product Categories Drawer"
+                >
+                  <Menu className="w-5 h-5 text-black stroke-[2.5]" />
+                  {selectedCategory !== 'all' && (
+                    <span className="absolute -top-0.5 -right-0.5 w-2.5 h-2.5 bg-orange-500 rounded-full border-2 border-white animate-pulse" />
+                  )}
+                </button>
+
+                {/* Mobile Logo: Cleanly constrained, never overlaps */}
+                <Link href="/" className="flex items-center shrink-0">
+                  <img
+                    src="/images/logo.png"
+                    alt="Mex Tanim Store Logo"
+                    className="h-10 w-auto max-w-[130px] object-contain drop-shadow-xs"
+                  />
+                </Link>
+              </div>
+
+              {/* Mobile Right Action Icons */}
+              <div className="flex items-center space-x-1.5 shrink-0">
+                {/* Mobile Language Switcher */}
+                <button
+                  onClick={() => setLanguage(language === 'en' ? 'bn' : 'en')}
+                  className="flex items-center space-x-0.5 bg-gray-100/90 border border-gray-200 px-2 py-1.5 rounded-full text-[11px] font-bold text-slate-800 transition active:scale-95 cursor-pointer shadow-2xs"
+                  title="Switch Language / ভাষা পরিবর্তন করুন"
+                >
+                  <Globe className="w-3 h-3 text-orange-500 shrink-0" />
+                  <span className={language === 'en' ? 'text-orange-600 font-black' : 'text-gray-400'}>EN</span>
+                  <span className="text-gray-300">|</span>
+                  <span className={language === 'bn' ? 'text-orange-600 font-black' : 'text-gray-400'}>বাং</span>
+                </button>
+
+                {/* Mobile Orders Link */}
+                <Link
+                  href="/orders"
+                  prefetch={false}
+                  className="p-1.5 bg-gray-100 hover:bg-slate-900 hover:text-white text-slate-800 rounded-xl border border-gray-200 flex items-center justify-center shrink-0 cursor-pointer shadow-2xs"
+                  title={language === 'bn' ? 'আমার অর্ডার' : 'My Orders'}
+                >
+                  <Package className="w-4 h-4 text-orange-500" />
+                </Link>
+
+                {/* Mobile Cart Link with Badge */}
+                <Link
+                  href="/cart"
+                  prefetch={false}
+                  className="relative p-1.5 bg-slate-900 text-white rounded-xl shadow-xs flex items-center justify-center shrink-0 cursor-pointer"
+                  title={t.cart}
+                >
+                  <ShoppingBag className="w-4 h-4 text-orange-400" />
+                  {totalItems > 0 && (
+                    <span className="absolute -top-1.5 -right-1.5 bg-orange-500 text-white text-[10px] font-black rounded-full h-4 min-w-[16px] px-1 flex items-center justify-center border border-white shadow-xs">
+                      {totalItems}
+                    </span>
+                  )}
+                </Link>
+              </div>
+            </div>
+
+            {/* Mobile Row 2: Full-Width Search Input */}
+            <div className="relative w-full">
+              <input
+                type="text"
+                placeholder={animatedPlaceholder}
+                value={searchQuery}
+                onChange={(e) => setSearchQuery?.(e.target.value)}
+                className="w-full bg-gray-100/90 text-gray-800 placeholder-gray-500 font-medium pl-9 pr-8 py-2 text-xs rounded-full border border-gray-200 focus:border-orange-500 focus:bg-white focus:ring-2 focus:ring-orange-500/20 outline-none shadow-inner transition-all"
+              />
+              <Search className="w-4 h-4 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2" />
+              {searchQuery && (
+                <button
+                  onClick={() => setSearchQuery?.('')}
+                  className="absolute right-2.5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 text-xs bg-gray-200 rounded-full w-4 h-4 flex items-center justify-center cursor-pointer"
+                >
+                  ×
+                </button>
+              )}
+            </div>
+
+            {/* Mobile Active Category Pill (if a category is active) */}
+            {selectedCategory !== 'all' && (
+              <div className="flex items-center justify-between bg-orange-50 border border-orange-200 px-3 py-1 rounded-xl text-xs text-orange-700 font-bold">
+                <span className="capitalize text-[11px] truncate">
+                  {language === 'bn' ? 'ক্যাটাগরি: ' : 'Category: '}
+                  {selectedCategory.replace('-', ' ')}
+                </span>
+                {onSelectCategory && (
+                  <button
+                    onClick={() => onSelectCategory('all')}
+                    className="text-orange-600 hover:text-orange-800 text-[11px] font-extrabold flex items-center gap-1 shrink-0 ml-2"
+                  >
+                    <span>{language === 'bn' ? 'রিসেট' : 'Reset'}</span>
+                    <X className="w-3.5 h-3.5" />
+                  </button>
+                )}
+              </div>
+            )}
           </div>
         </div>
       </header>

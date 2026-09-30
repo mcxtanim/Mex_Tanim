@@ -121,7 +121,7 @@ export const CategoryShowcase: React.FC<CategoryShowcaseProps> = ({
       {/* Horizontally Scrollable Thumbnail Rail */}
       <div
         ref={scrollRef}
-        className="overflow-x-auto scrollbar-none flex space-x-3 sm:space-x-4 snap-x touch-pan-x py-2 px-0.5"
+        className="overflow-x-auto scrollbar-none flex space-x-2.5 sm:space-x-4 snap-x overscroll-x-contain py-2 px-0.5"
         style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
       >
         {categories.length > 0 ? (

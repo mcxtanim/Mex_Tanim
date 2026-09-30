@@ -109,12 +109,12 @@ export const ComboOfferSection: React.FC = () => {
         ref={carouselRef}
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
-        className="flex space-x-5 overflow-x-auto scrollbar-none py-3 px-1 snap-x touch-pan-x"
+        className="flex space-x-4 sm:space-x-5 overflow-x-auto scrollbar-none py-3 px-1 snap-x overscroll-x-contain"
       >
         {comboProducts.map((comboProduct) => (
           <div
             key={comboProduct.id}
-            className="min-w-[300px] sm:min-w-[340px] max-w-[350px] shrink-0 snap-start bg-white rounded-3xl border border-gray-200/90 shadow-2xs hover:shadow-xl hover:border-orange-400 transition-all duration-300 flex flex-col justify-between overflow-hidden group"
+            className="min-w-[260px] sm:min-w-[340px] max-w-[350px] shrink-0 snap-start bg-white rounded-2xl sm:rounded-3xl border border-gray-200/90 shadow-2xs hover:shadow-xl hover:border-orange-400 transition-all duration-300 flex flex-col justify-between overflow-hidden group"
           >
             <Link href={`/product/${comboProduct.id}`} className="block flex-1">
               <div className="relative p-3.5 bg-slate-50/70 overflow-hidden border-b border-gray-100">

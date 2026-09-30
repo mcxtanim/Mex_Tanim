@@ -581,7 +581,7 @@ export default function DedicatedProductPage({ initialProduct }: DedicatedProduc
               {/* Related Products Horizontal Carousel */}
               <div
                 ref={relatedRailRef}
-                className="flex space-x-4 overflow-x-auto scrollbar-none py-2 px-1 snap-x touch-pan-x"
+                className="flex space-x-3 sm:space-x-4 overflow-x-auto scrollbar-none py-2 px-1 snap-x overscroll-x-contain"
               >
                 {relatedProducts.map((relProd) => (
                   <div

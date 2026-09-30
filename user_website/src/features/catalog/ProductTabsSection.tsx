@@ -99,12 +99,12 @@ const CategoryRailRow: React.FC<CategoryRailProps> = ({
 
       <div
         ref={railRef}
-        className="flex space-x-4 overflow-x-auto scrollbar-none py-2 px-1 snap-x touch-pan-x"
+        className="flex space-x-3 sm:space-x-4 overflow-x-auto scrollbar-none py-2 px-1 snap-x overscroll-x-contain"
       >
         {products.map((product, idx) => (
           <div
             key={product.id}
-            className="min-w-[240px] sm:min-w-[270px] max-w-[280px] shrink-0 snap-start animate-in fade-in slide-in-from-left duration-300"
+            className="min-w-[200px] sm:min-w-[270px] max-w-[280px] shrink-0 snap-start animate-in fade-in slide-in-from-left duration-300"
             style={{ animationDelay: `${idx * 80}ms` }}
           >
             <ProductCard product={product} />
