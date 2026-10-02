@@ -53,7 +53,7 @@ export const CategoryThumbnail: React.FC<CategoryThumbnailProps> = ({
     <button
       type="button"
       onClick={onClick}
-      className={`relative snap-start shrink-0 flex-none rounded-2xl sm:rounded-3xl p-3 sm:p-6 text-center flex flex-col items-center justify-between min-w-[135px] sm:min-w-[210px] md:min-w-[240px] h-[170px] sm:h-[250px] md:h-[270px] backdrop-blur-md transition-all duration-300 group cursor-pointer ${
+      className={`relative shrink-0 flex-none rounded-2xl sm:rounded-3xl p-3 sm:p-6 text-center flex flex-col items-center justify-between min-w-[135px] sm:min-w-[210px] md:min-w-[240px] h-[170px] sm:h-[250px] md:h-[270px] backdrop-blur-md transition-all duration-300 group cursor-pointer ${
         isSelected
           ? 'border-2 border-red-500 bg-white/95 shadow-xl scale-105 ring-2 ring-red-500/20'
           : 'bg-white/80 backdrop-blur-md border border-white/60 shadow-lg shadow-slate-900/5 hover:border-red-500/40 hover:bg-white/95 hover:shadow-2xl'

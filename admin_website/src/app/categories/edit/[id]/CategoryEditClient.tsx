@@ -1,11 +1,18 @@
-﻿"use client";
+"use client";
 
+import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import { CategoryFormView } from "../../../../features/categories/CategoryFormView";
+import { extractRouteId } from "../../../../lib/routeUtils";
 
 export default function CategoryEditClient() {
   const params = useParams();
-  const id = typeof params.id === "string" ? params.id : Array.isArray(params.id) ? params.id[0] : "";
+  const [resolvedId, setResolvedId] = useState<string>(() => extractRouteId(params?.id, "edit"));
 
-  return <CategoryFormView categoryId={id} />;
+  useEffect(() => {
+    const id = extractRouteId(params?.id, "edit");
+    if (id) setResolvedId(id);
+  }, [params]);
+
+  return <CategoryFormView categoryId={resolvedId} />;
 }

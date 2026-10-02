@@ -21,7 +21,6 @@ export const CategoryShowcase: React.FC<CategoryShowcaseProps> = ({
   const { language } = useLanguage();
   const router = useRouter();
   const scrollRef = useRef<HTMLDivElement>(null);
-  const isHoveredRef = useRef(false);
   const [categories, setCategories] = useState<CategoryItem[]>([]);
 
   useEffect(() => {
@@ -53,7 +52,83 @@ export const CategoryShowcase: React.FC<CategoryShowcaseProps> = ({
     };
   }, []);
 
+  // Continuous left-to-right smooth auto-scroll with pause on user interaction
+  useEffect(() => {
+    const el = scrollRef.current;
+    if (!el || categories.length === 0) return;
 
+    let animId: number;
+    let isInteracting = false;
+    let resumeTimeout: NodeJS.Timeout;
+
+    const pause = () => {
+      isInteracting = true;
+      clearTimeout(resumeTimeout);
+    };
+
+    const resumeWithDelay = (delayMs = 1500) => {
+      clearTimeout(resumeTimeout);
+      resumeTimeout = setTimeout(() => {
+        isInteracting = false;
+      }, delayMs);
+    };
+
+    const onMouseEnter = () => pause();
+    const onMouseLeave = () => resumeWithDelay(600);
+    const onTouchStart = () => pause();
+    const onTouchEnd = () => resumeWithDelay(2000);
+    const onWheel = () => {
+      pause();
+      resumeWithDelay(1500);
+    };
+
+    el.addEventListener('mouseenter', onMouseEnter);
+    el.addEventListener('mouseleave', onMouseLeave);
+    el.addEventListener('touchstart', onTouchStart, { passive: true });
+    el.addEventListener('touchend', onTouchEnd, { passive: true });
+    el.addEventListener('wheel', onWheel, { passive: true });
+
+    let lastTime = performance.now();
+    let accumulated = el.scrollLeft;
+
+    const step = (time: number) => {
+      const delta = time - lastTime;
+      lastTime = time;
+
+      if (!isInteracting && !document.hidden && el) {
+        // Continuous gentle gliding: ~35 pixels per second
+        const px = (delta / 1000) * 35;
+        accumulated += px;
+
+        const maxScroll = el.scrollWidth - el.clientWidth;
+        if (maxScroll > 15) {
+          if (accumulated >= maxScroll) {
+            accumulated = 0;
+            el.scrollLeft = 0;
+          } else {
+            el.scrollLeft = accumulated;
+          }
+        }
+      } else if (el) {
+        // Keep accumulator synced with manual user scroll position
+        accumulated = el.scrollLeft;
+      }
+
+      animId = requestAnimationFrame(step);
+    };
+
+    animId = requestAnimationFrame(step);
+
+    return () => {
+      cancelAnimationFrame(animId);
+      clearTimeout(resumeTimeout);
+      el.removeEventListener('mouseenter', onMouseEnter);
+      el.removeEventListener('mouseleave', onMouseLeave);
+      el.removeEventListener('touchstart', onTouchStart);
+      el.removeEventListener('touchend', onTouchEnd);
+      el.removeEventListener('wheel', onWheel);
+    };
+  }, [categories]);
 
   const handleScroll = (direction: 'left' | 'right') => {
     if (scrollRef.current) {
@@ -121,7 +196,7 @@ export const CategoryShowcase: React.FC<CategoryShowcaseProps> = ({
       {/* Horizontally Scrollable Thumbnail Rail */}
       <div
         ref={scrollRef}
-        className="overflow-x-auto scrollbar-none flex space-x-2.5 sm:space-x-4 snap-x overscroll-x-contain py-2 px-0.5"
+        className="overflow-x-auto scrollbar-none flex space-x-2.5 sm:space-x-4 overscroll-x-contain py-2 px-0.5"
         style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
       >
         {categories.length > 0 ? (

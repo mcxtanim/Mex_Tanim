@@ -1,6 +1,7 @@
 'use client';
 
 import React from 'react';
+import Link from 'next/link';
 import {
   Truck,
   ShieldCheck,
@@ -264,8 +265,35 @@ export const Footer: React.FC = () => {
 
         </div>
 
+        {/* Policy & Terms Links Bar */}
+        <div className="border-t border-gray-200/80 pt-6 pb-2 text-center text-xs font-bold text-gray-600 flex flex-wrap items-center justify-center gap-x-4 sm:gap-x-6 gap-y-2">
+          <Link
+            href="/terms"
+            prefetch={false}
+            className="hover:text-orange-600 transition-colors cursor-pointer"
+          >
+            {language === 'bn' ? 'শর্তাবলী ও নিয়মাবলী (Terms & Conditions)' : 'Terms & Conditions'}
+          </Link>
+          <span className="text-gray-300">•</span>
+          <Link
+            href="/return-refund"
+            prefetch={false}
+            className="hover:text-orange-600 transition-colors cursor-pointer"
+          >
+            {language === 'bn' ? 'রিটার্ন ও রিপ্লেসমেন্ট' : 'Return & Refund Policy'}
+          </Link>
+          <span className="text-gray-300">•</span>
+          <Link
+            href="/privacy-policy"
+            prefetch={false}
+            className="hover:text-orange-600 transition-colors cursor-pointer"
+          >
+            {language === 'bn' ? 'প্রাইভেসি পলিসি' : 'Privacy Policy'}
+          </Link>
+        </div>
+
         {/* Polished Bottom Bar: Copyright */}
-        <div className="border-t border-gray-200/80 pt-6 text-center text-xs sm:text-sm text-gray-600 font-medium flex flex-wrap items-center justify-center gap-x-2 gap-y-1">
+        <div className="border-t border-gray-100 pt-4 text-center text-xs sm:text-sm text-gray-600 font-medium flex flex-wrap items-center justify-center gap-x-2 gap-y-1">
           <span>
             {language === 'bn'
               ? '© ২০২৬ Mex Tanim Store | সর্বস্বত্ব সংরক্ষিত।'

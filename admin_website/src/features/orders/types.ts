@@ -29,6 +29,8 @@ export interface Order {
     street: string;
     city: string;
     district: string;
+    division?: string;
+    upazila?: string;
     postalCode: string;
   };
   items: OrderItem[];

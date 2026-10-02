@@ -70,6 +70,16 @@ export function ProductFormView({ productId }: ProductFormViewProps) {
     };
   });
 
+  const [hasDiscount, setHasDiscount] = useState<boolean>(() => {
+    if (initialProduct) {
+      return Boolean(
+        (initialProduct.discount && initialProduct.discount > 0) ||
+        (initialProduct.originalPrice && initialProduct.originalPrice > initialProduct.price)
+      );
+    }
+    return false;
+  });
+
   const [isSaving, setIsSaving] = useState(false);
   const [saveSuccess, setSaveSuccess] = useState(false);
 
@@ -81,6 +91,12 @@ export function ProductFormView({ productId }: ProductFormViewProps) {
         if (productId) {
           const existing = await fetchProductById(productId);
           if (isMounted && existing) {
+            const hasExistingDisc = Boolean(
+              (existing.discount && existing.discount > 0) ||
+              (existing.originalPrice && existing.originalPrice > existing.price)
+            );
+            setHasDiscount(hasExistingDisc);
+
             setFormData({
               title: existing.title || "",
               titleBn: existing.titleBn || "",
@@ -128,17 +144,147 @@ export function ProductFormView({ productId }: ProductFormViewProps) {
     };
   }, [productId]);
 
+  // 1. Selling price changes -> auto calculate discount % if original MRP is set
+  const handleSellingPriceChange = (valStr: string) => {
+    const newPrice = valStr === "" ? 0 : Number(valStr);
+    const orig = formData.originalPrice || 0;
+
+    if (hasDiscount && orig > 0) {
+      if (newPrice > 0 && newPrice < orig) {
+        const autoDiscount = Math.round(
+          ((orig - newPrice) / orig) * 100
+        );
+        setFormData((prev) => ({
+          ...prev,
+          price: newPrice,
+          discount: autoDiscount,
+        }));
+      } else {
+        setFormData((prev) => ({
+          ...prev,
+          price: newPrice,
+          discount: 0,
+        }));
+      }
+    } else {
+      setFormData((prev) => ({
+        ...prev,
+        price: newPrice,
+      }));
+    }
+  };
+
+  // 2. Original MRP changes -> auto calculate discount % or selling price
+  const handleOriginalPriceChange = (valStr: string) => {
+    const newOrig = valStr === "" ? 0 : Number(valStr);
+
+    if (hasDiscount && newOrig > 0) {
+      if (formData.discount > 0) {
+        // If discount % already specified, calculate new selling price
+        const autoSelling = Math.round(newOrig * (1 - formData.discount / 100));
+        setFormData((prev) => ({
+          ...prev,
+          originalPrice: newOrig,
+          price: autoSelling,
+        }));
+      } else if (formData.price > 0 && formData.price < newOrig) {
+        // If selling price already specified, calculate discount %
+        const autoDiscount = Math.round(
+          ((newOrig - formData.price) / newOrig) * 100
+        );
+        setFormData((prev) => ({
+          ...prev,
+          originalPrice: newOrig,
+          discount: autoDiscount,
+        }));
+      } else {
+        setFormData((prev) => ({
+          ...prev,
+          originalPrice: newOrig,
+        }));
+      }
+    } else {
+      setFormData((prev) => ({
+        ...prev,
+        originalPrice: newOrig,
+      }));
+    }
+  };
+
+  // 3. Discount percentage changes -> auto calculate selling price from original MRP
+  const handleDiscountChange = (valStr: string) => {
+    const rawNum = valStr === "" ? 0 : Number(valStr);
+    const newDiscount = Math.min(100, Math.max(0, rawNum));
+    const orig = formData.originalPrice || 0;
+
+    if (hasDiscount && orig > 0) {
+      if (newDiscount > 0) {
+        const autoSelling = Math.round(
+          orig * (1 - newDiscount / 100)
+        );
+        setFormData((prev) => ({
+          ...prev,
+          discount: newDiscount,
+          price: autoSelling,
+        }));
+      } else {
+        setFormData((prev) => ({
+          ...prev,
+          discount: 0,
+          price: prev.originalPrice || prev.price,
+        }));
+      }
+    } else {
+      setFormData((prev) => ({
+        ...prev,
+        discount: newDiscount,
+      }));
+    }
+  };
+
+  // 4. Toggle Discount Option On/Off
+  const handleToggleDiscount = (enable: boolean) => {
+    setHasDiscount(enable);
+    if (!enable) {
+      setFormData((prev) => ({
+        ...prev,
+        discount: 0,
+        originalPrice: 0,
+      }));
+    } else {
+      // If turning ON and originalPrice is missing or <= price, suggest sensible default
+      if (!formData.originalPrice || formData.originalPrice <= formData.price) {
+        const suggested = formData.price > 0 ? Math.round(formData.price * 1.25) : 0;
+        const initDiscount =
+          suggested > formData.price && formData.price > 0
+            ? Math.round(((suggested - formData.price) / suggested) * 100)
+            : 0;
+        setFormData((prev) => ({
+          ...prev,
+          originalPrice: suggested,
+          discount: initDiscount,
+        }));
+      }
+    }
+  };
+
   const handleSubmit = async (e?: React.FormEvent | React.MouseEvent) => {
     if (e) e.preventDefault();
     if (!formData.title.trim()) return;
 
     setIsSaving(true);
 
+    const finalData: ProductFormData = {
+      ...formData,
+      discount: hasDiscount ? formData.discount : 0,
+      originalPrice: hasDiscount ? (formData.originalPrice || 0) : 0,
+    };
+
     try {
       if (productId) {
-        await updateProduct(productId, formData, products);
+        await updateProduct(productId, finalData, products);
       } else {
-        await createProduct(formData, products);
+        await createProduct(finalData, products);
       }
       setSaveSuccess(true);
       setTimeout(() => {
@@ -296,25 +442,74 @@ export function ProductFormView({ productId }: ProductFormViewProps) {
                 type="number"
                 min="0"
                 required
-                value={formData.stock}
-                onChange={(e) => setFormData({ ...formData, stock: Number(e.target.value) })}
+                placeholder="0"
+                value={formData.stock === 0 ? "" : formData.stock}
+                onChange={(e) => setFormData({ ...formData, stock: e.target.value === "" ? 0 : Number(e.target.value) })}
                 className="w-full bg-slate-950/80 border border-slate-800 rounded-xl px-3.5 py-2.5 text-xs text-slate-100 focus:outline-none focus:border-emerald-500/60 font-mono"
               />
             </div>
           </div>
         </div>
 
-        {/* Card 2: Pricing & Inventory */}
+        {/* Card 2: Pricing & Discounts (Smart Auto-Calculation + Optional Discount Toggle) */}
         <div className="bg-slate-900/60 border border-slate-800 rounded-2xl p-6 space-y-4">
-          <h2 className="text-xs font-black uppercase text-slate-400 tracking-wider border-b border-slate-800 pb-3">
-            2. Pricing & Discounts
-          </h2>
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-800 pb-3">
+            <div>
+              <h2 className="text-xs font-black uppercase text-slate-400 tracking-wider">
+                2. Pricing & Discounts
+              </h2>
+              <p className="text-[11px] text-slate-500 font-medium mt-0.5">
+                {hasDiscount
+                  ? "Smart Calculation: Selling price, Original MRP & Discount % auto-sync in real time."
+                  : "Regular pricing: Only Selling Price is required. Toggle discount ON if you have an offer."}
+              </p>
+            </div>
+
+            {/* Discount Option Toggle Switch */}
+            <div className="flex items-center gap-2">
+              <label className="text-xs font-semibold text-slate-300 flex items-center gap-2.5 cursor-pointer select-none">
+                <span className="text-[11px] text-slate-400">Discount প্রযোজ্য?</span>
+                <button
+                  type="button"
+                  onClick={() => handleToggleDiscount(!hasDiscount)}
+                  className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none ${
+                    hasDiscount ? "bg-emerald-600" : "bg-slate-700"
+                  }`}
+                  role="switch"
+                  aria-checked={hasDiscount}
+                >
+                  <span
+                    className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow-lg ring-0 transition duration-200 ease-in-out ${
+                      hasDiscount ? "translate-x-5" : "translate-x-0"
+                    }`}
+                  />
+                </button>
+                <span
+                  className={`text-[10px] font-extrabold px-2 py-0.5 rounded-md ${
+                    hasDiscount
+                      ? "bg-emerald-500/20 text-emerald-400 border border-emerald-500/30"
+                      : "bg-slate-800 text-slate-400 border border-slate-700"
+                  }`}
+                >
+                  {hasDiscount ? "Discount ON" : "Discount OFF"}
+                </span>
+              </label>
+            </div>
+          </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            {/* 1. Selling Price (Auto calculated if Original MRP + Discount % are entered, or user can type directly) */}
             <div className="space-y-1.5">
-              <label className="text-xs font-semibold text-slate-300">
-                Selling Price (BDT ৳) <span className="text-emerald-400">*</span>
-              </label>
+              <div className="flex items-center justify-between">
+                <label className="text-xs font-semibold text-slate-300">
+                  Selling Price (BDT ৳) <span className="text-emerald-400">*</span>
+                </label>
+                {hasDiscount && (formData.originalPrice || 0) > 0 && formData.price > 0 && formData.price < (formData.originalPrice || 0) && (
+                  <span className="text-[10px] font-extrabold text-emerald-400 font-mono">
+                    Save ৳{((formData.originalPrice || 0) - formData.price).toLocaleString()}
+                  </span>
+                )}
+              </div>
               <div className="relative">
                 <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 font-medium text-xs">
                   ৳
@@ -323,15 +518,23 @@ export function ProductFormView({ productId }: ProductFormViewProps) {
                   type="number"
                   min="0"
                   required
-                  value={formData.price}
-                  onChange={(e) => setFormData({ ...formData, price: Number(e.target.value) })}
-                  className="w-full bg-slate-950/80 border border-slate-800 rounded-xl pl-8 pr-3.5 py-2.5 text-xs text-slate-100 focus:outline-none focus:border-emerald-500/60 font-mono font-bold text-emerald-400"
+                  placeholder="0"
+                  value={formData.price === 0 ? "" : formData.price}
+                  onChange={(e) => handleSellingPriceChange(e.target.value)}
+                  className="w-full bg-slate-950/80 border border-slate-800 rounded-xl pl-8 pr-3.5 py-2.5 text-xs text-slate-100 focus:outline-none focus:border-emerald-500/60 font-mono font-bold text-emerald-400 placeholder:text-slate-600"
                 />
               </div>
+              <p className="text-[10px] text-slate-500">The actual price customer pays at checkout.</p>
             </div>
 
-            <div className="space-y-1.5">
-              <label className="text-xs font-semibold text-slate-300">Original MRP Price (BDT ৳)</label>
+            {/* 2. Original MRP Price (Auto calculated discount if Selling Price is entered, or Selling Price auto updates if Discount % is entered) */}
+            <div className={`space-y-1.5 transition-opacity ${hasDiscount ? "opacity-100" : "opacity-40"}`}>
+              <div className="flex items-center justify-between">
+                <label className="text-xs font-semibold text-slate-300">Original MRP Price (BDT ৳)</label>
+                {hasDiscount && (
+                  <span className="text-[10px] text-slate-400 font-medium">Strikethrough Price</span>
+                )}
+              </div>
               <div className="relative">
                 <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 font-medium text-xs">
                   ৳
@@ -339,24 +542,49 @@ export function ProductFormView({ productId }: ProductFormViewProps) {
                 <input
                   type="number"
                   min="0"
-                  placeholder="e.g. 4800"
-                  value={formData.originalPrice || 0}
-                  onChange={(e) => setFormData({ ...formData, originalPrice: Number(e.target.value) })}
-                  className="w-full bg-slate-950/80 border border-slate-800 rounded-xl pl-8 pr-3.5 py-2.5 text-xs text-slate-100 focus:outline-none focus:border-emerald-500/60 font-mono"
+                  disabled={!hasDiscount}
+                  placeholder="0"
+                  value={!hasDiscount || !formData.originalPrice ? "" : formData.originalPrice}
+                  onChange={(e) => handleOriginalPriceChange(e.target.value)}
+                  className={`w-full bg-slate-950/80 border border-slate-800 rounded-xl pl-8 pr-3.5 py-2.5 text-xs text-slate-100 focus:outline-none focus:border-emerald-500/60 font-mono placeholder:text-slate-600 ${
+                    !hasDiscount ? "cursor-not-allowed bg-slate-900/50" : ""
+                  }`}
                 />
               </div>
+              <p className="text-[10px] text-slate-500">
+                {hasDiscount ? "Crossed out price shown next to discount badge." : "Enable discount above to activate."}
+              </p>
             </div>
 
-            <div className="space-y-1.5">
-              <label className="text-xs font-semibold text-slate-300">Discount Badge (%)</label>
-              <input
-                type="number"
-                min="0"
-                max="100"
-                value={formData.discount}
-                onChange={(e) => setFormData({ ...formData, discount: Number(e.target.value) })}
-                className="w-full bg-slate-950/80 border border-slate-800 rounded-xl px-3.5 py-2.5 text-xs text-slate-100 focus:outline-none focus:border-emerald-500/60 font-mono"
-              />
+            {/* 3. Discount Badge (%) (Auto calculated from Original MRP & Selling Price, or user enters % and Selling Price updates) */}
+            <div className={`space-y-1.5 transition-opacity ${hasDiscount ? "opacity-100" : "opacity-40"}`}>
+              <div className="flex items-center justify-between">
+                <label className="text-xs font-semibold text-slate-300">Discount Badge (%)</label>
+                {hasDiscount && formData.discount > 0 && (
+                  <span className="text-[10px] font-black text-rose-400 bg-rose-500/10 px-1.5 py-0.5 rounded border border-rose-500/20">
+                    -{formData.discount}% OFF
+                  </span>
+                )}
+              </div>
+              <div className="relative">
+                <input
+                  type="number"
+                  min="0"
+                  max="100"
+                  disabled={!hasDiscount}
+                  placeholder="0"
+                  value={!hasDiscount || formData.discount === 0 ? "" : formData.discount}
+                  onChange={(e) => handleDiscountChange(e.target.value)}
+                  className={`w-full bg-slate-950/80 border border-slate-800 rounded-xl px-3.5 py-2.5 text-xs text-slate-100 focus:outline-none focus:border-emerald-500/60 font-mono placeholder:text-slate-600 ${
+                    !hasDiscount ? "cursor-not-allowed bg-slate-900/50" : ""
+                  }`}
+                />
+              </div>
+              <p className="text-[10px] text-slate-500">
+                {hasDiscount
+                  ? "Changing this auto-calculates Selling Price from MRP."
+                  : "Enable discount above to activate."}
+              </p>
             </div>
           </div>
         </div>

@@ -70,6 +70,8 @@ export async function fetchOrdersFromSupabase(): Promise<Order[]> {
       const addrStreet = item.address || shipping.street || "Delivery Address";
       const addrCity = shipping.city || item.delivery_area || "City";
       const addrDistrict = shipping.district || item.delivery_area || "District";
+      const addrDivision = shipping.division || shipping.city || "Dhaka";
+      const addrUpazila = shipping.upazila || shipping.thana || "";
 
       const computedProductName = item.product_name || (itemsList.length > 0
         ? itemsList.map((i: any) => `${i.title} (x${i.quantity})`).join(", ")
@@ -87,6 +89,8 @@ export async function fetchOrdersFromSupabase(): Promise<Order[]> {
           street: addrStreet,
           city: addrCity,
           district: addrDistrict,
+          division: addrDivision,
+          upazila: addrUpazila,
           postalCode: shipping.postalCode || "1200",
         },
         items: itemsList,
@@ -176,6 +180,8 @@ export async function fetchOrderById(orderId: string): Promise<Order | null> {
     const addrStreet = data.address || shipping.street || "Delivery Address";
     const addrCity = shipping.city || data.delivery_area || "City";
     const addrDistrict = shipping.district || data.delivery_area || "District";
+    const addrDivision = shipping.division || shipping.city || "Dhaka";
+    const addrUpazila = shipping.upazila || shipping.thana || "";
 
     return {
       id: String(data.id),
@@ -188,6 +194,8 @@ export async function fetchOrderById(orderId: string): Promise<Order | null> {
         street: addrStreet,
         city: addrCity,
         district: addrDistrict,
+        division: addrDivision,
+        upazila: addrUpazila,
         postalCode: shipping.postalCode || "1200",
       },
       items: itemsList,

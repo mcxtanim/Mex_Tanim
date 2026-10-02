@@ -1,11 +1,18 @@
-﻿"use client";
+"use client";
 
+import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import { OrderDetailView } from "../../../features/orders/OrderDetailView";
+import { extractRouteId } from "../../../lib/routeUtils";
 
 export default function OrderDetailClient() {
   const params = useParams();
-  const id = typeof params.id === "string" ? params.id : Array.isArray(params.id) ? params.id[0] : "";
+  const [resolvedId, setResolvedId] = useState<string>(() => extractRouteId(params?.id, "orders"));
 
-  return <OrderDetailView orderId={id} />;
+  useEffect(() => {
+    const id = extractRouteId(params?.id, "orders");
+    if (id) setResolvedId(id);
+  }, [params]);
+
+  return <OrderDetailView orderId={resolvedId} />;
 }
