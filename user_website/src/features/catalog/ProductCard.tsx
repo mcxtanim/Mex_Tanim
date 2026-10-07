@@ -4,6 +4,7 @@ import React from 'react';
 import { useRouter } from 'next/navigation';
 import { Heart, Tag } from 'lucide-react';
 import { Product } from './types';
+import { cleanProductTitle } from './productService';
 import { useLanguage } from '../shared/LanguageContext';
 
 interface ProductCardProps {
@@ -31,7 +32,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
     return 35 + (seed % 110);
   }, [product.id, product.soldCount, product.reviewCount]);
 
-  const title = language === 'bn' ? (product.nameBn || product.name) : product.name;
+  const title = cleanProductTitle(language === 'bn' ? (product.nameBn || product.name) : product.name);
 
   return (
     <div

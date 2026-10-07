@@ -13,7 +13,7 @@ import {
   getCategoryName,
   DRAWER_COLLECTIONS,
 } from './categoryData';
-import { fetchLiveProducts, getCachedProducts } from './productService';
+import { fetchLiveProducts, getCachedProducts, cleanProductTitle } from './productService';
 import { Product } from './types';
 
 interface CategoriesViewProps {
@@ -201,7 +201,7 @@ const CategoriesViewContent: React.FC<CategoriesViewProps> = ({ initialCategory 
                   {/* Product Title (Bold Uppercase) */}
                   <div className="mt-1">
                     <h3 className="font-black text-xs sm:text-[13px] text-slate-900 uppercase tracking-tight line-clamp-2 leading-snug group-hover:text-blue-600 transition-colors">
-                      {product.name}
+                      {cleanProductTitle(product.name)}
                     </h3>
 
                     {/* Rating Stars (Matching Reference Image 3) */}

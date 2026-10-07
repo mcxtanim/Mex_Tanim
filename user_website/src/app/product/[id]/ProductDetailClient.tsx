@@ -23,6 +23,7 @@ import {
   getBrandName,
   getCachedProducts,
   fetchProductById,
+  cleanProductTitle,
 } from '@/features/catalog/productService';
 import { getCategoryName } from '@/features/catalog/categoryData';
 import { Product } from '@/features/catalog/types';
@@ -58,8 +59,17 @@ export default function DedicatedProductPage({ initialProduct }: DedicatedProduc
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [isMounted, setIsMounted] = useState(false);
+  const sanitize = (p?: Product | null): Product | undefined => {
+    if (!p) return undefined;
+    return {
+      ...p,
+      name: cleanProductTitle(p.name),
+      nameBn: cleanProductTitle(p.nameBn || p.name),
+    };
+  };
+
   const [allProducts, setAllProducts] = useState<Product[]>([]);
-  const [product, setProduct] = useState<Product | undefined>(initialProduct || undefined);
+  const [product, setProduct] = useState<Product | undefined>(() => sanitize(initialProduct));
   const [isLoading, setIsLoading] = useState(!initialProduct);
 
   const [quantity, setQuantity] = useState(1);
@@ -81,14 +91,14 @@ export default function DedicatedProductPage({ initialProduct }: DedicatedProduc
       setAllProducts(cached);
       const found = cached.find((p) => String(p.id) === String(productId));
       if (found) {
-        setProduct(found);
+        setProduct(sanitize(found));
         setIsLoading(false);
       }
     }
 
     fetchProductById(productId).then((prod) => {
       if (prod) {
-        setProduct(prod);
+        setProduct(sanitize(prod));
         setIsLoading(false);
       }
     });
@@ -97,10 +107,10 @@ export default function DedicatedProductPage({ initialProduct }: DedicatedProduc
       setAllProducts(data);
       const found = data.find((p) => String(p.id) === String(productId));
       if (found) {
-        setProduct(found);
+        setProduct(sanitize(found));
         setIsLoading(false);
       } else if (data.length > 0) {
-        setProduct((prev) => prev || data[0]);
+        setProduct((prev) => sanitize(prev || data[0]));
         setIsLoading(false);
       }
     });
@@ -456,7 +466,7 @@ export default function DedicatedProductPage({ initialProduct }: DedicatedProduc
 
               {/* Product Title (Bold Uppercase Dark) */}
               <h1 className="text-xl sm:text-2xl md:text-3xl font-black text-[#0B1A30] uppercase tracking-tight leading-snug">
-                {language === 'bn' ? product.nameBn || product.name : product.name}
+                {cleanProductTitle(language === 'bn' ? product.nameBn || product.name : product.name)}
               </h1>
 
               {/* Price Row (৳ Price, Strikethrough, X% OFF Black Badge) */}
@@ -574,7 +584,7 @@ export default function DedicatedProductPage({ initialProduct }: DedicatedProduc
                 <div className="space-y-5 text-slate-800 text-sm leading-relaxed">
                     <div>
                       <h3 className="font-black text-base sm:text-lg text-[#0B1A30] uppercase tracking-wide">
-                        {product.name}
+                        {cleanProductTitle(product.name)}
                       </h3>
                       <p className="font-extrabold text-slate-900 mt-1 flex items-center gap-2 text-sm sm:text-base">
                         <span>⚡</span>
@@ -583,13 +593,13 @@ export default function DedicatedProductPage({ initialProduct }: DedicatedProduc
                     </div>
 
                     <p className="text-gray-700 text-xs sm:text-sm leading-relaxed">
-                      <strong className="text-slate-900 font-bold">{product.name}</strong> mobile gamers-এর জন্য তৈরি, যেখানে gaming comfort-এর সঙ্গে রয়েছে একটি eye-catching luminous look। Finger movement-এর friction কমিয়ে touchscreen-এর ওপর smoother swipe, drag এবং aiming control পেতে সাহায্য করে। Gaming-এর সময় আঙুলে sweat বা moisture জমলে touch control-এর consistency প্রভাবিত হতে পারে। এটি ব্যবহার করে এই সমস্যা কমাতে সাহায্য করা যায়, ফলে fast-paced gameplay-এ finger movement আরও comfortable থাকে।
+                      <strong className="text-slate-900 font-bold">{cleanProductTitle(product.name)}</strong> mobile gamers-এর জন্য তৈরি, যেখানে gaming comfort-এর সঙ্গে রয়েছে একটি eye-catching luminous look। Finger movement-এর friction কমিয়ে touchscreen-এর ওপর smoother swipe, drag এবং aiming control পেতে সাহায্য করে। Gaming-এর সময় আঙুলে sweat বা moisture জমলে touch control-এর consistency প্রভাবিত হতে পারে। এটি ব্যবহার করে এই সমস্যা কমাতে সাহায্য করা যায়, ফলে fast-paced gameplay-এ finger movement আরও comfortable থাকে।
                     </p>
 
                     {/* Features List with Emojis */}
                     <div className="space-y-2.5 pt-2">
                       <h4 className="font-black text-slate-900 text-sm uppercase">
-                        কেন {product.name}?
+                        কেন {cleanProductTitle(product.name)}?
                       </h4>
                       <ul className="space-y-2 text-xs sm:text-sm text-gray-700 font-medium">
                         <li className="flex items-start gap-2">
@@ -676,7 +686,7 @@ export default function DedicatedProductPage({ initialProduct }: DedicatedProduc
                         Short Description
                       </h4>
                       <p className="text-xs sm:text-sm text-gray-600 leading-relaxed">
-                        <strong className="text-slate-900 font-bold">{product.name}</strong> হলো stylish gaming এক্সেসরিজ, যা smooth touch movement, aiming ও fast swiping-এ সাহায্য করে। Luminous design-এর সঙ্গে আপনার mobile gaming setup-এ যোগ করুন আরও comfortable control।
+                        <strong className="text-slate-900 font-bold">{cleanProductTitle(product.name)}</strong> হলো stylish gaming এক্সেসরিজ, যা smooth touch movement, aiming ও fast swiping-এ সাহায্য করে। Luminous design-এর সঙ্গে আপনার mobile gaming setup-এ যোগ করুন আরও comfortable control।
                       </p>
                     </div>
                   </div>

@@ -23,16 +23,29 @@ export const getBrandName = (product?: Partial<Product> | null, language: string
   return 'Mex Tanim';
 };
 
+export function cleanProductTitle(title?: string | null): string {
+  if (!title) return '';
+  return title
+    .replace(/\s*\(\s*cloudinary\s*verified\s*\)/gi, '')
+    .replace(/\s*\[\s*cloudinary\s*verified\s*\]/gi, '')
+    .replace(/\s*-\s*cloudinary\s*verified/gi, '')
+    .replace(/\s*cloudinary\s*verified/gi, '')
+    .trim();
+}
+
 function mapRawProduct(item: any): Product {
   const catSlug = item.category ? String(item.category).toLowerCase().trim().replace(/\s+/g, '-') : 'gaming-cooler';
   const catBn = (item.category_bn && /[\u0980-\u09FF]/.test(item.category_bn))
     ? item.category_bn
     : getCategoryName(catSlug, 'bn');
 
+  const cleanName = cleanProductTitle(item.title || item.name || '');
+  const cleanNameBn = cleanProductTitle(item.title_bn || item.titleBn || item.nameBn || item.title || item.name || '');
+
   return {
     id: String(item.id),
-    name: item.title || item.name || '',
-    nameBn: item.title_bn || item.titleBn || item.nameBn || item.title || '',
+    name: cleanName,
+    nameBn: cleanNameBn,
     category: catSlug,
     categoryBn: catBn,
     brand: item.brand || 'Mex Tanim',

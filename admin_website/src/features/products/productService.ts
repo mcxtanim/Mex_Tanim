@@ -3,6 +3,16 @@ import { supabase } from "../../lib/supabase";
 
 const STORAGE_KEY = "mex_tanim_admin_products";
 
+export function cleanProductTitle(title?: string | null): string {
+  if (!title) return '';
+  return title
+    .replace(/\s*\(\s*cloudinary\s*verified\s*\)/gi, '')
+    .replace(/\s*\[\s*cloudinary\s*verified\s*\]/gi, '')
+    .replace(/\s*-\s*cloudinary\s*verified/gi, '')
+    .replace(/\s*cloudinary\s*verified/gi, '')
+    .trim();
+}
+
 export function normalizeCategorySlug(rawCat: string): string {
   if (!rawCat) return "gaming-mice";
   const slug = rawCat
@@ -82,8 +92,8 @@ export async function fetchProductsFromSupabase(forceRefresh = false): Promise<P
 
       const mapped: Product[] = data.map((item: any) => ({
         id: String(item.id),
-        title: item.title || "",
-        titleBn: item.title_bn || item.titleBn || "",
+        title: cleanProductTitle(item.title || ""),
+        titleBn: cleanProductTitle(item.title_bn || item.titleBn || ""),
         brand: item.brand || "",
         category: item.category || "gaming-mice",
         price: Number(item.price) || 0,
