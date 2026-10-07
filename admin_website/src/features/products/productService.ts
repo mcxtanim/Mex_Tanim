@@ -66,6 +66,61 @@ export function saveStoredProducts(products: Product[]): void {
   }
 }
 
+function parseRichProductFields(item: any) {
+  const rawSpecs = Array.isArray(item.specs)
+    ? item.specs
+    : typeof item.specs === "string"
+    ? item.specs.split(/,|\n/).map((s: string) => s.trim()).filter(Boolean)
+    : [];
+
+  let videoUrl = item.video_url || item.videoUrl || "";
+  let highlightSubtitle = item.highlight_subtitle || item.highlightSubtitle || "";
+  let shortDescription = item.short_description || item.shortDescription || "";
+  const comboImages: string[] = (() => {
+    const raw = item.combo_images || item.comboImages;
+    if (Array.isArray(raw)) return raw.map(String).map((s) => s.trim()).filter(Boolean);
+    if (typeof raw === "string") return raw.split(/,|\n/).map((s) => s.trim()).filter(Boolean);
+    return [];
+  })();
+  const whyChoosePoints: string[] = Array.isArray(item.why_choose || item.whyChoosePoints)
+    ? (item.why_choose || item.whyChoosePoints)
+    : [];
+  const perfectForGames: string[] = Array.isArray(item.perfect_for || item.perfectForGames)
+    ? (item.perfect_for || item.perfectForGames)
+    : [];
+  const cleanSpecs: string[] = [];
+
+  for (const s of rawSpecs) {
+    const trimmed = String(s).trim();
+    if (!trimmed) continue;
+    if (trimmed.startsWith("VIDEO:")) {
+      if (!videoUrl) videoUrl = trimmed.substring(6).trim();
+    } else if (trimmed.startsWith("SUBTITLE:")) {
+      if (!highlightSubtitle) highlightSubtitle = trimmed.substring(9).trim();
+    } else if (trimmed.startsWith("SHORT:")) {
+      if (!shortDescription) shortDescription = trimmed.substring(6).trim();
+    } else if (trimmed.startsWith("POINT:")) {
+      whyChoosePoints.push(trimmed.substring(6).trim());
+    } else if (trimmed.startsWith("GAME:")) {
+      perfectForGames.push(trimmed.substring(5).trim());
+    } else if (trimmed.startsWith("IMAGE:")) {
+      comboImages.push(trimmed.substring(6).trim());
+    } else {
+      cleanSpecs.push(trimmed);
+    }
+  }
+
+  return {
+    videoUrl,
+    highlightSubtitle,
+    shortDescription,
+    comboImages,
+    whyChoosePoints,
+    perfectForGames,
+    specsText: cleanSpecs.join(", "),
+  };
+}
+
 export async function fetchProductsFromSupabase(forceRefresh = false): Promise<Product[]> {
   if (!forceRefresh && memoryProductsCache && memoryProductsCache.length > 0 && Date.now() - lastProductsFetchTimestamp < 60000) {
     return memoryProductsCache;
@@ -90,27 +145,36 @@ export async function fetchProductsFromSupabase(forceRefresh = false): Promise<P
 
       if (!data) return [];
 
-      const mapped: Product[] = data.map((item: any) => ({
-        id: String(item.id),
-        title: cleanProductTitle(item.title || ""),
-        titleBn: cleanProductTitle(item.title_bn || item.titleBn || ""),
-        brand: item.brand || "",
-        category: item.category || "gaming-mice",
-        price: Number(item.price) || 0,
-        originalPrice: Number(item.original_price || item.originalPrice) || 0,
-        discount: Number(item.discount) || 0,
-        stock: Number(item.stock) || 0,
-        description: item.description || "",
-        descriptionBn: item.description_bn || item.descriptionBn || "",
-        specs: Array.isArray(item.specs) ? item.specs.join(", ") : (item.specs || ""),
-        imageUrl: item.image_url || item.imageUrl || "",
-        is_featured: Boolean(item.is_featured),
-        is_popular: Boolean(item.is_popular),
-        is_bestseller: Boolean(item.is_bestseller),
-        is_new_arrival: Boolean(item.is_new_arrival),
-        is_combo: Boolean(item.is_combo),
-        createdAt: item.created_at || new Date().toISOString().split("T")[0],
-      }));
+      const mapped: Product[] = data.map((item: any) => {
+        const rich = parseRichProductFields(item);
+        return {
+          id: String(item.id),
+          title: cleanProductTitle(item.title || ""),
+          titleBn: cleanProductTitle(item.title_bn || item.titleBn || ""),
+          brand: item.brand || "",
+          category: item.category || "gaming-mice",
+          price: Number(item.price) || 0,
+          originalPrice: Number(item.original_price || item.originalPrice) || 0,
+          discount: Number(item.discount) || 0,
+          stock: Number(item.stock) || 0,
+          description: item.description || "",
+          descriptionBn: item.description_bn || item.descriptionBn || "",
+          specs: rich.specsText || (Array.isArray(item.specs) ? item.specs.join(", ") : (item.specs || "")),
+          imageUrl: item.image_url || item.imageUrl || "",
+          comboImages: rich.comboImages,
+          videoUrl: rich.videoUrl,
+          highlightSubtitle: rich.highlightSubtitle,
+          whyChoosePoints: rich.whyChoosePoints,
+          perfectForGames: rich.perfectForGames,
+          shortDescription: rich.shortDescription,
+          is_featured: Boolean(item.is_featured),
+          is_popular: Boolean(item.is_popular),
+          is_bestseller: Boolean(item.is_bestseller),
+          is_new_arrival: Boolean(item.is_new_arrival),
+          is_combo: Boolean(item.is_combo),
+          createdAt: item.created_at || new Date().toISOString().split("T")[0],
+        };
+      });
 
       lastProductsFetchTimestamp = Date.now();
       saveStoredProducts(mapped);
@@ -142,6 +206,7 @@ export async function fetchProductById(id: string): Promise<Product | null> {
         .maybeSingle();
 
       if (!error && data) {
+        const rich = parseRichProductFields(data);
         const mapped: Product = {
           id: String(data.id),
           title: data.title || "",
@@ -154,8 +219,14 @@ export async function fetchProductById(id: string): Promise<Product | null> {
           stock: Number(data.stock) || 0,
           description: data.description || "",
           descriptionBn: data.description_bn || data.descriptionBn || "",
-          specs: Array.isArray(data.specs) ? data.specs.join(", ") : (data.specs || ""),
+          specs: rich.specsText || (Array.isArray(data.specs) ? data.specs.join(", ") : (data.specs || "")),
           imageUrl: data.image_url || data.imageUrl || "",
+          comboImages: rich.comboImages,
+          videoUrl: rich.videoUrl,
+          highlightSubtitle: rich.highlightSubtitle,
+          whyChoosePoints: rich.whyChoosePoints,
+          perfectForGames: rich.perfectForGames,
+          shortDescription: rich.shortDescription,
           is_featured: Boolean(data.is_featured),
           is_popular: Boolean(data.is_popular),
           is_bestseller: Boolean(data.is_bestseller),
@@ -199,14 +270,52 @@ export async function createProduct(
 ): Promise<Product[]> {
   const newId = `prod-${Date.now()}`;
   const categorySlug = normalizeCategorySlug(formData.category);
+  
+  const comboImages = formData.comboImagesText
+    ? formData.comboImagesText.split(/,|\n/).map((s) => s.trim()).filter(Boolean)
+    : [];
+  const whyChoosePoints = formData.whyChooseText
+    ? formData.whyChooseText.split(/,|\n/).map((s) => s.trim()).filter(Boolean)
+    : [];
+  const perfectForGames = formData.perfectForText
+    ? formData.perfectForText.split(/,|\n/).map((s) => s.trim()).filter(Boolean)
+    : [];
+
   const specsArray = formData.specs
     ? formData.specs.split(/,|\n/).map((s) => s.trim()).filter(Boolean)
     : [];
+  if (formData.videoUrl?.trim()) specsArray.push(`VIDEO:${formData.videoUrl.trim()}`);
+  if (formData.highlightSubtitle?.trim()) specsArray.push(`SUBTITLE:${formData.highlightSubtitle.trim()}`);
+  if (formData.shortDescription?.trim()) specsArray.push(`SHORT:${formData.shortDescription.trim()}`);
+  whyChoosePoints.forEach((p) => specsArray.push(`POINT:${p}`));
+  perfectForGames.forEach((g) => specsArray.push(`GAME:${g}`));
+  comboImages.forEach((img) => specsArray.push(`IMAGE:${img}`));
 
   const newProduct: Product = {
     id: newId,
-    ...formData,
+    title: formData.title,
+    titleBn: formData.titleBn,
+    brand: formData.brand,
     category: categorySlug,
+    price: formData.price,
+    originalPrice: formData.originalPrice,
+    discount: formData.discount,
+    stock: formData.stock,
+    description: formData.description,
+    descriptionBn: formData.descriptionBn,
+    specs: formData.specs,
+    imageUrl: formData.imageUrl,
+    comboImages,
+    videoUrl: formData.videoUrl?.trim() || "",
+    highlightSubtitle: formData.highlightSubtitle?.trim() || "",
+    whyChoosePoints,
+    perfectForGames,
+    shortDescription: formData.shortDescription?.trim() || "",
+    is_featured: formData.is_featured,
+    is_popular: formData.is_popular,
+    is_bestseller: formData.is_bestseller,
+    is_new_arrival: formData.is_new_arrival,
+    is_combo: formData.is_combo,
     createdAt: new Date().toISOString(),
   };
 
@@ -254,12 +363,56 @@ export async function updateProduct(
   existingProducts: Product[]
 ): Promise<Product[]> {
   const categorySlug = normalizeCategorySlug(formData.category);
+  
+  const comboImages = formData.comboImagesText
+    ? formData.comboImagesText.split(/,|\n/).map((s) => s.trim()).filter(Boolean)
+    : [];
+  const whyChoosePoints = formData.whyChooseText
+    ? formData.whyChooseText.split(/,|\n/).map((s) => s.trim()).filter(Boolean)
+    : [];
+  const perfectForGames = formData.perfectForText
+    ? formData.perfectForText.split(/,|\n/).map((s) => s.trim()).filter(Boolean)
+    : [];
+
   const specsArray = formData.specs
     ? formData.specs.split(/,|\n/).map((s) => s.trim()).filter(Boolean)
     : [];
+  if (formData.videoUrl?.trim()) specsArray.push(`VIDEO:${formData.videoUrl.trim()}`);
+  if (formData.highlightSubtitle?.trim()) specsArray.push(`SUBTITLE:${formData.highlightSubtitle.trim()}`);
+  if (formData.shortDescription?.trim()) specsArray.push(`SHORT:${formData.shortDescription.trim()}`);
+  whyChoosePoints.forEach((p) => specsArray.push(`POINT:${p}`));
+  perfectForGames.forEach((g) => specsArray.push(`GAME:${g}`));
+  comboImages.forEach((img) => specsArray.push(`IMAGE:${img}`));
 
   const updated = existingProducts.map((p) =>
-    p.id === id ? { ...p, ...formData, category: categorySlug } : p
+    p.id === id
+      ? {
+          ...p,
+          title: formData.title,
+          titleBn: formData.titleBn,
+          brand: formData.brand,
+          category: categorySlug,
+          price: formData.price,
+          originalPrice: formData.originalPrice,
+          discount: formData.discount,
+          stock: formData.stock,
+          description: formData.description,
+          descriptionBn: formData.descriptionBn,
+          specs: formData.specs,
+          imageUrl: formData.imageUrl,
+          comboImages,
+          videoUrl: formData.videoUrl?.trim() || "",
+          highlightSubtitle: formData.highlightSubtitle?.trim() || "",
+          whyChoosePoints,
+          perfectForGames,
+          shortDescription: formData.shortDescription?.trim() || "",
+          is_featured: formData.is_featured,
+          is_popular: formData.is_popular,
+          is_bestseller: formData.is_bestseller,
+          is_new_arrival: formData.is_new_arrival,
+          is_combo: formData.is_combo,
+        }
+      : p
   );
   saveStoredProducts(updated);
   notifyProductsUpdated(updated);

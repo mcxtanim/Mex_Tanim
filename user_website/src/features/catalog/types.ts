@@ -13,6 +13,7 @@ export interface Product {
   reviewCount: number;
   image: string;
   comboImages?: string[];
+  videoUrl?: string;
   inStock: boolean;
   isPopular?: boolean;
   isFeatured?: boolean;
@@ -23,6 +24,10 @@ export interface Product {
   description: string;
   descriptionBn: string;
   specs: string[];
+  highlightSubtitle?: string;
+  whyChoosePoints?: string[];
+  perfectForGames?: string[];
+  shortDescription?: string;
 }
 
 export interface Category {

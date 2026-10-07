@@ -3,13 +3,29 @@
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { ArrowLeft, Save, Sparkles, Check } from "lucide-react";
+import { ArrowLeft, Save, Sparkles, Check, Video, Play, ExternalLink, Image as ImageIcon } from "lucide-react";
 import { Product, ProductFormData } from "./types";
 import { getStoredProducts, fetchProductsFromSupabase, fetchProductById, createProduct, updateProduct } from "./productService";
 import { ImageDropzone } from "../shared/ImageDropzone";
 
 import { Category } from "../categories/types";
 import { getStoredCategories, fetchCategoriesFromSupabase } from "../categories/categoryService";
+
+function getEmbedVideoInfo(rawUrl?: string) {
+  if (!rawUrl || !rawUrl.trim()) return null;
+  const url = rawUrl.trim();
+  const ytMatch = url.match(/(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|watch\?v=|watch\?.+&v=|shorts\/))([\w-]{11})/i);
+  if (ytMatch && ytMatch[1]) {
+    return {
+      isYouTube: true,
+      embedUrl: `https://www.youtube.com/embed/${ytMatch[1]}`,
+    };
+  }
+  return {
+    isYouTube: false,
+    videoUrl: url,
+  };
+}
 
 interface ProductFormViewProps {
   productId?: string;
@@ -42,6 +58,12 @@ export function ProductFormView({ productId }: ProductFormViewProps) {
         descriptionBn: initialProduct.descriptionBn || "",
         specs: initialProduct.specs || "",
         imageUrl: initialProduct.imageUrl || "",
+        comboImagesText: initialProduct.comboImages?.join("\n") || "",
+        videoUrl: initialProduct.videoUrl || "",
+        highlightSubtitle: initialProduct.highlightSubtitle || "",
+        whyChooseText: initialProduct.whyChoosePoints?.join("\n") || "",
+        perfectForText: initialProduct.perfectForGames?.join("\n") || "",
+        shortDescription: initialProduct.shortDescription || "",
         is_featured: initialProduct.is_featured ?? true,
         is_popular: initialProduct.is_popular ?? false,
         is_bestseller: initialProduct.is_bestseller ?? false,
@@ -62,6 +84,12 @@ export function ProductFormView({ productId }: ProductFormViewProps) {
       descriptionBn: "",
       specs: "",
       imageUrl: "",
+      comboImagesText: "",
+      videoUrl: "",
+      highlightSubtitle: "",
+      whyChooseText: "",
+      perfectForText: "",
+      shortDescription: "",
       is_featured: true,
       is_popular: false,
       is_bestseller: false,
@@ -110,6 +138,12 @@ export function ProductFormView({ productId }: ProductFormViewProps) {
               descriptionBn: existing.descriptionBn || "",
               specs: existing.specs || "",
               imageUrl: existing.imageUrl || "",
+              comboImagesText: existing.comboImages?.join("\n") || "",
+              videoUrl: existing.videoUrl || "",
+              highlightSubtitle: existing.highlightSubtitle || "",
+              whyChooseText: existing.whyChoosePoints?.join("\n") || "",
+              perfectForText: existing.perfectForGames?.join("\n") || "",
+              shortDescription: existing.shortDescription || "",
               is_featured: existing.is_featured ?? true,
               is_popular: existing.is_popular ?? false,
               is_bestseller: existing.is_bestseller ?? false,
@@ -589,18 +623,142 @@ export function ProductFormView({ productId }: ProductFormViewProps) {
           </div>
         </div>
 
-        {/* Card 3: Universal Image Dropzone (Drag&Drop, Paste, Browse) */}
-        <div className="bg-slate-900/60 border border-slate-800 rounded-2xl p-6 space-y-4">
-          <h2 className="text-xs font-black uppercase text-slate-400 tracking-wider border-b border-slate-800 pb-3">
-            3. Product Media
-          </h2>
+        {/* Card 3: Universal Image Dropzone (Drag&Drop, Paste, Browse) + Video URL + Gallery */}
+        <div className="bg-slate-900/60 border border-slate-800 rounded-2xl p-6 space-y-5">
+          <div className="border-b border-slate-800 pb-3 flex items-center justify-between">
+            <h2 className="text-xs font-black uppercase text-slate-400 tracking-wider">
+              3. Product Media (ছবি ও ভিডিও)
+            </h2>
+            <span className="text-[11px] text-slate-500 font-medium">
+              Image Gallery & Product Video
+            </span>
+          </div>
 
-          <ImageDropzone
-            value={formData.imageUrl}
-            onChange={(url) => setFormData({ ...formData, imageUrl: url })}
-            aspectRatio="1:1"
-            label="Upload Product Image"
-          />
+          {/* Primary Product Image */}
+          <div className="space-y-1.5">
+            <label className="text-xs font-semibold text-slate-300">
+              Primary Product Image (প্রধান ছবি) <span className="text-emerald-400">*</span>
+            </label>
+            <ImageDropzone
+              value={formData.imageUrl}
+              onChange={(url) => setFormData({ ...formData, imageUrl: url })}
+              aspectRatio="1:1"
+              label="Upload Product Image"
+            />
+          </div>
+
+          {/* Additional Gallery & Combo Images */}
+          <div className="space-y-2 pt-2 border-t border-slate-800/80">
+            <label className="text-xs font-semibold text-slate-300 flex items-center justify-between">
+              <span>Additional Gallery & Combo Images (অতিরিক্ত ছবি)</span>
+              <span className="text-[10px] text-slate-500 font-mono">প্রতি লাইনে ১টি ছবির URL</span>
+            </label>
+            <textarea
+              rows={3}
+              placeholder="https://images.unsplash.com/...&#10;https://res.cloudinary.com/..."
+              value={formData.comboImagesText || ""}
+              onChange={(e) => setFormData({ ...formData, comboImagesText: e.target.value })}
+              className="w-full bg-slate-950/80 border border-slate-800 rounded-xl px-3.5 py-2 text-xs text-slate-100 placeholder:text-slate-600 focus:outline-none focus:border-emerald-500/60 font-mono resize-none leading-relaxed"
+            />
+            <p className="text-[10px] text-slate-500">
+              প্রডাক্ট ডিটেইল পেজের গ্যালারি এবং কম্বো অফারে (Image 2, Image 3, Image 4) প্রদর্শনের জন্য একাধিক ছবির লিংক দিন।
+            </p>
+
+            {/* Thumbnail preview of additional images */}
+            {formData.comboImagesText && formData.comboImagesText.trim() && (
+              <div className="flex flex-wrap gap-2 pt-1">
+                {formData.comboImagesText
+                  .split(/,|\n/)
+                  .map((s) => s.trim())
+                  .filter(Boolean)
+                  .map((url, idx) => (
+                    <div
+                      key={idx}
+                      className="relative w-14 h-14 rounded-xl bg-slate-950 border border-slate-800 p-1 flex items-center justify-center overflow-hidden group shadow-sm"
+                    >
+                      <img
+                        src={url}
+                        alt={`Gallery ${idx + 2}`}
+                        className="w-full h-full object-contain"
+                        onError={(e) => {
+                          (e.target as HTMLElement).style.display = "none";
+                        }}
+                      />
+                      <span className="absolute bottom-0 right-0 bg-slate-900/90 text-[9px] font-bold text-emerald-400 px-1 rounded-tl">
+                        #{idx + 2}
+                      </span>
+                    </div>
+                  ))}
+              </div>
+            )}
+          </div>
+
+          {/* Product Video URL (YouTube or Direct Video) */}
+          <div className="space-y-2 pt-2 border-t border-slate-800/80">
+            <div className="flex items-center justify-between">
+              <label className="text-xs font-semibold text-slate-300 flex items-center gap-2">
+                <Video className="w-3.5 h-3.5 text-rose-500" />
+                <span>Product Video URL (ভিডিও লিংক)</span>
+              </label>
+              <span className="text-[10px] text-rose-400 font-bold bg-rose-500/10 px-2 py-0.5 rounded border border-rose-500/20">
+                YouTube & MP4 Supported
+              </span>
+            </div>
+            <div className="relative">
+              <input
+                type="text"
+                placeholder="https://www.youtube.com/watch?v=... or https://youtu.be/... or .mp4 URL"
+                value={formData.videoUrl || ""}
+                onChange={(e) => setFormData({ ...formData, videoUrl: e.target.value })}
+                className="w-full bg-slate-950/80 border border-slate-800 rounded-xl pl-3.5 pr-20 py-2.5 text-xs text-slate-100 placeholder:text-slate-600 focus:outline-none focus:border-rose-500/60 font-mono"
+              />
+              {formData.videoUrl ? (
+                <a
+                  href={formData.videoUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="absolute right-2 top-1/2 -translate-y-1/2 px-2.5 py-1 rounded-lg bg-rose-500/15 hover:bg-rose-500/25 border border-rose-500/30 text-rose-400 text-[11px] font-bold transition flex items-center gap-1 active:scale-95 cursor-pointer"
+                >
+                  <span>Open</span>
+                  <ExternalLink className="w-2.5 h-2.5" />
+                </a>
+              ) : null}
+            </div>
+            <p className="text-[10px] text-slate-500">
+              প্রডাক্ট ডিটেইল পেজে থাম্বনেইলে থাকা VIDEO বাটনে ক্লিক করলে এই ভিডিওটি সরাসরি মূল ইমেজ কন্টেইনারে চলবে।
+            </p>
+
+            {/* Video Live Preview */}
+            {(() => {
+              const videoInfo = getEmbedVideoInfo(formData.videoUrl);
+              if (!videoInfo) return null;
+              return (
+                <div className="p-3 bg-slate-950/90 rounded-xl border border-slate-800 space-y-2 mt-2">
+                  <div className="flex items-center justify-between text-[11px] font-bold text-slate-400">
+                    <span className="flex items-center gap-1.5 text-emerald-400">
+                      <Play className="w-3 h-3 fill-current" />
+                      Live Video Preview
+                    </span>
+                    <span className="font-mono text-[10px] text-slate-500">
+                      {videoInfo.isYouTube ? "YouTube Player" : "HTML5 Video"}
+                    </span>
+                  </div>
+                  <div className="w-full aspect-video max-w-sm rounded-lg overflow-hidden bg-black border border-slate-800">
+                    {videoInfo.isYouTube ? (
+                      <iframe
+                        src={videoInfo.embedUrl}
+                        title="Video Preview"
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                        className="w-full h-full border-0"
+                      />
+                    ) : (
+                      <video src={videoInfo.videoUrl} controls className="w-full h-full object-contain" />
+                    )}
+                  </div>
+                </div>
+              );
+            })()}
+          </div>
         </div>
 
         {/* Card 4: Product Flags */}
@@ -653,47 +811,107 @@ export function ProductFormView({ productId }: ProductFormViewProps) {
           </div>
         </div>
 
-        {/* Card 5: Specifications & Descriptions */}
+        {/* Card 5: বিবরণ (Description, Highlights & Features) */}
         <div className="bg-slate-900/60 border border-slate-800 rounded-2xl p-6 space-y-4">
-          <h2 className="text-xs font-black uppercase text-slate-400 tracking-wider border-b border-slate-800 pb-3">
-            5. Specifications & Details
-          </h2>
+          <div className="border-b border-slate-800 pb-3 flex items-center justify-between">
+            <h2 className="text-xs font-black uppercase text-slate-400 tracking-wider">
+              5. বিবরণ (Description, Highlights & Features)
+            </h2>
+            <span className="text-[11px] text-emerald-400 font-bold">
+              Product Detail Page বিবরণী
+            </span>
+          </div>
 
+          {/* Highlight Subtitle */}
           <div className="space-y-1.5">
             <label className="text-xs font-semibold text-slate-300">
-              Key Specifications / Bullet Points
+              Highlight Subtitle (হেডলাইন সাবটাইটেল)
+            </label>
+            <input
+              type="text"
+              placeholder="e.g. ⚡ Look আলাদা, gameplay-ও আরও smooth!"
+              value={formData.highlightSubtitle || ""}
+              onChange={(e) => setFormData({ ...formData, highlightSubtitle: e.target.value })}
+              className="w-full bg-slate-950/80 border border-slate-800 rounded-xl px-3.5 py-2.5 text-xs text-slate-100 placeholder:text-slate-600 focus:outline-none focus:border-emerald-500/60"
+            />
+            <p className="text-[10px] text-slate-500">
+              প্রডাক্ট ডিটেইল পেজে &quot;বিবরণ&quot; সেকশনের টাইটেলের ঠিক নিচে এই সাবটাইটেলটি দেখাবে।
+            </p>
+          </div>
+
+          {/* Descriptions in Bangla & English */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div className="space-y-1.5">
+              <label className="text-xs font-semibold text-slate-300">মূল বিবরণ (বাংলা)</label>
+              <textarea
+                rows={4}
+                placeholder="পণ্যের বিস্তারিত বিবরণ বাংলায় লিখুন..."
+                value={formData.descriptionBn || ""}
+                onChange={(e) => setFormData({ ...formData, descriptionBn: e.target.value })}
+                className="w-full bg-slate-950/80 border border-slate-800 rounded-xl px-3.5 py-2.5 text-xs text-slate-100 placeholder:text-slate-600 focus:outline-none focus:border-emerald-500/60 resize-none leading-relaxed"
+              />
+            </div>
+
+            <div className="space-y-1.5">
+              <label className="text-xs font-semibold text-slate-300">Description (English)</label>
+              <textarea
+                rows={4}
+                placeholder="Detailed description in English..."
+                value={formData.description || ""}
+                onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                className="w-full bg-slate-950/80 border border-slate-800 rounded-xl px-3.5 py-2.5 text-xs text-slate-100 placeholder:text-slate-600 focus:outline-none focus:border-emerald-500/60 resize-none leading-relaxed"
+              />
+            </div>
+          </div>
+
+          {/* "কেন এই পণ্যটি?" (Why Choose Points / Features) */}
+          <div className="space-y-1.5 pt-2 border-t border-slate-800/80">
+            <label className="text-xs font-semibold text-slate-300 flex items-center justify-between">
+              <span>&quot;কেন এই পণ্যটি?&quot; (বৈশিষ্ট্যের তালিকা - Features)</span>
+              <span className="text-[10px] text-slate-500 font-mono">প্রতি লাইনে ১টি বৈশিষ্ট্য</span>
+            </label>
+            <textarea
+              rows={4}
+              placeholder="⚡ Luminous Gaming Design — gaming setup-এ আলাদা visual style আনে&#10;🎯 Smooth Touch Control — swipe ও aiming সহজ করে&#10;🪶 Low-Friction Feel — হালকা ও আরামদায়ক অনুভূতি"
+              value={formData.whyChooseText || ""}
+              onChange={(e) => setFormData({ ...formData, whyChooseText: e.target.value })}
+              className="w-full bg-slate-950/80 border border-slate-800 rounded-xl px-3.5 py-2.5 text-xs text-slate-100 placeholder:text-slate-600 focus:outline-none focus:border-emerald-500/60 resize-none leading-relaxed font-sans"
+            />
+            <p className="text-[10px] text-slate-500">
+              প্রতি লাইনে একটি করে পয়েন্ট লিখুন। প্রডাক্ট ডিটেইল পেজের বিবরণীতে প্রতিটি পয়েন্টের সামনে ⚡ চিহ্ন সহ প্রদর্শিত হবে।
+            </p>
+          </div>
+
+          {/* "Perfect For" Games / Uses */}
+          <div className="space-y-1.5 pt-2 border-t border-slate-800/80">
+            <label className="text-xs font-semibold text-slate-300 flex items-center justify-between">
+              <span>&quot;Perfect For&quot; (উপযুক্ত গেম বা ব্যবহার)</span>
+              <span className="text-[10px] text-slate-500 font-mono">প্রতি লাইনে ১টি গেমের নাম</span>
             </label>
             <textarea
               rows={3}
-              placeholder="e.g. IP67 Waterproof, 5 Hours Playtime, Heavy Bass"
-              value={formData.specs}
-              onChange={(e) => setFormData({ ...formData, specs: e.target.value })}
-              className="w-full bg-slate-950/80 border border-slate-800 rounded-xl px-3.5 py-2.5 text-xs text-slate-100 placeholder:text-slate-500 focus:outline-none focus:border-emerald-500/60 resize-none"
+              placeholder="Free Fire / Free Fire MAX&#10;PUBG Mobile&#10;Call of Duty Mobile&#10;eFootball&#10;FPS & Battle Royale Games"
+              value={formData.perfectForText || ""}
+              onChange={(e) => setFormData({ ...formData, perfectForText: e.target.value })}
+              className="w-full bg-slate-950/80 border border-slate-800 rounded-xl px-3.5 py-2.5 text-xs text-slate-100 placeholder:text-slate-600 focus:outline-none focus:border-emerald-500/60 resize-none leading-relaxed"
             />
+            <p className="text-[10px] text-slate-500">
+              যে সকল গেমের জন্য এই গ্যাজেটটি উপযুক্ত (যেমন: Free Fire, PUBG, COD Mobile)। বিবরণীর নিচের গ্রিডে দেখাবে।
+            </p>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div className="space-y-1.5">
-              <label className="text-xs font-semibold text-slate-300">Short Description (English)</label>
-              <textarea
-                rows={3}
-                placeholder="Brief summary for product details page..."
-                value={formData.description || ""}
-                onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                className="w-full bg-slate-950/80 border border-slate-800 rounded-xl px-3.5 py-2.5 text-xs text-slate-100 placeholder:text-slate-500 focus:outline-none focus:border-emerald-500/60 resize-none"
-              />
-            </div>
-
-            <div className="space-y-1.5">
-              <label className="text-xs font-semibold text-slate-300">Short Description (Bangla)</label>
-              <textarea
-                rows={3}
-                placeholder="সংক্ষিপ্ত পণ্যের বিবরণ..."
-                value={formData.descriptionBn || ""}
-                onChange={(e) => setFormData({ ...formData, descriptionBn: e.target.value })}
-                className="w-full bg-slate-950/80 border border-slate-800 rounded-xl px-3.5 py-2.5 text-xs text-slate-100 placeholder:text-slate-500 focus:outline-none focus:border-emerald-500/60 resize-none"
-              />
-            </div>
+          {/* Short Description Summary */}
+          <div className="space-y-1.5 pt-2 border-t border-slate-800/80">
+            <label className="text-xs font-semibold text-slate-300">
+              Short Description (সংক্ষিপ্ত সারাংশ)
+            </label>
+            <textarea
+              rows={2}
+              placeholder="বিবরণীর শেষে প্রদর্শনের জন্য সংক্ষিপ্ত প্যারাগ্রাফ..."
+              value={formData.shortDescription || ""}
+              onChange={(e) => setFormData({ ...formData, shortDescription: e.target.value })}
+              className="w-full bg-slate-950/80 border border-slate-800 rounded-xl px-3.5 py-2 text-xs text-slate-100 placeholder:text-slate-600 focus:outline-none focus:border-emerald-500/60 resize-none leading-relaxed"
+            />
           </div>
         </div>
 

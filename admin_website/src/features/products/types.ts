@@ -12,6 +12,12 @@ export interface Product {
   descriptionBn?: string;
   specs: string; // Formatting specifications details
   imageUrl: string;
+  comboImages?: string[];
+  videoUrl?: string;
+  highlightSubtitle?: string;
+  whyChoosePoints?: string[];
+  perfectForGames?: string[];
+  shortDescription?: string;
   is_featured?: boolean;
   is_popular?: boolean;
   is_bestseller?: boolean;
@@ -35,6 +41,12 @@ export interface ProductFormData {
   descriptionBn?: string;
   specs: string;
   imageUrl: string;
+  comboImagesText?: string;
+  videoUrl?: string;
+  highlightSubtitle?: string;
+  whyChooseText?: string;
+  perfectForText?: string;
+  shortDescription?: string;
   is_featured?: boolean;
   is_popular?: boolean;
   is_bestseller?: boolean;

@@ -36,6 +36,23 @@ interface DedicatedProductPageProps {
   initialProduct?: Product | null;
 }
 
+function getEmbedVideoInfo(rawUrl?: string) {
+  const fallback = 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4';
+  const url = (rawUrl && rawUrl.trim()) ? rawUrl.trim() : fallback;
+  
+  const ytMatch = url.match(/(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|watch\?v=|watch\?.+&v=|shorts\/))([\w-]{11})/i);
+  if (ytMatch && ytMatch[1]) {
+    return {
+      isYouTube: true,
+      embedUrl: `https://www.youtube.com/embed/${ytMatch[1]}?autoplay=1&rel=0`,
+    };
+  }
+  return {
+    isYouTube: false,
+    videoUrl: url,
+  };
+}
+
 export default function DedicatedProductPage({ initialProduct }: DedicatedProductPageProps = {}) {
   const params = useParams();
   const router = useRouter();
@@ -351,13 +368,29 @@ export default function DedicatedProductPage({ initialProduct }: DedicatedProduc
                 {isVideoActive ? (
                   /* Interactive Video Player (Plays video right inside the main area) */
                   <div className="w-full h-full bg-black relative flex items-center justify-center">
-                    <video
-                      src="https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4"
-                      controls
-                      autoPlay
-                      playsInline
-                      className="w-full h-full object-contain"
-                    />
+                    {(() => {
+                      const videoInfo = getEmbedVideoInfo(product.videoUrl);
+                      if (videoInfo.isYouTube) {
+                        return (
+                          <iframe
+                            src={videoInfo.embedUrl}
+                            title="Product Video"
+                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                            allowFullScreen
+                            className="w-full h-full border-0"
+                          />
+                        );
+                      }
+                      return (
+                        <video
+                          src={videoInfo.videoUrl}
+                          controls
+                          autoPlay
+                          playsInline
+                          className="w-full h-full object-contain"
+                        />
+                      );
+                    })()}
                   </div>
                 ) : (
                   /* Image View with Zoom on Hover */
@@ -588,12 +621,18 @@ export default function DedicatedProductPage({ initialProduct }: DedicatedProduc
                       </h3>
                       <p className="font-extrabold text-slate-900 mt-1 flex items-center gap-2 text-sm sm:text-base">
                         <span>⚡</span>
-                        <span>Look আলাদা, gameplay-ও আরও smooth!</span>
+                        <span>{product.highlightSubtitle || 'Look আলাদা, gameplay-ও আরও smooth!'}</span>
                       </p>
                     </div>
 
                     <p className="text-gray-700 text-xs sm:text-sm leading-relaxed">
-                      <strong className="text-slate-900 font-bold">{cleanProductTitle(product.name)}</strong> mobile gamers-এর জন্য তৈরি, যেখানে gaming comfort-এর সঙ্গে রয়েছে একটি eye-catching luminous look। Finger movement-এর friction কমিয়ে touchscreen-এর ওপর smoother swipe, drag এবং aiming control পেতে সাহায্য করে। Gaming-এর সময় আঙুলে sweat বা moisture জমলে touch control-এর consistency প্রভাবিত হতে পারে। এটি ব্যবহার করে এই সমস্যা কমাতে সাহায্য করা যায়, ফলে fast-paced gameplay-এ finger movement আরও comfortable থাকে।
+                      {product.descriptionBn || product.description ? (
+                        <span>{language === 'bn' ? (product.descriptionBn || product.description) : (product.description || product.descriptionBn)}</span>
+                      ) : (
+                        <>
+                          <strong className="text-slate-900 font-bold">{cleanProductTitle(product.name)}</strong> mobile gamers-এর জন্য তৈরি, যেখানে gaming comfort-এর সঙ্গে রয়েছে একটি eye-catching look। Finger movement-এর friction কমিয়ে touchscreen-এর ওপর smoother swipe, drag এবং aiming control পেতে সাহায্য করে। Gaming-এর সময় আঙুলে sweat বা moisture জমলে touch control-এর consistency প্রভাবিত হতে পারে। এটি ব্যবহার করে এই সমস্যা কমাতে সাহায্য করা যায়, ফলে fast-paced gameplay-এ finger movement আরও comfortable থাকে।
+                        </>
+                      )}
                     </p>
 
                     {/* Features List with Emojis */}
@@ -602,48 +641,66 @@ export default function DedicatedProductPage({ initialProduct }: DedicatedProduc
                         কেন {cleanProductTitle(product.name)}?
                       </h4>
                       <ul className="space-y-2 text-xs sm:text-sm text-gray-700 font-medium">
-                        <li className="flex items-start gap-2">
-                          <span className="shrink-0 mt-0.5">⚡</span>
-                          <div>
-                            <strong className="text-slate-900 font-bold">Luminous Gaming Design —</strong> gaming setup-এ আলাদা visual style এনে দেয়।
-                          </div>
-                        </li>
-                        <li className="flex items-start gap-2">
-                          <span className="shrink-0 mt-0.5">🎯</span>
-                          <div>
-                            <strong className="text-slate-900 font-bold">Smooth Touch Control —</strong> swipe, drag ও aiming-এর সময় smoother movement নিশ্চিত করে।
-                          </div>
-                        </li>
-                        <li className="flex items-start gap-2">
-                          <span className="shrink-0 mt-0.5">🪶</span>
-                          <div>
-                            <strong className="text-slate-900 font-bold">Low-Friction Feel —</strong> fast finger movement-এর জন্য suitable ও হালকা অনুভূতি।
-                          </div>
-                        </li>
-                        <li className="flex items-start gap-2">
-                          <span className="shrink-0 mt-0.5">💧</span>
-                          <div>
-                            <strong className="text-slate-900 font-bold">Moisture Management —</strong> sweat-related touch issues কমাতে সাহায্য করে।
-                          </div>
-                        </li>
-                        <li className="flex items-start gap-2">
-                          <span className="shrink-0 mt-0.5">🎮</span>
-                          <div>
-                            <strong className="text-slate-900 font-bold">Made for Mobile Gaming —</strong> competitive gameplay-এর জন্য practical।
-                          </div>
-                        </li>
-                        <li className="flex items-start gap-2">
-                          <span className="shrink-0 mt-0.5">👆</span>
-                          <div>
-                            <strong className="text-slate-900 font-bold">Comfortable Finger Movement —</strong> দীর্ঘ gameplay-এ convenient feel।
-                          </div>
-                        </li>
-                        <li className="flex items-start gap-2">
-                          <span className="shrink-0 mt-0.5">✨</span>
-                          <div>
-                            <strong className="text-slate-900 font-bold">Stylish Gaming Accessory —</strong> performance setup-এর সঙ্গে added visual appeal।
-                          </div>
-                        </li>
+                        {(product.whyChoosePoints && product.whyChoosePoints.length > 0) ? (
+                          product.whyChoosePoints.map((point, idx) => (
+                            <li key={idx} className="flex items-start gap-2">
+                              <span className="shrink-0 mt-0.5">⚡</span>
+                              <div className="text-slate-900 font-semibold">{point}</div>
+                            </li>
+                          ))
+                        ) : (product.specs && product.specs.length > 0) ? (
+                          product.specs.map((spec, idx) => (
+                            <li key={idx} className="flex items-start gap-2">
+                              <span className="shrink-0 mt-0.5">⚡</span>
+                              <div className="text-slate-900 font-semibold">{spec}</div>
+                            </li>
+                          ))
+                        ) : (
+                          <>
+                            <li className="flex items-start gap-2">
+                              <span className="shrink-0 mt-0.5">⚡</span>
+                              <div>
+                                <strong className="text-slate-900 font-bold">Luminous Gaming Design —</strong> gaming setup-এ আলাদা visual style এনে দেয়।
+                              </div>
+                            </li>
+                            <li className="flex items-start gap-2">
+                              <span className="shrink-0 mt-0.5">🎯</span>
+                              <div>
+                                <strong className="text-slate-900 font-bold">Smooth Touch Control —</strong> swipe, drag ও aiming-এর সময় smoother movement নিশ্চিত করে।
+                              </div>
+                            </li>
+                            <li className="flex items-start gap-2">
+                              <span className="shrink-0 mt-0.5">🪶</span>
+                              <div>
+                                <strong className="text-slate-900 font-bold">Low-Friction Feel —</strong> fast finger movement-এর জন্য suitable ও হালকা অনুভূতি।
+                              </div>
+                            </li>
+                            <li className="flex items-start gap-2">
+                              <span className="shrink-0 mt-0.5">💧</span>
+                              <div>
+                                <strong className="text-slate-900 font-bold">Moisture Management —</strong> sweat-related touch issues কমাতে সাহায্য করে।
+                              </div>
+                            </li>
+                            <li className="flex items-start gap-2">
+                              <span className="shrink-0 mt-0.5">🎮</span>
+                              <div>
+                                <strong className="text-slate-900 font-bold">Made for Mobile Gaming —</strong> competitive gameplay-এর জন্য practical।
+                              </div>
+                            </li>
+                            <li className="flex items-start gap-2">
+                              <span className="shrink-0 mt-0.5">👆</span>
+                              <div>
+                                <strong className="text-slate-900 font-bold">Comfortable Finger Movement —</strong> দীর্ঘ gameplay-এ convenient feel।
+                              </div>
+                            </li>
+                            <li className="flex items-start gap-2">
+                              <span className="shrink-0 mt-0.5">✨</span>
+                              <div>
+                                <strong className="text-slate-900 font-bold">Stylish Gaming Accessory —</strong> performance setup-এর সঙ্গে added visual appeal।
+                              </div>
+                            </li>
+                          </>
+                        )}
                       </ul>
                     </div>
 
@@ -653,30 +710,41 @@ export default function DedicatedProductPage({ initialProduct }: DedicatedProduc
                         Perfect For
                       </h4>
                       <div className="grid grid-cols-2 gap-2 text-xs sm:text-sm text-gray-700 font-semibold">
-                        <div className="flex items-center gap-1.5">
-                          <span className="w-1.5 h-1.5 rounded-full bg-slate-900 shrink-0" />
-                          <span>Free Fire / Free Fire MAX</span>
-                        </div>
-                        <div className="flex items-center gap-1.5">
-                          <span className="w-1.5 h-1.5 rounded-full bg-slate-900 shrink-0" />
-                          <span>PUBG Mobile</span>
-                        </div>
-                        <div className="flex items-center gap-1.5">
-                          <span className="w-1.5 h-1.5 rounded-full bg-slate-900 shrink-0" />
-                          <span>Call of Duty Mobile</span>
-                        </div>
-                        <div className="flex items-center gap-1.5">
-                          <span className="w-1.5 h-1.5 rounded-full bg-slate-900 shrink-0" />
-                          <span>eFootball</span>
-                        </div>
-                        <div className="flex items-center gap-1.5">
-                          <span className="w-1.5 h-1.5 rounded-full bg-slate-900 shrink-0" />
-                          <span>FPS & Battle Royale Games</span>
-                        </div>
-                        <div className="flex items-center gap-1.5">
-                          <span className="w-1.5 h-1.5 rounded-full bg-slate-900 shrink-0" />
-                          <span>Competitive Mobile Gaming</span>
-                        </div>
+                        {(product.perfectForGames && product.perfectForGames.length > 0) ? (
+                          product.perfectForGames.map((game, idx) => (
+                            <div key={idx} className="flex items-center gap-1.5">
+                              <span className="w-1.5 h-1.5 rounded-full bg-slate-900 shrink-0" />
+                              <span>{game}</span>
+                            </div>
+                          ))
+                        ) : (
+                          <>
+                            <div className="flex items-center gap-1.5">
+                              <span className="w-1.5 h-1.5 rounded-full bg-slate-900 shrink-0" />
+                              <span>Free Fire / Free Fire MAX</span>
+                            </div>
+                            <div className="flex items-center gap-1.5">
+                              <span className="w-1.5 h-1.5 rounded-full bg-slate-900 shrink-0" />
+                              <span>PUBG Mobile</span>
+                            </div>
+                            <div className="flex items-center gap-1.5">
+                              <span className="w-1.5 h-1.5 rounded-full bg-slate-900 shrink-0" />
+                              <span>Call of Duty Mobile</span>
+                            </div>
+                            <div className="flex items-center gap-1.5">
+                              <span className="w-1.5 h-1.5 rounded-full bg-slate-900 shrink-0" />
+                              <span>eFootball</span>
+                            </div>
+                            <div className="flex items-center gap-1.5">
+                              <span className="w-1.5 h-1.5 rounded-full bg-slate-900 shrink-0" />
+                              <span>FPS & Battle Royale Games</span>
+                            </div>
+                            <div className="flex items-center gap-1.5">
+                              <span className="w-1.5 h-1.5 rounded-full bg-slate-900 shrink-0" />
+                              <span>Competitive Mobile Gaming</span>
+                            </div>
+                          </>
+                        )}
                       </div>
                     </div>
 
@@ -686,7 +754,13 @@ export default function DedicatedProductPage({ initialProduct }: DedicatedProduc
                         Short Description
                       </h4>
                       <p className="text-xs sm:text-sm text-gray-600 leading-relaxed">
-                        <strong className="text-slate-900 font-bold">{cleanProductTitle(product.name)}</strong> হলো stylish gaming এক্সেসরিজ, যা smooth touch movement, aiming ও fast swiping-এ সাহায্য করে। Luminous design-এর সঙ্গে আপনার mobile gaming setup-এ যোগ করুন আরও comfortable control।
+                        {product.shortDescription ? (
+                          <span>{product.shortDescription}</span>
+                        ) : (
+                          <>
+                            <strong className="text-slate-900 font-bold">{cleanProductTitle(product.name)}</strong> হলো stylish gaming এক্সেসরিজ, যা smooth touch movement, aiming ও fast swiping-এ সাহায্য করে। Luminous design-এর সঙ্গে আপনার mobile gaming setup-এ যোগ করুন আরও comfortable control।
+                          </>
+                        )}
                       </p>
                     </div>
                   </div>
