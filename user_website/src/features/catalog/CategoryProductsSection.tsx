@@ -22,6 +22,32 @@ const CATEGORY_SECTIONS: CategorySectionDef[] = [
     titleBn: 'গেমিং কুলার',
     dummyProducts: [
       {
+        id: 'cooler-k6',
+        name: 'K6 PHONE COOLER',
+        nameBn: 'K6 ফোন কুলার',
+        category: 'gaming-cooler',
+        categoryBn: 'গেমিং কুলার',
+        brand: 'Generic',
+        brandBn: 'জেনেরিক',
+        price: 1150,
+        originalPrice: 1390,
+        discountBadge: '-17%',
+        rating: 4.8,
+        reviewCount: 61,
+        soldCount: 61,
+        image: 'https://images.unsplash.com/photo-1591799264318-7e6ef8ddb7ea?w=500&auto=format&fit=crop&q=80',
+        comboImages: [],
+        inStock: true,
+        isPopular: true,
+        isFeatured: true,
+        isBestSeller: true,
+        isNewArrival: true,
+        isComboOffer: false,
+        description: 'Magnetic RGB semiconductor phone cooler.',
+        descriptionBn: 'উচ্চগতির সাইলেন্ট ফ্যান সহ ম্যাগনেটিক আরজিবি ফোন কুলার।',
+        specs: ['Magnetic Mount', 'RGB Light', 'Silent Fan'],
+      },
+      {
         id: 'cooler-ex2',
         name: 'PLEXTONE EX2 ULTRA',
         nameBn: 'প্লেক্সটোন EX2 আল্ট্রা ফোন কুলার',
@@ -34,6 +60,7 @@ const CATEGORY_SECTIONS: CategorySectionDef[] = [
         discountBadge: '-24%',
         rating: 4.9,
         reviewCount: 31,
+        soldCount: 31,
         image: 'https://images.unsplash.com/photo-1591799264318-7e6ef8ddb7ea?w=500&auto=format&fit=crop&q=80',
         comboImages: [],
         inStock: true,
@@ -59,6 +86,7 @@ const CATEGORY_SECTIONS: CategorySectionDef[] = [
         discountBadge: '-18%',
         rating: 5.0,
         reviewCount: 83,
+        soldCount: 83,
         image: 'https://images.unsplash.com/photo-1550745165-9bc0b252726f?w=500&auto=format&fit=crop&q=80',
         comboImages: [],
         inStock: true,
@@ -84,6 +112,7 @@ const CATEGORY_SECTIONS: CategorySectionDef[] = [
         discountBadge: '-13%',
         rating: 4.8,
         reviewCount: 145,
+        soldCount: 145,
         image: 'https://images.unsplash.com/photo-1600080972464-8e5f35f63d08?w=500&auto=format&fit=crop&q=80',
         comboImages: [],
         inStock: true,
@@ -109,6 +138,7 @@ const CATEGORY_SECTIONS: CategorySectionDef[] = [
         discountBadge: '-8%',
         rating: 4.9,
         reviewCount: 118,
+        soldCount: 118,
         image: 'https://res.cloudinary.com/nc5hyaab/image/upload/v1789770807/memo_cx08_cooler.jpg',
         comboImages: [],
         inStock: true,
@@ -134,6 +164,7 @@ const CATEGORY_SECTIONS: CategorySectionDef[] = [
         discountBadge: '-20%',
         rating: 5.0,
         reviewCount: 66,
+        soldCount: 66,
         image: 'https://res.cloudinary.com/nc5hyaab/image/upload/v1789770807/memo_cx08_cooler.jpg',
         comboImages: [],
         inStock: true,
@@ -526,8 +557,8 @@ const CategoryRowItem: React.FC<CategoryRowItemProps> = ({
   return (
     <section className="space-y-3 sm:space-y-4">
       {/* Category Row Header (Matching Hunter Reference Screenshot) */}
-      <div className="flex items-center justify-between border-b border-gray-100 pb-2">
-        <h3 className="text-base sm:text-lg md:text-xl font-black text-slate-900 tracking-tight uppercase">
+      <div className="flex items-center justify-between pb-1">
+        <h3 className="text-lg sm:text-xl md:text-2xl font-black text-[#0B1A30] tracking-tight uppercase">
           {section.titleEn}
         </h3>
 
@@ -555,7 +586,7 @@ const CategoryRowItem: React.FC<CategoryRowItemProps> = ({
           {/* View All Pill Button (Matching Reference) */}
           <button
             onClick={handleViewAll}
-            className="text-xs font-bold text-slate-800 hover:text-black bg-[#F1F3F5] hover:bg-gray-200 transition-all flex items-center space-x-1 cursor-pointer px-3.5 py-1 rounded-full border border-gray-200/60 active:scale-95 shadow-2xs"
+            className="text-xs font-bold text-slate-800 hover:text-black bg-[#E5E7EB] hover:bg-gray-300 transition-all flex items-center space-x-1 cursor-pointer px-3.5 py-1 rounded-full border border-gray-300/60 active:scale-95 shadow-2xs"
           >
             <span>View All</span>
             <ChevronRight className="w-3.5 h-3.5 stroke-[2.5]" />
