@@ -11,6 +11,7 @@ export interface StoreSettings {
 
   // 2. Direct Connect & Live Chat Channels (WhatsApp, Messenger, Telegram)
   whatsappNumber: string;
+  whatsappGroupLink?: string;
   messengerUsername: string;
   messengerLink: string;
   telegramUsername: string;

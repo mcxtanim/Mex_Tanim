@@ -201,6 +201,38 @@ export function SettingsView() {
                   </a>
                 ) : null}
               </div>
+
+              {/* WhatsApp Offer Group Link */}
+              <div className="pt-2 border-t border-slate-800/60">
+                <label className="text-[11px] font-bold text-emerald-400 block mb-1">
+                  WhatsApp অফার গ্রুপ লিংক (Group Invite Link)
+                </label>
+                <div className="relative">
+                  <ExternalLink className="w-3.5 h-3.5 text-slate-500 absolute left-3 top-1/2 -translate-y-1/2" />
+                  <input
+                    type="text"
+                    placeholder="https://chat.whatsapp.com/..."
+                    value={settings.whatsappGroupLink || ""}
+                    onChange={(e) => setSettings({ ...settings, whatsappGroupLink: e.target.value })}
+                    className="w-full bg-slate-800/80 border border-slate-700/80 rounded-xl pl-8 pr-16 py-2 text-xs text-slate-100 focus:outline-none focus:border-[#25D366]/60 font-mono"
+                  />
+                  {settings.whatsappGroupLink ? (
+                    <a
+                      href={settings.whatsappGroupLink}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      title="Test Group Link"
+                      className="absolute right-2 top-1/2 -translate-y-1/2 px-2.5 py-1 rounded-lg bg-[#25D366]/15 hover:bg-[#25D366]/25 border border-[#25D366]/30 text-[#25D366] text-[11px] font-bold transition flex items-center gap-1 active:scale-95 cursor-pointer"
+                    >
+                      <span>Test</span>
+                      <ExternalLink className="w-2.5 h-2.5" />
+                    </a>
+                  ) : null}
+                </div>
+                <p className="text-[10px] text-slate-400 mt-1">
+                  ইউজার &quot;Support এ কথা বলুন&quot; মেনুর WhatsApp অফার গ্রুপ বাটনে ক্লিক করলে সরাসরি এই গ্রুপে জয়েন হবেন।
+                </p>
+              </div>
             </div>
 
             {/* Messenger */}

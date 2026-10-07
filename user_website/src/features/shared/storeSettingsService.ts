@@ -14,6 +14,7 @@ export interface StoreSettings {
 
   // 2. Direct Connect & Live Chat Channels (WhatsApp, Messenger, Telegram)
   whatsappNumber: string;
+  whatsappGroupLink?: string;
   messengerUsername: string;
   messengerLink: string;
   telegramUsername: string;
@@ -66,6 +67,7 @@ export const DEFAULT_SETTINGS: StoreSettings = {
 
   // Connect & Chat Channels
   whatsappNumber: '',
+  whatsappGroupLink: 'https://chat.whatsapp.com/MexTanimStore',
   messengerUsername: 'mextanimstore',
   messengerLink: 'https://m.me/mextanimstore',
   telegramUsername: 'mextanimstore',
@@ -119,6 +121,7 @@ export function mapDbToSettings(item: any): StoreSettings {
     supportHoursEn: item.support_hours_en || DEFAULT_SETTINGS.supportHoursEn,
 
     whatsappNumber: item.whatsapp_number ?? '',
+    whatsappGroupLink: item.whatsapp_group_link || (item.whatsapp_number?.includes('chat.whatsapp.com') ? item.whatsapp_number : '') || DEFAULT_SETTINGS.whatsappGroupLink,
     messengerUsername: item.messenger_username || DEFAULT_SETTINGS.messengerUsername,
     messengerLink: item.messenger_link || (item.messenger_username ? `https://m.me/${item.messenger_username}` : DEFAULT_SETTINGS.messengerLink),
     telegramUsername: item.telegram_username || DEFAULT_SETTINGS.telegramUsername,
