@@ -62,14 +62,40 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
           <Heart className={`w-4.5 h-4.5 stroke-[1.8] ${isWishlisted ? 'fill-current text-red-500' : ''}`} />
         </button>
 
-        {/* Product Image with smooth hover zoom ("carsor rakhle boro hoy") */}
-        <img
-          src={product.image}
-          alt={title}
-          loading="lazy"
-          decoding="async"
-          className="w-full h-full object-contain p-1 transform group-hover:scale-110 transition-transform duration-500 ease-out drop-shadow-xs"
-        />
+        {/* If combo product with multiple images, show them together! */}
+        {product.comboImages && product.comboImages.length > 1 ? (
+          <div className="w-full h-full flex items-center justify-center gap-1.5 p-1.5">
+            <div className="flex-1 h-full bg-white rounded-xl p-1.5 flex items-center justify-center border border-gray-100 shadow-2xs">
+              <img
+                src={product.comboImages[0]}
+                alt="Combo Item 1"
+                loading="lazy"
+                decoding="async"
+                className="max-h-full max-w-full object-contain group-hover:scale-105 transition-transform duration-300"
+              />
+            </div>
+            <div className="w-6 h-6 rounded-full bg-orange-500 text-white font-black text-xs flex items-center justify-center shrink-0 shadow-xs border border-white z-10">
+              +
+            </div>
+            <div className="flex-1 h-full bg-white rounded-xl p-1.5 flex items-center justify-center border border-gray-100 shadow-2xs">
+              <img
+                src={product.comboImages[1] || product.image}
+                alt="Combo Item 2"
+                loading="lazy"
+                decoding="async"
+                className="max-h-full max-w-full object-contain group-hover:scale-105 transition-transform duration-300"
+              />
+            </div>
+          </div>
+        ) : (
+          <img
+            src={product.image}
+            alt={title}
+            loading="lazy"
+            decoding="async"
+            className="w-full h-full object-contain p-1 transform group-hover:scale-110 transition-transform duration-500 ease-out drop-shadow-xs"
+          />
+        )}
 
         {/* Out of Stock Badge (if applicable) */}
         {!product.inStock && (
