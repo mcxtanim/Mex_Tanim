@@ -277,6 +277,30 @@ export const ComboOfferSection: React.FC<ComboOfferSectionProps> = ({ onSelectCa
     };
   }, []);
 
+  const [isHovered, setIsHovered] = useState(false);
+
+  // Continuous right-to-left auto-scroll every 2 seconds
+  useEffect(() => {
+    if (isHovered || !railRef.current || comboProducts.length <= 1) return;
+
+    const interval = setInterval(() => {
+      if (railRef.current) {
+        const { scrollLeft, scrollWidth, clientWidth } = railRef.current;
+        const card = railRef.current.firstElementChild as HTMLElement | null;
+        const scrollStep = card ? card.offsetWidth + 16 : 280;
+
+        // When reaching near the end, loop back smoothly to start
+        if (scrollLeft + clientWidth >= scrollWidth - 15) {
+          railRef.current.scrollTo({ left: 0, behavior: 'smooth' });
+        } else {
+          railRef.current.scrollBy({ left: scrollStep, behavior: 'smooth' });
+        }
+      }
+    }, 2000);
+
+    return () => clearInterval(interval);
+  }, [isHovered, comboProducts.length]);
+
   const handleScroll = (direction: 'left' | 'right') => {
     if (railRef.current) {
       const scrollAmount = direction === 'left' ? -320 : 320;
@@ -337,6 +361,8 @@ export const ComboOfferSection: React.FC<ComboOfferSectionProps> = ({ onSelectCa
       {/* Horizontal Product Rail */}
       <div
         ref={railRef}
+        onMouseEnter={() => setIsHovered(true)}
+        onMouseLeave={() => setIsHovered(false)}
         className="flex space-x-3 sm:space-x-4 lg:space-x-4.5 overflow-x-auto scrollbar-none py-1.5 px-0.5 snap-x overscroll-x-contain scroll-smooth"
         style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
       >

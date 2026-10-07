@@ -1103,6 +1103,30 @@ const CategoryRowItem: React.FC<CategoryRowItemProps> = ({
   const supplemental = section.dummyProducts.filter((p) => !existingIds.has(p.id));
   const products = [...matchingLive, ...supplemental];
 
+  const [isHovered, setIsHovered] = React.useState(false);
+
+  // Auto-scroll from right to left every 2 seconds continuously
+  React.useEffect(() => {
+    if (isHovered || !railRef.current || products.length <= 1) return;
+
+    const interval = setInterval(() => {
+      if (railRef.current) {
+        const { scrollLeft, scrollWidth, clientWidth } = railRef.current;
+        const card = railRef.current.firstElementChild as HTMLElement | null;
+        const scrollStep = card ? card.offsetWidth + 16 : 280;
+
+        // When reaching near the end, loop back smoothly to start
+        if (scrollLeft + clientWidth >= scrollWidth - 15) {
+          railRef.current.scrollTo({ left: 0, behavior: 'smooth' });
+        } else {
+          railRef.current.scrollBy({ left: scrollStep, behavior: 'smooth' });
+        }
+      }
+    }, 2000);
+
+    return () => clearInterval(interval);
+  }, [isHovered, products.length]);
+
   const handleScroll = (direction: 'left' | 'right') => {
     if (railRef.current) {
       const cardWidth = railRef.current.firstElementChild
@@ -1169,6 +1193,8 @@ const CategoryRowItem: React.FC<CategoryRowItemProps> = ({
       {/* Horizontal Product Rail (Matching 5-Product Row) */}
       <div
         ref={railRef}
+        onMouseEnter={() => setIsHovered(true)}
+        onMouseLeave={() => setIsHovered(false)}
         className="flex space-x-3 sm:space-x-4 lg:space-x-4.5 overflow-x-auto scrollbar-none py-1.5 px-0.5 snap-x overscroll-x-contain scroll-smooth"
         style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
       >
