@@ -124,12 +124,12 @@ export const HeroBanner: React.FC = () => {
   };
 
   return (
-    <section id="hero" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-3 sm:pt-6 pb-2 select-none">
-      {/* Full-Bleed Hero Banner Slider Container */}
+    <section id="hero" className="w-full select-none">
+      {/* Full-Bleed Hero Banner Slider Container - Centered Wide Aspect Ratio (Hunter Reference Style) */}
       <div
         onTouchStart={handleTouchStart}
         onTouchEnd={handleTouchEnd}
-        className="relative rounded-2xl sm:rounded-3xl overflow-hidden bg-slate-950 shadow-xl sm:shadow-2xl border border-slate-800 aspect-[16/9] sm:aspect-[24/9] md:aspect-[27/9] min-h-[190px] sm:min-h-[360px] md:min-h-[420px] group flex items-center justify-center"
+        className="relative rounded-2xl sm:rounded-3xl overflow-hidden bg-slate-950 shadow-md sm:shadow-xl border border-gray-100/80 aspect-[16/7.5] sm:aspect-[21/8] md:aspect-[24/8] lg:aspect-[26/8] min-h-[170px] sm:min-h-[280px] md:min-h-[340px] group flex items-center justify-center"
       >
         
         {/* Banner Images Carousel - Spanning 100% Full Area with Smooth Transition */}
@@ -138,7 +138,7 @@ export const HeroBanner: React.FC = () => {
           return (
             <div
               key={item.id || index}
-              className={`absolute inset-0 w-full h-full transition-opacity duration-1000 ease-in-out ${
+              className={`absolute inset-0 w-full h-full transition-opacity duration-700 ease-in-out ${
                 isActive ? 'opacity-100 z-10' : 'opacity-0 z-0 pointer-events-none'
               }`}
             >
@@ -149,14 +149,14 @@ export const HeroBanner: React.FC = () => {
                 loading={index === 0 ? 'eager' : 'lazy'}
               />
               {/* Subtle Gradient Overlay for visual contrast and text readability */}
-              <div className="absolute inset-0 bg-gradient-to-t from-slate-950/70 via-transparent to-black/20 pointer-events-none" />
+              <div className="absolute inset-0 bg-gradient-to-t from-slate-950/60 via-transparent to-black/10 pointer-events-none" />
             </div>
           );
         })}
 
         {/* Dynamic Title / Subtitle Text Overlay (if custom title or subtitle is configured) */}
         {(titleText || subtitleText) && (
-          <div className="absolute top-4 left-4 sm:top-12 sm:left-10 md:left-12 z-20 max-w-xl pointer-events-none space-y-1 sm:space-y-1.5 animate-in fade-in duration-300">
+          <div className="absolute top-4 left-4 sm:top-10 sm:left-10 md:left-12 z-20 max-w-xl pointer-events-none space-y-1 sm:space-y-1.5 animate-in fade-in duration-300">
             {titleText && (
               <h2 className="text-sm sm:text-2xl md:text-3xl lg:text-4xl font-black text-white tracking-tight drop-shadow-[0_2px_12px_rgba(0,0,0,0.8)] leading-tight">
                 {titleText}
@@ -172,7 +172,7 @@ export const HeroBanner: React.FC = () => {
 
         {/* Bottom-Left Floating Badge */}
         {badgeText && (
-          <div className="absolute bottom-3 left-3 sm:bottom-8 sm:left-8 z-20 flex items-center space-x-1.5 sm:space-x-2 bg-slate-950/85 backdrop-blur-md px-2.5 py-1 sm:px-4 sm:py-2 rounded-full border border-orange-500/40 shadow-xl transition-all">
+          <div className="absolute bottom-3 left-3 sm:bottom-6 sm:left-8 z-20 flex items-center space-x-1.5 sm:space-x-2 bg-slate-950/80 backdrop-blur-md px-2.5 py-1 sm:px-3.5 sm:py-1.5 rounded-full border border-orange-500/40 shadow-lg transition-all">
             <Flame className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-orange-400 animate-pulse" />
             <span className="text-[10px] sm:text-xs font-black text-white tracking-wider">
               Mex Tanim <span className="text-orange-400">{badgeText}</span>
@@ -181,60 +181,60 @@ export const HeroBanner: React.FC = () => {
         )}
 
         {/* Floating Action Button on Bottom-Right */}
-        <div className="absolute bottom-6 right-6 sm:bottom-8 sm:right-10 z-20 hidden sm:flex items-center space-x-3">
+        <div className="absolute bottom-4 right-4 sm:bottom-6 sm:right-8 z-20 hidden sm:flex items-center space-x-3">
           <a
             href={buttonLink}
-            className="px-6 py-3 bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 text-white font-extrabold text-xs sm:text-sm rounded-2xl shadow-xl shadow-orange-500/40 flex items-center space-x-2 transition active:scale-95 border border-white/20 backdrop-blur-md cursor-pointer"
+            className="px-5 py-2.5 bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 text-white font-extrabold text-xs sm:text-sm rounded-xl shadow-lg shadow-orange-500/30 flex items-center space-x-2 transition active:scale-95 border border-white/20 backdrop-blur-md cursor-pointer"
           >
             <ShoppingBag className="w-4 h-4" />
             <span>{buttonText}</span>
           </a>
         </div>
 
-        {/* Left Arrow Button (Desktop only - hidden on mobile so it doesn't cover text) */}
+        {/* Left Arrow Button (Desktop only on hover) */}
         {totalSlides > 1 && (
           <button
             onClick={prevSlide}
             type="button"
-            className="hidden sm:flex absolute left-3 sm:left-5 top-1/2 -translate-y-1/2 p-2.5 sm:p-3 rounded-full bg-slate-950/70 hover:bg-orange-500 text-white backdrop-blur-md border border-white/20 transition-all z-20 shadow-xl opacity-90 hover:opacity-100 hover:scale-110 active:scale-95 cursor-pointer"
+            className="hidden sm:flex absolute left-3 sm:left-5 top-1/2 -translate-y-1/2 p-2 sm:p-2.5 rounded-full bg-slate-950/60 hover:bg-black text-white backdrop-blur-md border border-white/20 transition-all z-20 shadow-lg opacity-0 group-hover:opacity-90 hover:opacity-100 hover:scale-110 active:scale-95 cursor-pointer"
             aria-label="Previous Slide"
           >
-            <ChevronLeft className="w-5 h-5 sm:w-6 sm:h-6" />
+            <ChevronLeft className="w-5 h-5" />
           </button>
         )}
 
-        {/* Right Arrow Button (Desktop only - hidden on mobile so it doesn't cover text) */}
+        {/* Right Arrow Button (Desktop only on hover) */}
         {totalSlides > 1 && (
           <button
             onClick={nextSlide}
             type="button"
-            className="hidden sm:flex absolute right-3 sm:right-5 top-1/2 -translate-y-1/2 p-2.5 sm:p-3 rounded-full bg-slate-950/70 hover:bg-orange-500 text-white backdrop-blur-md border border-white/20 transition-all z-20 shadow-xl opacity-90 hover:opacity-100 hover:scale-110 active:scale-95 cursor-pointer"
+            className="hidden sm:flex absolute right-3 sm:right-5 top-1/2 -translate-y-1/2 p-2 sm:p-2.5 rounded-full bg-slate-950/60 hover:bg-black text-white backdrop-blur-md border border-white/20 transition-all z-20 shadow-lg opacity-0 group-hover:opacity-90 hover:opacity-100 hover:scale-110 active:scale-95 cursor-pointer"
             aria-label="Next Slide"
           >
-            <ChevronRight className="w-5 h-5 sm:w-6 sm:h-6" />
+            <ChevronRight className="w-5 h-5" />
           </button>
         )}
 
-        {/* Live Sliding Pagination Indicators Bar (shown if multiple banners) */}
-        {totalSlides > 1 && (
-          <div className="absolute bottom-3 sm:bottom-4 left-1/2 -translate-x-1/2 flex items-center space-x-1.5 sm:space-x-2.5 z-20 bg-slate-950/60 backdrop-blur-md px-2.5 py-1 sm:px-3.5 sm:py-1.5 rounded-full border border-white/10">
-            {banners.map((_, index) => (
-              <button
-                key={index}
-                type="button"
-                onClick={(e) => handleDotClick(index, e)}
-                className={`h-2 sm:h-2.5 rounded-full transition-all duration-300 cursor-pointer ${
-                  safeIndex === index
-                    ? 'w-6 sm:w-8 bg-orange-500 shadow-md shadow-orange-500/80 scale-105'
-                    : 'w-2 sm:w-2.5 bg-white/40 hover:bg-white/70'
-                }`}
-                aria-label={`Slide ${index + 1}`}
-              />
-            ))}
-          </div>
-        )}
-
       </div>
+
+      {/* Pagination Dots Placed Beneath the Banner (Matching Hunter Reference Screenshot) */}
+      {totalSlides > 1 && (
+        <div className="flex items-center justify-center space-x-2 pt-3 sm:pt-3.5">
+          {banners.map((_, index) => (
+            <button
+              key={index}
+              type="button"
+              onClick={(e) => handleDotClick(index, e)}
+              className={`h-1.5 sm:h-2 rounded-full transition-all duration-300 cursor-pointer ${
+                safeIndex === index
+                  ? 'w-6 sm:w-7 bg-black scale-105'
+                  : 'w-2 sm:w-2.5 bg-slate-300 hover:bg-slate-400'
+              }`}
+              aria-label={`Slide ${index + 1}`}
+            />
+          ))}
+        </div>
+      )}
     </section>
   );
 };

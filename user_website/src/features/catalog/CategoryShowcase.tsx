@@ -151,52 +151,51 @@ export const CategoryShowcase: React.FC<CategoryShowcaseProps> = ({
   };
 
   return (
-    <section id="category-showcase" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-      {/* Section Header */}
-      <div className="flex items-center justify-between mb-4 sm:mb-5">
-        <div className="flex items-center space-x-3">
-          <span className="w-2.5 h-6 sm:w-3 sm:h-7 bg-orange-500 rounded-full inline-block shadow-sm"></span>
-          <h2 className="text-lg sm:text-xl md:text-2xl font-black text-slate-900 tracking-tight">
+    <section id="category-showcase" className="w-full py-1 sm:py-2 select-none">
+      {/* Section Header (Matching Hunter Reference Style) */}
+      <div className="flex items-center justify-between mb-3 sm:mb-4">
+        <div>
+          <h2 className="text-base sm:text-lg md:text-xl font-black text-slate-900 tracking-tight">
             {language === 'bn' ? 'সকল ক্যাটাগরি' : 'All Categories'}
           </h2>
         </div>
 
-        <div className="flex items-center space-x-2 sm:space-x-3">
+        <div className="flex items-center space-x-2 sm:space-x-2.5">
           {/* Desktop Left/Right Scroll Arrow Buttons */}
-          <div className="hidden sm:flex items-center space-x-1.5 bg-gray-100/80 p-1 rounded-full border border-gray-200/80">
+          <div className="hidden sm:flex items-center space-x-1 bg-gray-100/90 p-1 rounded-full border border-gray-200/80">
             <button
               onClick={() => handleScroll('left')}
-              className="w-8 h-8 rounded-full bg-white hover:bg-orange-50 hover:text-orange-600 text-slate-700 flex items-center justify-center shadow-xs transition active:scale-95 cursor-pointer border border-gray-200/60"
+              className="w-7 h-7 rounded-full bg-white hover:bg-gray-50 text-slate-700 flex items-center justify-center shadow-2xs transition active:scale-95 cursor-pointer border border-gray-200/60"
               title="Scroll Left"
               aria-label="Scroll left categories"
             >
-              <ChevronLeft className="w-4 h-4 stroke-[2.5]" />
+              <ChevronLeft className="w-3.5 h-3.5 stroke-[2.5]" />
             </button>
             <button
               onClick={() => handleScroll('right')}
-              className="w-8 h-8 rounded-full bg-white hover:bg-orange-50 hover:text-orange-600 text-slate-700 flex items-center justify-center shadow-xs transition active:scale-95 cursor-pointer border border-gray-200/60"
+              className="w-7 h-7 rounded-full bg-white hover:bg-gray-50 text-slate-700 flex items-center justify-center shadow-2xs transition active:scale-95 cursor-pointer border border-gray-200/60"
               title="Scroll Right"
               aria-label="Scroll right categories"
             >
-              <ChevronRight className="w-4 h-4 stroke-[2.5]" />
+              <ChevronRight className="w-3.5 h-3.5 stroke-[2.5]" />
             </button>
           </div>
 
-          {/* View All Button */}
+          {/* View All Button (Matching Hunter Reference Pill) */}
           <button
             onClick={handleViewAll}
-            className="text-xs sm:text-sm font-bold text-orange-600 hover:text-orange-700 hover:bg-orange-100/80 transition-all flex items-center space-x-1.5 cursor-pointer bg-orange-50 px-3.5 py-1.5 sm:px-4 sm:py-2 rounded-full border border-orange-200/80 active:scale-95 shadow-2xs"
+            className="text-xs font-bold text-slate-700 hover:text-black bg-gray-100 hover:bg-gray-200 transition-all flex items-center space-x-1 cursor-pointer px-3.5 py-1.5 rounded-full border border-gray-200/80 active:scale-95 shadow-2xs"
           >
             <span>{language === 'bn' ? 'সবগুলো দেখুন' : 'View All'}</span>
-            <ArrowRight className="w-3.5 h-3.5 sm:w-4 sm:h-4 stroke-[2.5]" />
+            <ChevronRight className="w-3.5 h-3.5 stroke-[2.5]" />
           </button>
         </div>
       </div>
 
-      {/* Horizontally Scrollable Thumbnail Rail */}
+      {/* Horizontally Scrollable Thumbnail Rail (Hunter Reference Carousel) */}
       <div
         ref={scrollRef}
-        className="overflow-x-auto scrollbar-none flex space-x-2.5 sm:space-x-4 overscroll-x-contain py-2 px-0.5"
+        className="overflow-x-auto scrollbar-none flex space-x-2.5 sm:space-x-3.5 overscroll-x-contain py-1.5 px-0.5"
         style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
       >
         {categories.length > 0 ? (
@@ -213,13 +212,13 @@ export const CategoryShowcase: React.FC<CategoryShowcaseProps> = ({
             );
           })
         ) : (
-          [...Array(6)].map((_, i) => (
+          [...Array(8)].map((_, i) => (
             <div
               key={i}
-              className="snap-start shrink-0 flex-none rounded-3xl p-5 sm:p-6 min-w-[180px] sm:min-w-[210px] md:min-w-[240px] h-[220px] sm:h-[250px] md:h-[270px] bg-white/60 animate-pulse border border-white/60 shadow-xs flex flex-col items-center justify-between"
+              className="snap-start shrink-0 flex-none rounded-2xl sm:rounded-3xl p-3 min-w-[105px] sm:min-w-[125px] md:min-w-[140px] h-[115px] sm:h-[130px] md:h-[142px] bg-gray-100/80 animate-pulse border border-gray-200/60 shadow-2xs flex flex-col items-center justify-between"
             >
-              <div className="w-24 h-24 rounded-full bg-slate-100 mt-4" />
-              <div className="w-24 h-4 bg-slate-100 rounded-full mb-2" />
+              <div className="w-14 h-14 rounded-full bg-gray-200/80 mt-2" />
+              <div className="w-16 h-3 bg-gray-200/80 rounded-full mb-1" />
             </div>
           ))
         )}
