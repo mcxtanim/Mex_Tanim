@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { useRouter } from 'next/navigation';
-import { Star, Heart, Tag } from 'lucide-react';
+import { Heart, Tag } from 'lucide-react';
 import { Product } from './types';
 import { useLanguage } from '../shared/LanguageContext';
 
@@ -123,25 +123,6 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
           <h3 className="font-bold text-sm sm:text-base text-[#0F172A] tracking-tight uppercase line-clamp-2 min-h-[2.6rem] group-hover:text-blue-600 transition-colors">
             {title}
           </h3>
-
-          {/* Star Rating (Compact row matching Reference) */}
-          {product.rating > 0 && (
-            <div className="flex items-center space-x-1.5 mt-1.5">
-              <div className="flex text-amber-400">
-                {[...Array(5)].map((_, i) => (
-                  <Star
-                    key={i}
-                    className={`w-3.5 h-3.5 ${
-                      i < Math.floor(product.rating) ? 'fill-amber-400 text-amber-400' : 'text-gray-200'
-                    }`}
-                  />
-                ))}
-              </div>
-              <span className="text-xs text-slate-500 font-semibold">
-                {product.rating.toFixed(1)} {product.reviewCount ? `(${product.reviewCount})` : ''}
-              </span>
-            </div>
-          )}
         </div>
 
         {/* Price and Sold Row (Matching Reference) */}
