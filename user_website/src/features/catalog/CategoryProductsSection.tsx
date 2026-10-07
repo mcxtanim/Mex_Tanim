@@ -1105,38 +1105,62 @@ const CategoryRowItem: React.FC<CategoryRowItemProps> = ({
 
   const [isHovered, setIsHovered] = React.useState(false);
 
-  // Auto-scroll from right to left every 2 seconds continuously
+  // Triple the products array so the loop seamlessly continues forward indefinitely
+  const loopProducts = React.useMemo(() => {
+    if (products.length === 0) return [];
+    return [...products, ...products, ...products];
+  }, [products]);
+
+  // Continuous seamless right-to-left auto-scroll every 2 seconds without ever reversing
   React.useEffect(() => {
     if (isHovered || !railRef.current || products.length <= 1) return;
 
     const interval = setInterval(() => {
-      if (railRef.current) {
-        const { scrollLeft, scrollWidth, clientWidth } = railRef.current;
-        const card = railRef.current.firstElementChild as HTMLElement | null;
-        const scrollStep = card ? card.offsetWidth + 16 : 280;
+      const rail = railRef.current;
+      if (!rail) return;
 
-        // When reaching near the end, loop back smoothly to start
-        if (scrollLeft + clientWidth >= scrollWidth - 15) {
-          railRef.current.scrollTo({ left: 0, behavior: 'smooth' });
-        } else {
-          railRef.current.scrollBy({ left: scrollStep, behavior: 'smooth' });
-        }
+      const first = rail.children[0] as HTMLElement | null;
+      const second = rail.children[1] as HTMLElement | null;
+      if (!first) return;
+
+      const stride = second ? (second.offsetLeft - first.offsetLeft) : (first.offsetWidth + 16);
+      const singleSetWidth = stride * products.length;
+
+      // Silent invisible wrap: when scrolled past the set, silently shift back by 1 set width
+      // with ZERO animation. Since sets are exact clones, the user's screen looks 100% identical!
+      if (rail.scrollLeft >= singleSetWidth * 2 - 10) {
+        rail.scrollLeft -= singleSetWidth;
       }
+
+      // Smoothly advance 1 product card forward to the left
+      rail.scrollBy({ left: stride, behavior: 'smooth' });
     }, 2000);
 
     return () => clearInterval(interval);
   }, [isHovered, products.length]);
 
   const handleScroll = (direction: 'left' | 'right') => {
-    if (railRef.current) {
-      const cardWidth = railRef.current.firstElementChild
-        ? (railRef.current.firstElementChild as HTMLElement).offsetWidth
-        : 260;
-      const scrollStep = (cardWidth + 16) * 2;
-      railRef.current.scrollBy({
-        left: direction === 'left' ? -scrollStep : scrollStep,
-        behavior: 'smooth',
-      });
+    const rail = railRef.current;
+    if (!rail || products.length === 0) return;
+
+    const first = rail.children[0] as HTMLElement | null;
+    const second = rail.children[1] as HTMLElement | null;
+    if (!first) return;
+
+    const stride = second ? (second.offsetLeft - first.offsetLeft) : (first.offsetWidth + 16);
+    const singleSetWidth = stride * products.length;
+    const scrollStep = stride * 2;
+
+    if (direction === 'right') {
+      if (rail.scrollLeft >= singleSetWidth * 2 - 10) {
+        rail.scrollLeft -= singleSetWidth;
+      }
+      rail.scrollBy({ left: scrollStep, behavior: 'smooth' });
+    } else {
+      if (rail.scrollLeft <= stride) {
+        rail.scrollLeft += singleSetWidth;
+      }
+      rail.scrollBy({ left: -scrollStep, behavior: 'smooth' });
     }
   };
 
@@ -1190,18 +1214,18 @@ const CategoryRowItem: React.FC<CategoryRowItemProps> = ({
         </div>
       </div>
 
-      {/* Horizontal Product Rail (Matching 5-Product Row) */}
+      {/* Horizontal Product Rail (Infinite Seamless Right-to-Left Loop) */}
       <div
         ref={railRef}
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
-        className="flex space-x-3 sm:space-x-4 lg:space-x-4.5 overflow-x-auto scrollbar-none py-1.5 px-0.5 snap-x overscroll-x-contain scroll-smooth"
+        className="flex space-x-3 sm:space-x-4 lg:space-x-4.5 overflow-x-auto scrollbar-none py-1.5 px-0.5 overscroll-x-contain"
         style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
       >
-        {products.map((product) => (
+        {loopProducts.map((product, idx) => (
           <div
-            key={product.id}
-            className="min-w-[220px] sm:min-w-[250px] md:min-w-[275px] lg:min-w-[295px] max-w-[310px] shrink-0 snap-start"
+            key={`${product.id}-loop-${idx}`}
+            className="min-w-[220px] sm:min-w-[250px] md:min-w-[275px] lg:min-w-[295px] max-w-[310px] shrink-0"
           >
             <ProductCard product={product} />
           </div>

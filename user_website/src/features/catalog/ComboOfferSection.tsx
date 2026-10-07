@@ -279,32 +279,62 @@ export const ComboOfferSection: React.FC<ComboOfferSectionProps> = ({ onSelectCa
 
   const [isHovered, setIsHovered] = useState(false);
 
-  // Continuous right-to-left auto-scroll every 2 seconds
+  // Triple the combos array so the loop seamlessly continues forward indefinitely
+  const loopProducts = React.useMemo(() => {
+    if (comboProducts.length === 0) return [];
+    return [...comboProducts, ...comboProducts, ...comboProducts];
+  }, [comboProducts]);
+
+  // Continuous seamless right-to-left auto-scroll every 2 seconds without ever reversing
   useEffect(() => {
     if (isHovered || !railRef.current || comboProducts.length <= 1) return;
 
     const interval = setInterval(() => {
-      if (railRef.current) {
-        const { scrollLeft, scrollWidth, clientWidth } = railRef.current;
-        const card = railRef.current.firstElementChild as HTMLElement | null;
-        const scrollStep = card ? card.offsetWidth + 16 : 280;
+      const rail = railRef.current;
+      if (!rail) return;
 
-        // When reaching near the end, loop back smoothly to start
-        if (scrollLeft + clientWidth >= scrollWidth - 15) {
-          railRef.current.scrollTo({ left: 0, behavior: 'smooth' });
-        } else {
-          railRef.current.scrollBy({ left: scrollStep, behavior: 'smooth' });
-        }
+      const first = rail.children[0] as HTMLElement | null;
+      const second = rail.children[1] as HTMLElement | null;
+      if (!first) return;
+
+      const stride = second ? (second.offsetLeft - first.offsetLeft) : (first.offsetWidth + 16);
+      const singleSetWidth = stride * comboProducts.length;
+
+      // Silent invisible wrap: when scrolled past the set, silently shift back by 1 set width
+      // with ZERO animation. Since sets are exact clones, the user's screen looks 100% identical!
+      if (rail.scrollLeft >= singleSetWidth * 2 - 10) {
+        rail.scrollLeft -= singleSetWidth;
       }
+
+      // Smoothly advance 1 product card forward to the left
+      rail.scrollBy({ left: stride, behavior: 'smooth' });
     }, 2000);
 
     return () => clearInterval(interval);
   }, [isHovered, comboProducts.length]);
 
   const handleScroll = (direction: 'left' | 'right') => {
-    if (railRef.current) {
-      const scrollAmount = direction === 'left' ? -320 : 320;
-      railRef.current.scrollBy({ left: scrollAmount, behavior: 'smooth' });
+    const rail = railRef.current;
+    if (!rail || comboProducts.length === 0) return;
+
+    const first = rail.children[0] as HTMLElement | null;
+    const second = rail.children[1] as HTMLElement | null;
+    if (!first) return;
+
+    const stride = second ? (second.offsetLeft - first.offsetLeft) : (first.offsetWidth + 16);
+    const singleSetWidth = stride * comboProducts.length;
+    const scrollStep = stride * 2;
+
+    if (direction === 'right') {
+      if (rail.scrollLeft >= singleSetWidth * 2 - 10) {
+        rail.scrollLeft -= singleSetWidth;
+      }
+      rail.scrollBy({ left: scrollStep, behavior: 'smooth' });
+    } else {
+      if (rail.scrollLeft <= stride) {
+        rail.scrollLeft += singleSetWidth;
+      }
+      rail.scrollBy({ left: -scrollStep, behavior: 'smooth' });
     }
   };
 
@@ -358,18 +388,18 @@ export const ComboOfferSection: React.FC<ComboOfferSectionProps> = ({ onSelectCa
         </div>
       </div>
 
-      {/* Horizontal Product Rail */}
+      {/* Horizontal Product Rail (Infinite Seamless Right-to-Left Loop) */}
       <div
         ref={railRef}
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
-        className="flex space-x-3 sm:space-x-4 lg:space-x-4.5 overflow-x-auto scrollbar-none py-1.5 px-0.5 snap-x overscroll-x-contain scroll-smooth"
+        className="flex space-x-3 sm:space-x-4 lg:space-x-4.5 overflow-x-auto scrollbar-none py-1.5 px-0.5 overscroll-x-contain"
         style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
       >
-        {comboProducts.map((product) => (
+        {loopProducts.map((product, idx) => (
           <div
-            key={product.id}
-            className="min-w-[220px] sm:min-w-[250px] md:min-w-[275px] lg:min-w-[295px] max-w-[310px] shrink-0 snap-start"
+            key={`${product.id}-loop-${idx}`}
+            className="min-w-[220px] sm:min-w-[250px] md:min-w-[275px] lg:min-w-[295px] max-w-[310px] shrink-0"
           >
             <ProductCard product={product} />
           </div>
