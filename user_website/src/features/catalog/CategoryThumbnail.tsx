@@ -53,28 +53,28 @@ export const CategoryThumbnail: React.FC<CategoryThumbnailProps> = ({
     <button
       type="button"
       onClick={onClick}
-      className={`relative shrink-0 flex-none rounded-2xl sm:rounded-3xl p-3 text-center flex flex-col items-center justify-between min-w-[105px] sm:min-w-[125px] md:min-w-[140px] h-[115px] sm:h-[130px] md:h-[142px] transition-all duration-200 group cursor-pointer ${
-        isSelected
-          ? 'border-2 border-slate-900 bg-white shadow-md scale-102 ring-2 ring-slate-900/10'
-          : 'bg-gray-100/90 hover:bg-gray-200/90 border border-transparent hover:border-gray-300/80 shadow-2xs active:scale-95'
-      } ${className}`}
+      className={`relative shrink-0 flex-none text-center flex flex-col items-center justify-start group cursor-pointer transition-all duration-200 ${className}`}
     >
-      {/* Centered Category Visual (Matching Hunter Reference Card Style) */}
-      <div className="relative flex-1 w-full flex items-center justify-center min-h-0 pt-1">
+      {/* Light Gray Rounded Square Box for Category Icon (Matching Reference Style) */}
+      <div
+        className={`w-24 h-24 sm:w-28 sm:h-28 md:w-32 md:h-32 rounded-2xl sm:rounded-3xl flex items-center justify-center p-3 sm:p-4 transition-all duration-300 ${
+          isSelected
+            ? 'bg-white border-2 border-slate-900 shadow-md ring-2 ring-slate-900/10 scale-102'
+            : 'bg-[#F1F3F5] hover:bg-gray-200/90 border border-gray-200/50 shadow-2xs active:scale-95'
+        }`}
+      >
         <img
           src={category.image}
           alt={category.nameEn}
           onError={handleImageError}
-          className="w-12 h-12 sm:w-14 sm:h-14 md:w-16 md:h-16 object-contain group-hover:scale-108 transition-transform duration-200 drop-shadow-xs"
+          className="w-12 h-12 sm:w-14 sm:h-14 md:w-16 md:h-16 object-contain group-hover:scale-110 transition-transform duration-300 drop-shadow-xs"
         />
       </div>
 
-      {/* Typography: Clean Category Label */}
-      <div className="w-full flex flex-col items-center mt-1 pb-0.5 shrink-0">
-        <span className="text-[10px] sm:text-xs font-bold text-slate-800 tracking-tight text-center px-1 truncate w-full group-hover:text-black transition-colors">
-          {catName}
-        </span>
-      </div>
+      {/* Category Name in Bold Uppercase Below the Square Box */}
+      <span className="text-[10px] sm:text-xs font-black uppercase text-slate-800 group-hover:text-black tracking-tight text-center mt-2 sm:mt-2.5 max-w-[105px] sm:max-w-[125px] truncate w-full transition-colors block">
+        {catName}
+      </span>
     </button>
   );
 };

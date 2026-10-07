@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { useRouter } from 'next/navigation';
-import { Star, ShoppingBag } from 'lucide-react';
+import { Star, ShoppingCart, Heart } from 'lucide-react';
 import { Product } from './types';
 import { getBrandName } from './productService';
 import { getCategoryName } from './categoryData';
@@ -17,6 +17,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
   const router = useRouter();
   const { addToCart } = useCart();
   const { t, language } = useLanguage();
+  const [isWishlisted, setIsWishlisted] = React.useState(false);
 
   const handleCardClick = () => {
     router.push(`/product/${product.id}`);
@@ -32,72 +33,79 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
   return (
     <div
       onClick={handleCardClick}
-      className="bg-white/80 backdrop-blur-md border border-white/60 shadow-xl shadow-slate-900/5 rounded-2xl overflow-hidden hover:border-orange-500/40 hover:bg-white/95 hover:shadow-2xl transition-all duration-300 group flex flex-col justify-between cursor-pointer"
+      className="bg-white rounded-2xl sm:rounded-3xl border border-gray-100 hover:border-gray-200/90 shadow-2xs hover:shadow-xl transition-all duration-300 group flex flex-col justify-between overflow-hidden cursor-pointer"
     >
-      
-      {/* Product Image & Badges */}
-      <div className="relative block w-full h-48 sm:h-52 bg-slate-50/80 overflow-hidden cursor-pointer">
+      {/* Product Image & Badges (Matching Reference Style) */}
+      <div className="relative block w-full aspect-square bg-[#F8FAFC] overflow-hidden p-3 sm:p-4 cursor-pointer flex items-center justify-center">
         <img
           src={product.image}
           alt={title}
           loading="lazy"
           decoding="async"
-          className="w-full h-full object-cover group-hover:scale-105 transition duration-500"
+          className="w-full h-full object-contain group-hover:scale-105 transition duration-500 drop-shadow-xs"
         />
 
-        {/* Discount Badge */}
+        {/* Black Discount Badge on Top-Left (Matching Reference Style) */}
         {discountPercent > 0 && (
-          <span className="absolute top-2.5 left-2.5 bg-orange-500/90 backdrop-blur-md text-white text-[10px] font-black px-2 py-0.5 rounded-md shadow-sm uppercase tracking-wider z-10 border border-white/30">
-            -{discountPercent}% {t.discount}
+          <span className="absolute top-2.5 left-2.5 bg-black text-white text-[10px] sm:text-[11px] font-black px-2 py-0.5 rounded-full shadow-xs uppercase tracking-tight z-10">
+            -{discountPercent}%
           </span>
         )}
 
-        {/* Stock Badge */}
-        <span
-          className={`absolute top-2.5 right-2.5 text-[10px] font-bold px-2 py-0.5 rounded-md backdrop-blur-md shadow-xs z-10 border border-white/30 ${
-            product.inStock
-              ? 'bg-emerald-500/90 text-white'
-              : 'bg-red-500/90 text-white'
+        {/* Wishlist Heart Icon on Top-Right (Matching Reference Style) */}
+        <button
+          type="button"
+          onClick={(e) => {
+            e.stopPropagation();
+            setIsWishlisted(!isWishlisted);
+          }}
+          className={`absolute top-2.5 right-2.5 w-7.5 h-7.5 rounded-full bg-white/90 hover:bg-white flex items-center justify-center shadow-2xs transition active:scale-90 z-10 cursor-pointer ${
+            isWishlisted ? 'text-red-500' : 'text-gray-400 hover:text-red-500'
           }`}
+          title="Wishlist"
         >
-          {product.inStock ? t.inStock : t.outOfStock}
-        </span>
+          <Heart className={`w-4 h-4 stroke-[2] ${isWishlisted ? 'fill-current' : ''}`} />
+        </button>
+
+        {/* Out of Stock Badge (if applicable) */}
+        {!product.inStock && (
+          <span className="absolute bottom-2.5 left-2.5 text-[10px] font-bold px-2 py-0.5 rounded-md bg-red-600/90 text-white z-10 shadow-xs">
+            {t.outOfStock}
+          </span>
+        )}
       </div>
 
       {/* Product Information */}
-      <div className="p-4 flex-1 flex flex-col justify-between space-y-3">
+      <div className="p-3 sm:p-4 flex-1 flex flex-col justify-between space-y-2 sm:space-y-3">
         <div>
-          <div className="flex items-center justify-between text-xs text-gray-500 mb-1">
-            <div className="flex items-center space-x-1.5 overflow-hidden">
-              <span className="font-semibold text-orange-600 uppercase text-[10px] tracking-wider truncate">
-                {language === 'bn' ? (product.categoryBn || getCategoryName(product.category, 'bn')) : getCategoryName(product.category, 'en')}
-              </span>
-              <span className="text-gray-300">•</span>
-              <span className="font-extrabold text-slate-800 text-[10px] bg-slate-100/90 backdrop-blur-xs px-1.5 py-0.5 rounded border border-slate-200/80 truncate">
-                {getBrandName(product, language)}
-              </span>
-            </div>
+          <div className="flex items-center space-x-1.5 overflow-hidden text-[10px] font-semibold text-gray-400 mb-1">
+            <span className="text-orange-600 uppercase tracking-wider truncate">
+              {language === 'bn' ? (product.categoryBn || getCategoryName(product.category, 'bn')) : getCategoryName(product.category, 'en')}
+            </span>
+            <span className="text-gray-300">•</span>
+            <span className="text-slate-700 bg-slate-100 px-1.5 py-0.2 rounded truncate">
+              {getBrandName(product, language)}
+            </span>
           </div>
 
-          <h3 className="font-bold text-sm text-slate-900 line-clamp-1 hover:text-orange-600 transition cursor-pointer block">
+          <h3 className="font-bold text-xs sm:text-sm text-slate-900 line-clamp-1 group-hover:text-orange-600 transition cursor-pointer block">
             {title}
           </h3>
 
-          <p className="text-xs text-gray-500 line-clamp-2 mt-1 leading-relaxed">
+          <p className="text-[11px] text-gray-500 line-clamp-1 sm:line-clamp-2 mt-1 leading-relaxed">
             {description}
           </p>
         </div>
 
         {/* Price & Official Add to Cart Button */}
-        <div className="pt-2 border-t border-gray-100/80 flex items-center justify-between gap-2">
+        <div className="pt-2 border-t border-gray-100 flex items-center justify-between gap-1.5 sm:gap-2">
           <div>
-            <span className="text-[10px] text-gray-400 block font-medium">Price</span>
-            <div className="flex items-baseline space-x-1.5">
-              <span className="text-base sm:text-lg font-black text-slate-900">
+            <div className="flex items-baseline space-x-1 sm:space-x-1.5">
+              <span className="text-sm sm:text-base md:text-lg font-black text-slate-900">
                 ৳{product.price}
               </span>
               {product.originalPrice && (
-                <span className="text-xs text-gray-400 line-through">
+                <span className="text-[10px] sm:text-xs text-gray-400 line-through">
                   ৳{product.originalPrice}
                 </span>
               )}
@@ -111,11 +119,11 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
               addToCart(product);
             }}
             disabled={!product.inStock}
-            className="flex items-center space-x-1.5 px-3.5 py-2 bg-slate-900/90 hover:bg-orange-500/90 backdrop-blur-md text-white rounded-xl font-bold text-xs shadow-md border border-white/20 transition-all active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed group/btn cursor-pointer"
+            className="flex items-center space-x-1 px-2.5 sm:px-3 py-1.5 sm:py-2 bg-black hover:bg-slate-800 text-white rounded-xl font-bold text-xs shadow-xs transition-all active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
             title={t.addToCart}
           >
-            <ShoppingBag className="w-4 h-4 text-orange-400 group-hover/btn:text-white transition-colors" />
-            <span className="hidden sm:inline">{t.addToCart}</span>
+            <ShoppingCart className="w-3.5 h-3.5 text-white" />
+            <span className="hidden md:inline text-[11px]">{t.addToCart}</span>
           </button>
         </div>
 
