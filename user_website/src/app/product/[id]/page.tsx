@@ -7,8 +7,18 @@ interface Props {
 }
 
 export async function generateStaticParams() {
-  const ids = new Set<string>();
-  ids.add("preview");
+  const ids = new Set<string>([
+    "preview",
+    "cooler-cx08-pro",
+    "cooler-k6",
+    "sleeves-shezi-24",
+    "dummy-mouse-1",
+    "prod_memo_cx08",
+    "prod-cloudinary-verify-01",
+    "prod-cloudinary-test-1",
+    "prod_kb_custom_65",
+    "prod-headset-1",
+  ]);
   try {
     const products = await fetchLiveProducts();
     if (Array.isArray(products)) {
