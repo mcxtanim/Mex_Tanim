@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { Menu, Search, ShoppingBag, Globe, X, RotateCcw, Package, Layers, ChevronRight, ArrowRight, LayoutGrid } from 'lucide-react';
+import { Menu, Search, ShoppingCart, Globe, X, RotateCcw, Package, Layers, ChevronRight, ArrowRight, LayoutGrid } from 'lucide-react';
 import { useCart } from '../cart/CartContext';
 import { useAuth } from '../auth/AuthContext';
 import { useLanguage } from './LanguageContext';
@@ -200,7 +200,7 @@ export const Header: React.FC<HeaderProps> = ({
                 className="relative h-9 w-9 sm:h-10 sm:w-10 rounded-full bg-gray-100 hover:bg-gray-200/90 text-slate-800 border border-gray-200/80 shadow-2xs transition flex items-center justify-center active:scale-95 cursor-pointer shrink-0"
                 title={t.cart}
               >
-                <ShoppingBag className="w-4.5 h-4.5 sm:w-5 sm:h-5 text-slate-900" />
+                <ShoppingCart className="w-4.5 h-4.5 sm:w-5 sm:h-5 text-slate-900" />
                 {totalItems > 0 && (
                   <span className="absolute -top-1 -right-1 bg-black text-white text-[10px] font-black rounded-full h-4.5 min-w-[18px] px-1 flex items-center justify-center border-2 border-white shadow-xs">
                     {totalItems}
@@ -273,7 +273,7 @@ export const Header: React.FC<HeaderProps> = ({
                   className="relative w-8.5 h-8.5 rounded-full bg-gray-100 hover:bg-gray-200 text-slate-900 border border-gray-200 flex items-center justify-center shrink-0 cursor-pointer shadow-2xs active:scale-95"
                   title={t.cart}
                 >
-                  <ShoppingBag className="w-4 h-4 text-slate-800" />
+                  <ShoppingCart className="w-4 h-4 text-slate-800" />
                   {totalItems > 0 && (
                     <span className="absolute -top-1 -right-1 bg-black text-white text-[9px] font-black rounded-full h-4 min-w-[16px] px-0.5 flex items-center justify-center border border-white shadow-xs">
                       {totalItems}
