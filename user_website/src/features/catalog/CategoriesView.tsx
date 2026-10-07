@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useSearchParams, useRouter } from 'next/navigation';
-import { Home, ChevronRight, Heart, Star, ShoppingBag, RotateCcw } from 'lucide-react';
+import { Home, ChevronRight, Heart, ShoppingBag, RotateCcw } from 'lucide-react';
 import {
   CategoryItem,
   fetchLiveCategories,
@@ -14,6 +14,7 @@ import {
   DRAWER_COLLECTIONS,
 } from './categoryData';
 import { fetchLiveProducts, getCachedProducts, cleanProductTitle } from './productService';
+import { PRODUCTS as FALLBACK_PRODUCTS } from './mockData';
 import { Product } from './types';
 
 interface CategoriesViewProps {
@@ -28,8 +29,8 @@ const CategoriesViewContent: React.FC<CategoriesViewProps> = ({ initialCategory 
   const [selectedCategory, setSelectedCategory] = useState<string>(
     catParam || initialCategory || 'finger-sleeves'
   );
-  const [categories, setCategories] = useState<CategoryItem[]>(() => getCachedCategories());
-  const [products, setProducts] = useState<Product[]>(() => getCachedProducts());
+  const [categories, setCategories] = useState<CategoryItem[]>(DRAWER_COLLECTIONS);
+  const [products, setProducts] = useState<Product[]>(FALLBACK_PRODUCTS);
   const [wishlist, setWishlist] = useState<Record<string, boolean>>({});
 
   useEffect(() => {
@@ -203,23 +204,6 @@ const CategoriesViewContent: React.FC<CategoriesViewProps> = ({ initialCategory 
                     <h3 className="font-black text-xs sm:text-[13px] text-slate-900 uppercase tracking-tight line-clamp-2 leading-snug group-hover:text-blue-600 transition-colors">
                       {cleanProductTitle(product.name)}
                     </h3>
-
-                    {/* Rating Stars (Matching Reference Image 3) */}
-                    {product.rating && (
-                      <div className="flex items-center space-x-1 mt-1.5 text-xs text-amber-400">
-                        <div className="flex items-center">
-                          {[...Array(5)].map((_, i) => (
-                            <Star
-                              key={i}
-                              className="w-3 h-3 fill-amber-400 text-amber-400"
-                            />
-                          ))}
-                        </div>
-                        <span className="text-[11px] text-slate-500 font-semibold ml-0.5">
-                          {product.rating.toFixed(1)} ({product.reviewCount || 1})
-                        </span>
-                      </div>
-                    )}
 
                     {/* Price Row (Current BDT Price & Original Price Strikethrough) */}
                     <div className="flex items-baseline space-x-1.5 mt-2">
