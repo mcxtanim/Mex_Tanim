@@ -112,13 +112,23 @@ export const CategorySidebar: React.FC<CategorySidebarProps> = ({
             }`}
           >
             <div className="flex items-center space-x-3.5 min-w-0">
-              {/* Colored Squircle Badge (Matching Reference Image 2) */}
+              {/* Colored Squircle Badge / Thumbnail (Matching Reference Image 2) */}
               <div
-                className={`w-12 h-12 rounded-[14px] flex items-center justify-center font-bold text-xl select-none shrink-0 shadow-xs ${
-                  cat.badgeBg || 'bg-black text-white'
+                className={`w-12 h-12 rounded-[14px] flex items-center justify-center font-bold text-xl select-none shrink-0 shadow-xs overflow-hidden ${
+                  cat.image && !cat.image.endsWith('.svg')
+                    ? 'bg-slate-50 border border-slate-200/80 p-1.5'
+                    : cat.badgeBg || 'bg-black text-white'
                 }`}
               >
-                {cat.badge}
+                {cat.image && !cat.image.endsWith('.svg') ? (
+                  <img
+                    src={cat.image}
+                    alt={cat.nameEn}
+                    className="w-full h-full object-contain"
+                  />
+                ) : (
+                  cat.badge
+                )}
               </div>
 
               {/* Category Name & Product Count */}

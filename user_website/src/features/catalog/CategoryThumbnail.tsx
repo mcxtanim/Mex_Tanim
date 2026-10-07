@@ -27,7 +27,10 @@ export const CategoryThumbnail: React.FC<CategoryThumbnailProps> = ({
     : (category.nameEn || getCategoryName(category.id, 'en'));
 
   const handleImageError = (e: React.SyntheticEvent<HTMLImageElement, Event>) => {
-    e.currentTarget.src = getSvgImageForSlug(category.id);
+    const fallback = getSvgImageForSlug(category.id);
+    if (!e.currentTarget.src.includes(fallback)) {
+      e.currentTarget.src = fallback;
+    }
   };
 
   if (variant === 'icon') {
@@ -67,7 +70,7 @@ export const CategoryThumbnail: React.FC<CategoryThumbnailProps> = ({
           src={category.image}
           alt={category.nameEn}
           onError={handleImageError}
-          className="w-12 h-12 sm:w-14 sm:h-14 md:w-16 md:h-16 object-contain group-hover:scale-110 transition-transform duration-300 drop-shadow-xs"
+          className="w-14 h-14 sm:w-16 sm:h-16 md:w-20 md:h-20 max-w-full max-h-full object-contain group-hover:scale-105 transition-transform duration-300 drop-shadow-xs"
         />
       </div>
 

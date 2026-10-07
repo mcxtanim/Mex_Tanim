@@ -77,9 +77,11 @@ export const ProductGrid: React.FC<ProductGridProps> = ({
 
     window.addEventListener('products_updated', handleProductsUpdate);
     window.addEventListener('storage', loadData);
+    window.addEventListener('focus', loadData);
     return () => {
       window.removeEventListener('products_updated', handleProductsUpdate);
       window.removeEventListener('storage', loadData);
+      window.removeEventListener('focus', loadData);
     };
   }, []);
 

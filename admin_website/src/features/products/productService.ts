@@ -261,6 +261,22 @@ function notifyProductsUpdated(products: Product[]) {
         bc.close();
       } catch {}
     }
+    if (supabase) {
+      try {
+        const channel = supabase.channel("mex_tanim_cross_tab_sync");
+        channel.subscribe((status) => {
+          if (status === "SUBSCRIBED") {
+            channel.send({
+              type: "broadcast",
+              event: "PRODUCTS_UPDATED",
+              payload: { timestamp: Date.now() },
+            });
+          }
+        });
+      } catch (err) {
+        console.warn("Realtime product sync notification error:", err);
+      }
+    }
   }
 }
 

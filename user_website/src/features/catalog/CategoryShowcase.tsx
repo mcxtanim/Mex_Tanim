@@ -46,9 +46,11 @@ export const CategoryShowcase: React.FC<CategoryShowcaseProps> = ({
 
     window.addEventListener('categories_updated', handleCategoriesUpdate);
     window.addEventListener('storage', loadCategories);
+    window.addEventListener('focus', loadCategories);
     return () => {
       window.removeEventListener('categories_updated', handleCategoriesUpdate);
       window.removeEventListener('storage', loadCategories);
+      window.removeEventListener('focus', loadCategories);
     };
   }, []);
 

@@ -69,10 +69,12 @@ const CategoriesViewContent: React.FC<CategoriesViewProps> = ({ initialCategory 
     window.addEventListener('categories_updated', handleCategoriesUpdate);
     window.addEventListener('products_updated', handleProductsUpdate);
     window.addEventListener('storage', loadData);
+    window.addEventListener('focus', loadData);
     return () => {
       window.removeEventListener('categories_updated', handleCategoriesUpdate);
       window.removeEventListener('products_updated', handleProductsUpdate);
       window.removeEventListener('storage', loadData);
+      window.removeEventListener('focus', loadData);
     };
   }, []);
 

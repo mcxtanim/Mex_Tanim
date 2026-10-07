@@ -271,9 +271,11 @@ export const ComboOfferSection: React.FC<ComboOfferSectionProps> = ({ onSelectCa
 
     window.addEventListener('products_updated', handleProductsUpdate);
     window.addEventListener('storage', loadCombos);
+    window.addEventListener('focus', loadCombos);
     return () => {
       window.removeEventListener('products_updated', handleProductsUpdate);
       window.removeEventListener('storage', loadCombos);
+      window.removeEventListener('focus', loadCombos);
     };
   }, []);
 

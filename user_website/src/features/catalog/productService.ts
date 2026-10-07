@@ -201,29 +201,43 @@ export async function fetchLiveProducts(forceRefresh = false): Promise<Product[]
 let productsRealtimeInitialized = false;
 
 export function initProductsRealtime(): void {
-  if (!supabase || typeof window === 'undefined' || productsRealtimeInitialized) {
+  if (typeof window === 'undefined' || productsRealtimeInitialized) {
     return;
   }
   productsRealtimeInitialized = true;
 
-  try {
-    supabase
-      .channel('public:products_live_sync')
-      .on(
-        'postgres_changes',
-        { event: '*', schema: 'public', table: 'products' },
-        async (payload) => {
+  // 1. Supabase Cross-App Realtime Broadcast & Postgres Changes
+  if (supabase) {
+    try {
+      supabase
+        .channel('mex_tanim_cross_tab_sync')
+        .on('broadcast', { event: 'PRODUCTS_UPDATED' }, async () => {
           memoryProductsCache = null;
           lastFetchTimestamp = 0;
           const fresh = await fetchLiveProducts(true);
           window.dispatchEvent(new CustomEvent('products_updated', { detail: fresh }));
-        }
-      )
-      .subscribe();
-  } catch (err) {
-    console.warn('Realtime products subscription notice:', err);
+        })
+        .subscribe();
+
+      supabase
+        .channel('public:products_live_sync')
+        .on(
+          'postgres_changes',
+          { event: '*', schema: 'public', table: 'products' },
+          async () => {
+            memoryProductsCache = null;
+            lastFetchTimestamp = 0;
+            const fresh = await fetchLiveProducts(true);
+            window.dispatchEvent(new CustomEvent('products_updated', { detail: fresh }));
+          }
+        )
+        .subscribe();
+    } catch (err) {
+      console.warn('Realtime products subscription notice:', err);
+    }
   }
 
+  // 2. Cross-Tab BroadcastChannel
   if ('BroadcastChannel' in window) {
     try {
       const bc = new BroadcastChannel('mex_tanim_store_sync');
@@ -237,6 +251,28 @@ export function initProductsRealtime(): void {
       };
     } catch {}
   }
+
+  // 3. Window Focus / Visibility Change Auto-Revalidate (instant sync when switching tabs)
+  const revalidate = async () => {
+    memoryProductsCache = null;
+    lastFetchTimestamp = 0;
+    const fresh = await fetchLiveProducts(true);
+    window.dispatchEvent(new CustomEvent('products_updated', { detail: fresh }));
+  };
+
+  window.addEventListener('focus', revalidate);
+  document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'visible') revalidate();
+  });
+
+  // 4. Background Heartbeat Polling every 3.5 seconds
+  setInterval(() => {
+    if (!document.hidden) {
+      fetchLiveProducts(true).then((fresh) => {
+        window.dispatchEvent(new CustomEvent('products_updated', { detail: fresh }));
+      }).catch(() => {});
+    }
+  }, 3500);
 }
 
 /**

@@ -198,6 +198,22 @@ function notifyCategoriesUpdated(categories: Category[]) {
         bc.close();
       } catch {}
     }
+    if (supabase) {
+      try {
+        const channel = supabase.channel("mex_tanim_cross_tab_sync");
+        channel.subscribe((status) => {
+          if (status === "SUBSCRIBED") {
+            channel.send({
+              type: "broadcast",
+              event: "CATEGORIES_UPDATED",
+              payload: { timestamp: Date.now() },
+            });
+          }
+        });
+      } catch (err) {
+        console.warn("Realtime category sync notification error:", err);
+      }
+    }
   }
 }
 

@@ -118,9 +118,9 @@ export const DRAWER_COLLECTIONS: CategoryItem[] = [
     image: '/categories/fast-chargers.svg',
   },
   {
-    id: 'cable',
-    nameEn: 'CABLE',
-    nameBn: 'কেবল',
+    id: 'cables',
+    nameEn: 'CABLES',
+    nameBn: 'কেবলস',
     badge: 'C',
     badgeBg: 'bg-gradient-to-br from-[#1e88e5] to-[#1565c0] text-white',
     icon: Cable,
@@ -329,10 +329,7 @@ export function mapRawCategoryToItem(item: any): CategoryItem {
   const badge = predefined ? predefined.badge : (rawName ? rawName.charAt(0).toUpperCase() : slug.charAt(0).toUpperCase());
   const badgeBg = predefined ? predefined.badgeBg : 'bg-black text-white';
 
-  let finalImg = item.image_url || item.image || '';
-  if (!finalImg || (typeof finalImg === 'string' && finalImg.startsWith('data:image') && finalImg.length > 500)) {
-    finalImg = predefined ? predefined.image : getSvgImageForSlug(slug, finalImg);
-  }
+  const finalImg = item.image_url || item.image || (predefined ? predefined.image : getSvgImageForSlug(slug));
 
   return {
     id: slug,
@@ -345,6 +342,52 @@ export function mapRawCategoryToItem(item: any): CategoryItem {
     staticCount: Number(item.product_count) || (predefined ? predefined.staticCount : 0) || 0,
     image: finalImg || getSvgImageForSlug(slug),
   };
+}
+
+/**
+ * Merges raw database/storage categories with the 12 canonical collections.
+ * Preserves uploaded images, names, and product counts from Supabase while
+ * ensuring all 12 canonical collections appear in their defined order, followed
+ * by any additional custom categories created in admin panel.
+ */
+function mergeRawWithCanonicalCollections(rawList: any[]): CategoryItem[] {
+  // 1. Map each canonical collection to its live version if available
+  const canonicalItems = DRAWER_COLLECTIONS.map((dc) => {
+    const matched = rawList.find((r) => {
+      const rSlug = String(r.slug || r.id || r.name || '')
+        .toLowerCase()
+        .trim()
+        .replace(/[^a-z0-9]+/g, '-');
+      return rSlug === dc.id || isCategorySelected(rSlug, dc.id);
+    });
+
+    if (matched) {
+      const liveImg = matched.image_url || matched.image;
+      return {
+        ...dc,
+        nameEn: matched.name || dc.nameEn,
+        nameBn: (matched.name_bn && /[\u0980-\u09FF]/.test(matched.name_bn)) ? matched.name_bn : dc.nameBn,
+        image: liveImg || dc.image,
+        staticCount: Number(matched.product_count) || dc.staticCount,
+      };
+    }
+    return dc;
+  });
+
+  // 2. Append any extra categories created by admin that are not in DRAWER_COLLECTIONS
+  const result = [...canonicalItems];
+  for (const raw of rawList) {
+    const rSlug = String(raw.slug || raw.id || raw.name || '')
+      .toLowerCase()
+      .trim()
+      .replace(/[^a-z0-9]+/g, '-');
+    const alreadyPresent = result.some((c) => c.id === rSlug || isCategorySelected(rSlug, c.id));
+    if (!alreadyPresent && raw.name) {
+      result.push(mapRawCategoryToItem(raw));
+    }
+  }
+
+  return result;
 }
 
 export function getCachedCategories(): CategoryItem[] {
@@ -365,7 +408,7 @@ export function getCachedCategories(): CategoryItem[] {
         if (Array.isArray(parsed) && parsed.length > 0) {
           isMappingCategories = true;
           try {
-            list = parsed.map(mapRawCategoryToItem);
+            list = mergeRawWithCanonicalCollections(parsed);
           } finally {
             isMappingCategories = false;
           }
@@ -373,14 +416,6 @@ export function getCachedCategories(): CategoryItem[] {
       }
     } catch (e) {
       console.warn('Error reading cached categories from localStorage:', e);
-    }
-  }
-
-  // Ensure all 12 DRAWER_COLLECTIONS are always present
-  const existingSlugs = new Set(list.map((c) => c.id));
-  for (const dc of DRAWER_COLLECTIONS) {
-    if (!existingSlugs.has(dc.id)) {
-      list.push(dc);
     }
   }
 
@@ -396,19 +431,88 @@ export function getCachedCategories(): CategoryItem[] {
 export function saveCachedCategories(cats: CategoryItem[]): void {
   if (typeof window === 'undefined') return;
   try {
-    // Strip large base64 images to stay within storage quota
-    const sanitized = cats.map((c) => ({
-      ...c,
-      image: c.image && c.image.startsWith('data:image') && c.image.length > 500 ? '' : c.image,
-    }));
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(sanitized));
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(cats));
   } catch (err) {
     console.warn('Could not persist categories to localStorage:', err);
   }
 }
 
+export function initCategoriesRealtime(): void {
+  if (typeof window === 'undefined' || realtimeInitialized) return;
+  realtimeInitialized = true;
+
+  // Supabase Cross-App Realtime Broadcast & Postgres Changes
+  if (supabase) {
+    try {
+      supabase
+        .channel('mex_tanim_cross_tab_sync')
+        .on('broadcast', { event: 'CATEGORIES_UPDATED' }, async () => {
+          memoryCategoriesCache = null;
+          lastCategoriesFetchTimestamp = 0;
+          const updated = await fetchLiveCategories(true);
+          window.dispatchEvent(new CustomEvent('categories_updated', { detail: updated }));
+        })
+        .subscribe();
+
+      supabase
+        .channel('public:categories_sync')
+        .on(
+          'postgres_changes',
+          { event: '*', schema: 'public', table: 'categories' },
+          async () => {
+            memoryCategoriesCache = null;
+            lastCategoriesFetchTimestamp = 0;
+            const updated = await fetchLiveCategories(true);
+            window.dispatchEvent(new CustomEvent('categories_updated', { detail: updated }));
+          }
+        )
+        .subscribe();
+    } catch (subErr) {
+      console.warn('Supabase Realtime subscription notice for categories:', subErr);
+    }
+  }
+
+  // Cross-Tab BroadcastChannel
+  if ('BroadcastChannel' in window) {
+    try {
+      const bc = new BroadcastChannel('mex_tanim_store_sync');
+      bc.onmessage = async (event) => {
+        if (event.data?.type === 'CATEGORIES_UPDATED') {
+          memoryCategoriesCache = null;
+          lastCategoriesFetchTimestamp = 0;
+          const updated = await fetchLiveCategories(true);
+          window.dispatchEvent(new CustomEvent('categories_updated', { detail: updated }));
+        }
+      };
+    } catch {}
+  }
+
+  // Window Focus / Visibility Change Auto-Revalidate (instant sync when switching tabs)
+  const revalidate = async () => {
+    memoryCategoriesCache = null;
+    lastCategoriesFetchTimestamp = 0;
+    const updated = await fetchLiveCategories(true);
+    window.dispatchEvent(new CustomEvent('categories_updated', { detail: updated }));
+  };
+
+  window.addEventListener('focus', revalidate);
+  document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'visible') revalidate();
+  });
+
+  // Background Heartbeat Polling every 3.5 seconds
+  setInterval(() => {
+    if (!document.hidden) {
+      fetchLiveCategories(true).then((updated) => {
+        window.dispatchEvent(new CustomEvent('categories_updated', { detail: updated }));
+      }).catch(() => {});
+    }
+  }, 3500);
+}
+
 export async function fetchLiveCategories(forceRefresh = false): Promise<CategoryItem[]> {
-  // Return cached if fresh (within 30 seconds)
+  initCategoriesRealtime();
+
   if (!forceRefresh && memoryCategoriesCache && memoryCategoriesCache.length > 0 && Date.now() - lastCategoriesFetchTimestamp < 30000) {
     return memoryCategoriesCache;
   }
@@ -451,54 +555,12 @@ export async function fetchLiveCategories(forceRefresh = false): Promise<Categor
       }
     }
 
-    // 3. Map database rows to dynamic CategoryItem list
-    const mappedCategories: CategoryItem[] = rawList.map(mapRawCategoryToItem);
-
-    // Merge DRAWER_COLLECTIONS so all 12 are represented
-    const existingSlugs = new Set(mappedCategories.map((c) => c.id));
-    for (const dc of DRAWER_COLLECTIONS) {
-      if (!existingSlugs.has(dc.id)) {
-        mappedCategories.push(dc);
-      }
-    }
+    // 3. Merge raw items with canonical 12 collections
+    const mappedCategories: CategoryItem[] = mergeRawWithCanonicalCollections(rawList);
 
     memoryCategoriesCache = mappedCategories;
     lastCategoriesFetchTimestamp = Date.now();
     saveCachedCategories(mappedCategories);
-
-    // 4. Initialize Supabase Realtime subscription once in browser
-    if (supabase && typeof window !== 'undefined' && !realtimeInitialized) {
-      try {
-        realtimeInitialized = true;
-        supabase
-          .channel('public:categories_sync')
-          .on(
-            'postgres_changes',
-            { event: '*', schema: 'public', table: 'categories' },
-            async () => {
-              memoryCategoriesCache = null;
-              lastCategoriesFetchTimestamp = 0;
-              const updated = await fetchLiveCategories(true);
-              window.dispatchEvent(new CustomEvent('categories_updated', { detail: updated }));
-            }
-          )
-          .subscribe();
-
-        if ('BroadcastChannel' in window) {
-          const bc = new BroadcastChannel('mex_tanim_store_sync');
-          bc.onmessage = async (event) => {
-            if (event.data?.type === 'CATEGORIES_UPDATED') {
-              memoryCategoriesCache = null;
-              lastCategoriesFetchTimestamp = 0;
-              const updated = await fetchLiveCategories(true);
-              window.dispatchEvent(new CustomEvent('categories_updated', { detail: updated }));
-            }
-          };
-        }
-      } catch (subErr) {
-        console.warn('Supabase Realtime subscription notice for categories:', subErr);
-      }
-    }
 
     return mappedCategories;
   })().finally(() => {
