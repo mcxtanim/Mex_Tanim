@@ -1622,65 +1622,6 @@ const CATEGORY_SECTIONS: CategorySectionDef[] = [
       },
     ],
   },
-  {
-    id: 'combo-offers',
-    titleEn: 'COMBO OFFERS',
-    titleBn: 'কম্বো অফার',
-    dummyProducts: [
-      {
-        id: 'combo-pro-gamer',
-        name: 'PRO GAMER COMBO: CX08 COOLER + SLEEVES + TRIGGERS',
-        nameBn: 'প্রো গেমার কম্বো: CX08 কুলার + স্লিভস + ট্রিগার্স',
-        category: 'combo-offers',
-        categoryBn: 'কম্বো অফার',
-        brand: 'Mex Tanim',
-        brandBn: 'মেক্স তানিম',
-        price: 1990,
-        originalPrice: 2750,
-        discountBadge: '-28%',
-        rating: 5.0,
-        reviewCount: 68,
-        soldCount: 68,
-        image: 'https://images.unsplash.com/photo-1591799264318-7e6ef8ddb7ea?w=500&auto=format&fit=crop&q=80',
-        comboImages: [],
-        inStock: true,
-        isPopular: true,
-        isFeatured: true,
-        isBestSeller: true,
-        isNewArrival: true,
-        isComboOffer: true,
-        description: 'Exclusive 3-in-1 gaming combo kit: MEMO CX08 cooler, 2 pairs silver sleeves, and alloy mechanical triggers.',
-        descriptionBn: 'মেমো CX08 ফোন কুলার, ২ জোড়া সিলভার স্লিভস ও মেকানিক্যাল ট্রিগার সহ স্পেশাল কম্বো প্যাক।',
-        specs: ['Complete Pro Kit', 'Save ৳760', 'Free Gaming Case'],
-      },
-      {
-        id: 'combo-pubg-sarafox',
-        name: 'ULTIMATE PUBG COMBO: W6 TRIGGERS + GLIDE PRO SLEEVES',
-        nameBn: 'আলটিমেট পাবজি কম্বো',
-        category: 'combo-offers',
-        categoryBn: 'কম্বো অফার',
-        brand: 'Sarafox',
-        brandBn: 'সারাফক্স',
-        price: 650,
-        originalPrice: 850,
-        discountBadge: '-24%',
-        rating: 4.9,
-        reviewCount: 44,
-        soldCount: 44,
-        image: 'https://images.unsplash.com/photo-1550745165-9bc0b252726f?w=500&auto=format&fit=crop&q=80',
-        comboImages: [],
-        inStock: true,
-        isPopular: true,
-        isFeatured: true,
-        isBestSeller: true,
-        isNewArrival: false,
-        isComboOffer: true,
-        description: 'Sarafox W6 mechanical triggers combined with Vero Forza Glide Pro tournament sleeves.',
-        descriptionBn: 'সারাফক্স W6 ট্রিগার্স এবং ভেরো ফোরজা গ্লাইড প্রো স্লিভস কম্বো অফার।',
-        specs: ['Tournament Combo', 'Save ৳200', 'Zero Latency'],
-      },
-    ],
-  },
 ];
 
 interface CategoryRowItemProps {
@@ -1899,7 +1840,7 @@ export const CategoryProductsSection: React.FC<CategoryProductsSectionProps> = (
     const extraSections: CategorySectionDef[] = [];
 
     for (const cat of categories) {
-      if (definedIds.has(cat.id) || isCategorySelected(cat.id, 'all')) continue;
+      if (definedIds.has(cat.id) || isCategorySelected(cat.id, 'all') || isCategorySelected(cat.id, 'combo-offers')) continue;
       const matchingLive = liveProducts.filter((p) => isCategorySelected(p.category, cat.id));
       if (matchingLive.length > 0) {
         extraSections.push({
