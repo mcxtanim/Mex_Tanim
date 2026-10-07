@@ -96,8 +96,8 @@ export default function Home() {
                 onSelectCategory={setSelectedCategory}
               />
               <ProductTabsSection />
-              <ComboOfferSection onSelectCategory={setSelectedCategory} />
               <CategoryProductsSection onSelectCategory={setSelectedCategory} />
+              <ComboOfferSection onSelectCategory={setSelectedCategory} />
             </>
           ) : (
             <>
