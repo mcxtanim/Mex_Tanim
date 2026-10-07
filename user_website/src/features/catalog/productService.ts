@@ -42,6 +42,53 @@ function mapRawProduct(item: any): Product {
   const cleanName = cleanProductTitle(item.title || item.name || '');
   const cleanNameBn = cleanProductTitle(item.title_bn || item.titleBn || item.nameBn || item.title || item.name || '');
 
+  const rawSpecs: string[] = Array.isArray(item.specs)
+    ? item.specs
+    : typeof item.specs === 'string'
+    ? item.specs.split(/,|\n/).map((s: string) => s.trim()).filter(Boolean)
+    : [];
+
+  let videoUrl = item.video_url || item.videoUrl || '';
+  let highlightSubtitle = item.highlight_subtitle || item.highlightSubtitle || '';
+  let shortDescription = item.short_description || item.shortDescription || '';
+  const comboImages: string[] = (() => {
+    const rawCombo = item.combo_images || item.comboImages;
+    if (Array.isArray(rawCombo)) return rawCombo.map(String).map((s) => s.trim()).filter(Boolean);
+    if (typeof rawCombo === 'string') return rawCombo.split(/,|\n/).map((s) => s.trim()).filter(Boolean);
+    return [];
+  })();
+  const whyChoosePoints: string[] = Array.isArray(item.why_choose || item.whyChoosePoints)
+    ? (item.why_choose || item.whyChoosePoints)
+    : typeof (item.why_choose || item.whyChoosePoints) === 'string'
+    ? (item.why_choose || item.whyChoosePoints).split(/,|\n/).map((s: string) => s.trim()).filter(Boolean)
+    : [];
+  const perfectForGames: string[] = Array.isArray(item.perfect_for || item.perfectForGames)
+    ? (item.perfect_for || item.perfectForGames)
+    : typeof (item.perfect_for || item.perfectForGames) === 'string'
+    ? (item.perfect_for || item.perfectForGames).split(/,|\n/).map((s: string) => s.trim()).filter(Boolean)
+    : [];
+  const cleanSpecs: string[] = [];
+
+  for (const s of rawSpecs) {
+    const trimmed = String(s).trim();
+    if (!trimmed) continue;
+    if (trimmed.startsWith('VIDEO:')) {
+      if (!videoUrl) videoUrl = trimmed.substring(6).trim();
+    } else if (trimmed.startsWith('SUBTITLE:')) {
+      if (!highlightSubtitle) highlightSubtitle = trimmed.substring(9).trim();
+    } else if (trimmed.startsWith('SHORT:')) {
+      if (!shortDescription) shortDescription = trimmed.substring(6).trim();
+    } else if (trimmed.startsWith('POINT:')) {
+      whyChoosePoints.push(trimmed.substring(6).trim());
+    } else if (trimmed.startsWith('GAME:')) {
+      perfectForGames.push(trimmed.substring(5).trim());
+    } else if (trimmed.startsWith('IMAGE:')) {
+      comboImages.push(trimmed.substring(6).trim());
+    } else {
+      cleanSpecs.push(trimmed);
+    }
+  }
+
   return {
     id: String(item.id),
     name: cleanName,
@@ -56,13 +103,8 @@ function mapRawProduct(item: any): Product {
     rating: 4.9,
     reviewCount: 42,
     image: item.image_url || item.imageUrl || item.image || '',
-    comboImages: (() => {
-      const rawCombo = item.combo_images || item.comboImages;
-      if (Array.isArray(rawCombo)) return rawCombo.map(String).map((s) => s.trim()).filter(Boolean);
-      if (typeof rawCombo === 'string') return rawCombo.split(/,|\n/).map((s) => s.trim()).filter(Boolean);
-      return [];
-    })(),
-    videoUrl: item.video_url || item.videoUrl || '',
+    comboImages,
+    videoUrl,
     inStock: Number(item.stock ?? 10) > 0,
     isPopular: Boolean(item.is_popular ?? true),
     isFeatured: Boolean(item.is_featured ?? true),
@@ -71,23 +113,11 @@ function mapRawProduct(item: any): Product {
     isComboOffer: Boolean(item.is_combo ?? false),
     description: item.description || '',
     descriptionBn: item.description_bn || item.descriptionBn || item.description || '',
-    specs: Array.isArray(item.specs)
-      ? item.specs
-      : typeof item.specs === 'string'
-      ? item.specs.split(/,|\n/).map((s: string) => s.trim()).filter(Boolean)
-      : [],
-    highlightSubtitle: item.highlight_subtitle || item.highlightSubtitle || '',
-    whyChoosePoints: Array.isArray(item.why_choose || item.whyChoosePoints)
-      ? (item.why_choose || item.whyChoosePoints)
-      : typeof (item.why_choose || item.whyChoosePoints) === 'string'
-      ? (item.why_choose || item.whyChoosePoints).split(/,|\n/).map((s: string) => s.trim()).filter(Boolean)
-      : [],
-    perfectForGames: Array.isArray(item.perfect_for || item.perfectForGames)
-      ? (item.perfect_for || item.perfectForGames)
-      : typeof (item.perfect_for || item.perfectForGames) === 'string'
-      ? (item.perfect_for || item.perfectForGames).split(/,|\n/).map((s: string) => s.trim()).filter(Boolean)
-      : [],
-    shortDescription: item.short_description || item.shortDescription || '',
+    specs: cleanSpecs,
+    highlightSubtitle,
+    whyChoosePoints,
+    perfectForGames,
+    shortDescription,
   };
 }
 
