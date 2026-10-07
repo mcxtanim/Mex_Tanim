@@ -36,10 +36,10 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
   return (
     <div
       onClick={handleCardClick}
-      className="bg-white rounded-2xl sm:rounded-3xl border border-gray-150 hover:border-gray-300/80 shadow-[0_2px_12px_rgba(0,0,0,0.04)] hover:shadow-[0_12px_32px_rgba(0,0,0,0.09)] hover:-translate-y-1.5 transition-all duration-300 ease-out group flex flex-col justify-between p-4 sm:p-5 cursor-pointer relative h-full select-none"
+      className="bg-white rounded-2xl sm:rounded-3xl border border-gray-150 hover:border-gray-300/80 shadow-[0_2px_12px_rgba(0,0,0,0.04)] hover:shadow-[0_12px_32px_rgba(0,0,0,0.09)] hover:-translate-y-1.5 transition-all duration-300 ease-out group flex flex-col justify-between overflow-hidden cursor-pointer relative h-full select-none"
     >
-      {/* Product Image & Badges (Matching Reference Style) */}
-      <div className="relative w-full aspect-square bg-[#F8FAFC]/70 rounded-xl sm:rounded-2xl flex items-center justify-center p-3 sm:p-4 mb-3 overflow-hidden">
+      {/* Product Image & Badges (Matching Reference: Light Gray Top Half with Large Image) */}
+      <div className="relative w-full aspect-square bg-[#F1F3F5] flex items-center justify-center p-2 sm:p-2.5 overflow-hidden">
         {/* Black Discount Badge on Top-Left */}
         {discountPercent > 0 && (
           <span className="absolute top-2.5 left-2.5 bg-black text-white text-[10px] sm:text-xs font-black px-2.5 py-0.5 rounded-full shadow-xs uppercase tracking-tight z-10">
@@ -68,7 +68,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
           alt={title}
           loading="lazy"
           decoding="async"
-          className="w-full h-full object-contain transform group-hover:scale-115 transition-transform duration-500 ease-out drop-shadow-xs"
+          className="w-full h-full object-contain p-1 transform group-hover:scale-110 transition-transform duration-500 ease-out drop-shadow-xs"
         />
 
         {/* Out of Stock Badge (if applicable) */}
@@ -79,8 +79,8 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
         )}
       </div>
 
-      {/* Product Content: ONLY Product Name & Ratings (NO Description, matching Reference) */}
-      <div className="flex-1 flex flex-col justify-between">
+      {/* Product Content: ONLY Product Name & Ratings (White Bottom Half) */}
+      <div className="p-4 sm:p-4.5 bg-white flex-1 flex flex-col justify-between">
         <div>
           <h3 className="font-bold text-sm sm:text-base text-[#0F172A] tracking-tight uppercase line-clamp-2 min-h-[2.6rem] group-hover:text-blue-600 transition-colors">
             {title}
