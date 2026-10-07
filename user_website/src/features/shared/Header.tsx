@@ -112,11 +112,11 @@ export const Header: React.FC<HeaderProps> = ({
           </div>
         )}
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          {/* Desktop & Tablet Layout (sm and up) - Clean, Balanced Hunter-Inspired Structure */}
-          <div className="hidden sm:flex items-center justify-between h-16 sm:h-18 gap-3 md:gap-4">
+          {/* Desktop & Tablet Layout (sm and up) - Balanced Header with Prominent Logo & Compact Controls */}
+          <div className="hidden sm:flex items-center justify-between h-18 sm:h-20 gap-3 md:gap-4">
             
-            {/* Left section: Left Hamburger Button + Mex Tanim Logo */}
-            <div className="flex items-center space-x-2.5 sm:space-x-3 shrink-0">
+            {/* Left section: Left Hamburger Button + Prominent Mex Tanim Logo */}
+            <div className="flex items-center space-x-2.5 sm:space-x-3.5 shrink-0">
               
               {/* Compact Circular Hamburger Menu Button */}
               <button
@@ -149,12 +149,12 @@ export const Header: React.FC<HeaderProps> = ({
                 </div>
               )}
 
-              {/* Official Mex Tanim Store Logo */}
-              <Link href="/" className="flex items-center cursor-pointer shrink-0 group">
+              {/* Official Mex Tanim Store Logo (Slightly larger, crisp presentation) */}
+              <Link href="/" className="flex items-center cursor-pointer shrink-0 group py-1">
                 <img
                   src="/images/logo.png"
                   alt="Mex Tanim Store Logo"
-                  className="h-8 sm:h-9 md:h-11 w-auto object-contain group-hover:scale-102 transition-all drop-shadow-xs"
+                  className="h-10 sm:h-12 md:h-13 lg:h-14 w-auto max-h-16 object-contain group-hover:scale-102 transition-all drop-shadow-xs"
                 />
               </Link>
             </div>
@@ -190,29 +190,29 @@ export const Header: React.FC<HeaderProps> = ({
               </div>
             </div>
 
-            {/* Right Action Controls: Unified, Compact Toolbar (Cart → My Orders → Language) */}
+            {/* Right Action Controls: Unified, Compact Toolbar ([Cart] → [Orders] → [EN / বাংলা]) */}
             <div className="flex items-center space-x-2 sm:space-x-2.5 shrink-0">
               
               {/* 1. Cart Icon with Badge (Directly after Search) */}
               <Link
                 href="/cart"
                 prefetch={false}
-                className="relative h-9 w-9 sm:h-9.5 sm:w-9.5 rounded-full bg-gray-100 hover:bg-gray-200/90 text-slate-800 border border-gray-200/70 shadow-2xs transition flex items-center justify-center active:scale-95 cursor-pointer shrink-0"
+                className="relative h-9 w-9 sm:h-10 sm:w-10 rounded-full bg-gray-100 hover:bg-gray-200/90 text-slate-800 border border-gray-200/80 shadow-2xs transition flex items-center justify-center active:scale-95 cursor-pointer shrink-0"
                 title={t.cart}
               >
-                <ShoppingBag className="w-4.5 h-4.5 text-slate-800" />
+                <ShoppingBag className="w-4.5 h-4.5 sm:w-5 sm:h-5 text-slate-900" />
                 {totalItems > 0 && (
-                  <span className="absolute -top-1 -right-1 bg-black text-white text-[10px] font-black rounded-full h-4.5 min-w-[18px] px-1 flex items-center justify-center border border-white shadow-xs">
+                  <span className="absolute -top-1 -right-1 bg-black text-white text-[10px] font-black rounded-full h-4.5 min-w-[18px] px-1 flex items-center justify-center border-2 border-white shadow-xs">
                     {totalItems}
                   </span>
                 )}
               </Link>
 
-              {/* 2. My Orders Control (Visually distinct pill on desktop) */}
+              {/* 2. Orders Control (Visually distinct compact pill on desktop) */}
               <Link
                 href="/orders"
                 prefetch={false}
-                className="h-9 sm:h-9.5 px-2.5 sm:px-3 rounded-full bg-gray-100 hover:bg-gray-200/90 text-slate-700 hover:text-slate-900 border border-gray-200/70 shadow-2xs transition flex items-center gap-1.5 active:scale-95 cursor-pointer shrink-0 text-xs font-bold"
+                className="h-9 sm:h-10 px-2.5 sm:px-3 rounded-full bg-gray-100 hover:bg-gray-200/90 text-slate-700 hover:text-slate-900 border border-gray-200/80 shadow-2xs transition flex items-center gap-1.5 active:scale-95 cursor-pointer shrink-0 text-xs font-bold"
                 title={language === 'bn' ? 'আমার অর্ডার ও ট্র্যাকিং' : 'My Orders & Tracking'}
               >
                 <Package className="w-4 h-4 text-orange-500 shrink-0" />
@@ -224,7 +224,7 @@ export const Header: React.FC<HeaderProps> = ({
               {/* 3. Language Switcher Pill */}
               <button
                 onClick={() => setLanguage(language === 'en' ? 'bn' : 'en')}
-                className="h-9 sm:h-9.5 px-2.5 sm:px-3 rounded-full bg-gray-100 hover:bg-gray-200/90 border border-gray-200/70 shadow-2xs text-xs font-bold text-slate-700 hover:text-slate-900 transition flex items-center space-x-1 active:scale-95 cursor-pointer shrink-0"
+                className="h-9 sm:h-10 px-2.5 sm:px-3 rounded-full bg-gray-100 hover:bg-gray-200/90 border border-gray-200/80 shadow-2xs text-xs font-bold text-slate-700 hover:text-slate-900 transition flex items-center space-x-1 active:scale-95 cursor-pointer shrink-0"
                 title="Switch Language / ভাষা পরিবর্তন করুন"
               >
                 <Globe className="w-3.5 h-3.5 text-slate-500 shrink-0" />
@@ -237,8 +237,8 @@ export const Header: React.FC<HeaderProps> = ({
           </div>
 
           {/* Dedicated Mobile Layout (< sm): Clean 2-Row Layout */}
-          <div className="sm:hidden py-2 space-y-2">
-            {/* Mobile Row 1: Left Menu + Logo, Right Controls (Cart → My Orders → Language) */}
+          <div className="sm:hidden py-2.5 space-y-2.5">
+            {/* Mobile Row 1: Left Menu + Larger Logo, Right Controls ([Cart] → [Orders] → [EN / বাংলা]) */}
             <div className="flex items-center justify-between gap-1.5">
               <div className="flex items-center space-x-2 shrink-0">
                 {/* Mobile Menu Button */}
@@ -254,17 +254,17 @@ export const Header: React.FC<HeaderProps> = ({
                   )}
                 </button>
 
-                {/* Mobile Logo */}
+                {/* Mobile Logo (Slightly larger, crisp) */}
                 <Link href="/" className="flex items-center shrink-0">
                   <img
                     src="/images/logo.png"
                     alt="Mex Tanim Store Logo"
-                    className="h-8 w-auto max-w-[120px] object-contain drop-shadow-xs"
+                    className="h-9 sm:h-10 w-auto max-w-[140px] object-contain drop-shadow-xs"
                   />
                 </Link>
               </div>
 
-              {/* Mobile Right Controls: Exact same order: Cart → My Orders → Language */}
+              {/* Mobile Right Controls: Exact same order: [Cart] → [Orders] → [EN / বাংলা] */}
               <div className="flex items-center space-x-1.5 shrink-0">
                 {/* Mobile Cart Link with Black Badge */}
                 <Link
