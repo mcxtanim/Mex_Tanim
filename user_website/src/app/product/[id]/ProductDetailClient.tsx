@@ -72,7 +72,6 @@ export default function DedicatedProductPage({ initialProduct }: DedicatedProduc
   const [isZoomed, setIsZoomed] = useState(false);
   const [zoomPos, setZoomPos] = useState({ x: 50, y: 50 });
   const [isFullscreenImage, setIsFullscreenImage] = useState(false);
-  const [activeDetailTab, setActiveDetailTab] = useState<'desc' | 'specs'>('desc');
 
   useEffect(() => {
     setIsMounted(true);
@@ -564,35 +563,15 @@ export default function DedicatedProductPage({ initialProduct }: DedicatedProduc
 
               {/* DESCRIPTION & SPECIFICATIONS SECTION (DIRECTLY AFTER SHARE BUTTON - MATCHING REFERENCE IMAGE) */}
               <div className="pt-6 border-t border-gray-200/90 space-y-5">
-                {/* Tab Bar: 'বিবরণ' & 'স্পেসিফিকেশন' Tabs */}
+                {/* Section Header: 'বিবরণ' (Matching Reference Image) */}
                 <div className="flex items-center gap-6 border-b border-gray-200">
-                  <button
-                    type="button"
-                    onClick={() => setActiveDetailTab('desc')}
-                    className={`pb-3 font-extrabold text-sm sm:text-base transition-colors relative cursor-pointer ${
-                      activeDetailTab === 'desc'
-                        ? 'text-slate-900 border-b-2 border-black'
-                        : 'text-gray-500 hover:text-slate-800'
-                    }`}
-                  >
+                  <div className="pb-3 font-extrabold text-sm sm:text-base text-slate-900 border-b-2 border-black">
                     বিবরণ
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setActiveDetailTab('specs')}
-                    className={`pb-3 font-extrabold text-sm sm:text-base transition-colors relative cursor-pointer ${
-                      activeDetailTab === 'specs'
-                        ? 'text-slate-900 border-b-2 border-black'
-                        : 'text-gray-500 hover:text-slate-800'
-                    }`}
-                  >
-                    স্পেসিফিকেশন
-                  </button>
+                  </div>
                 </div>
 
-                {activeDetailTab === 'desc' ? (
-                  /* Description Tab Content */
-                  <div className="space-y-5 text-slate-800 text-sm leading-relaxed">
+                {/* Description Content */}
+                <div className="space-y-5 text-slate-800 text-sm leading-relaxed">
                     <div>
                       <h3 className="font-black text-base sm:text-lg text-[#0B1A30] uppercase tracking-wide">
                         {product.name}
@@ -701,38 +680,6 @@ export default function DedicatedProductPage({ initialProduct }: DedicatedProduc
                       </p>
                     </div>
                   </div>
-                ) : (
-                  /* Specifications Tab Content */
-                  <div className="space-y-4 text-slate-800 text-sm">
-                    <h4 className="font-black text-slate-900 text-sm uppercase">
-                      Technical Specifications
-                    </h4>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs sm:text-sm text-gray-700 font-medium">
-                      <div className="flex items-center gap-2 bg-gray-50 p-2.5 rounded-xl border border-gray-200/60">
-                        <span className="w-1.5 h-1.5 rounded-full bg-orange-500 shrink-0" />
-                        <span><strong>Brand:</strong> {getBrandName(product, language)}</span>
-                      </div>
-                      <div className="flex items-center gap-2 bg-gray-50 p-2.5 rounded-xl border border-gray-200/60">
-                        <span className="w-1.5 h-1.5 rounded-full bg-orange-500 shrink-0" />
-                        <span><strong>Category:</strong> {product.category}</span>
-                      </div>
-                      <div className="flex items-center gap-2 bg-gray-50 p-2.5 rounded-xl border border-gray-200/60">
-                        <span className="w-1.5 h-1.5 rounded-full bg-orange-500 shrink-0" />
-                        <span><strong>Stock:</strong> 67 Units Available</span>
-                      </div>
-                      <div className="flex items-center gap-2 bg-gray-50 p-2.5 rounded-xl border border-gray-200/60">
-                        <span className="w-1.5 h-1.5 rounded-full bg-orange-500 shrink-0" />
-                        <span><strong>Authenticity:</strong> 100% Genuine</span>
-                      </div>
-                      {product.specs && product.specs.map((spec, i) => (
-                        <div key={i} className="flex items-center gap-2 bg-gray-50 p-2.5 rounded-xl border border-gray-200/60">
-                          <span className="w-1.5 h-1.5 rounded-full bg-orange-500 shrink-0" />
-                          <span>{spec}</span>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                )}
               </div>
 
             </div>
