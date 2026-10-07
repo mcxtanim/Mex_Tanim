@@ -463,7 +463,7 @@ export const ProductTabsSection: React.FC = () => {
           {activeTabProducts.map((product) => (
             <div
               key={product.id}
-              className="min-w-[190px] sm:min-w-[220px] md:min-w-[245px] lg:min-w-[255px] max-w-[265px] shrink-0 snap-start"
+              className="min-w-[220px] sm:min-w-[250px] md:min-w-[275px] lg:min-w-[295px] max-w-[310px] shrink-0 snap-start"
             >
               <ProductCard product={product} />
             </div>

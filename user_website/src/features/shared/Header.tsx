@@ -119,8 +119,8 @@ export const Header: React.FC<HeaderProps> = ({
           </div>
         )}
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          {/* Desktop & Tablet Layout (sm and up) - Balanced Header with Prominent Logo & Compact Controls */}
-          <div className="hidden sm:flex items-center justify-between h-18 sm:h-20 gap-3 md:gap-4">
+          {/* Desktop & Tablet Layout (sm and up) - Balanced Header with 1.5x Prominent Logo & Compact Controls */}
+          <div className="hidden sm:flex items-center justify-between h-20 sm:h-24 md:h-26 gap-3 md:gap-4">
             
             {/* Left section: Left Hamburger Button + Prominent Mex Tanim Logo */}
             <div className="flex items-center space-x-2.5 sm:space-x-3.5 shrink-0">
@@ -156,12 +156,12 @@ export const Header: React.FC<HeaderProps> = ({
                 </div>
               )}
 
-              {/* Official Mex Tanim Store Logo (Slightly larger, crisp presentation) */}
+              {/* Official Mex Tanim Store Logo (1.5x Larger, crisp presentation) */}
               <Link href="/" className="flex items-center cursor-pointer shrink-0 group py-1">
                 <img
                   src="/images/logo.png"
                   alt="Mex Tanim Store Logo"
-                  className="h-10 sm:h-12 md:h-13 lg:h-14 w-auto max-h-16 object-contain group-hover:scale-102 transition-all drop-shadow-xs"
+                  className="h-14 sm:h-18 md:h-20 lg:h-22 w-auto max-h-24 object-contain group-hover:scale-102 transition-all drop-shadow-sm"
                 />
               </Link>
             </div>
@@ -238,12 +238,12 @@ export const Header: React.FC<HeaderProps> = ({
                   )}
                 </button>
 
-                {/* Mobile Logo */}
+                {/* Mobile Logo (1.5x larger) */}
                 <Link href="/" className="flex items-center shrink-0">
                   <img
                     src="/images/logo.png"
                     alt="Mex Tanim Store Logo"
-                    className="h-9 sm:h-10 w-auto max-w-[140px] object-contain drop-shadow-xs"
+                    className="h-13 sm:h-15 w-auto max-w-[200px] object-contain drop-shadow-xs"
                   />
                 </Link>
               </div>

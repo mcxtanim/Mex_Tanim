@@ -36,13 +36,13 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
   return (
     <div
       onClick={handleCardClick}
-      className="bg-white rounded-2xl sm:rounded-3xl border border-gray-100 hover:border-gray-200/90 shadow-2xs hover:shadow-lg transition-all duration-300 group flex flex-col justify-between p-3.5 sm:p-4 cursor-pointer relative h-full select-none"
+      className="bg-white rounded-2xl sm:rounded-3xl border border-gray-150 hover:border-gray-300/80 shadow-[0_2px_12px_rgba(0,0,0,0.04)] hover:shadow-[0_12px_32px_rgba(0,0,0,0.09)] hover:-translate-y-1.5 transition-all duration-300 ease-out group flex flex-col justify-between p-4 sm:p-5 cursor-pointer relative h-full select-none"
     >
       {/* Product Image & Badges (Matching Reference Style) */}
-      <div className="relative w-full aspect-square bg-[#F8FAFC]/60 rounded-xl sm:rounded-2xl flex items-center justify-center p-2 mb-2 overflow-hidden">
+      <div className="relative w-full aspect-square bg-[#F8FAFC]/70 rounded-xl sm:rounded-2xl flex items-center justify-center p-3 sm:p-4 mb-3 overflow-hidden">
         {/* Black Discount Badge on Top-Left */}
         {discountPercent > 0 && (
-          <span className="absolute top-2 left-2 bg-black text-white text-[10px] sm:text-[11px] font-black px-2 py-0.5 rounded-full shadow-xs uppercase tracking-tight z-10">
+          <span className="absolute top-2.5 left-2.5 bg-black text-white text-[10px] sm:text-xs font-black px-2.5 py-0.5 rounded-full shadow-xs uppercase tracking-tight z-10">
             -{discountPercent}%
           </span>
         )}
@@ -54,26 +54,26 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
             e.stopPropagation();
             setIsWishlisted(!isWishlisted);
           }}
-          className={`absolute top-2 right-2 w-7.5 h-7.5 rounded-full bg-white/90 hover:bg-white flex items-center justify-center shadow-2xs transition active:scale-90 z-10 cursor-pointer ${
+          className={`absolute top-2.5 right-2.5 w-8 h-8 rounded-full bg-white/90 hover:bg-white flex items-center justify-center shadow-2xs transition-all active:scale-90 z-10 cursor-pointer ${
             isWishlisted ? 'text-red-500' : 'text-gray-400 hover:text-red-500'
           }`}
           title="Wishlist"
         >
-          <Heart className={`w-4 h-4 stroke-[1.8] ${isWishlisted ? 'fill-current' : ''}`} />
+          <Heart className={`w-4.5 h-4.5 stroke-[1.8] ${isWishlisted ? 'fill-current text-red-500' : ''}`} />
         </button>
 
-        {/* Product Image */}
+        {/* Product Image with smooth hover zoom ("carsor rakhle boro hoy") */}
         <img
           src={product.image}
           alt={title}
           loading="lazy"
           decoding="async"
-          className="w-full h-full object-contain group-hover:scale-105 transition-transform duration-300 drop-shadow-xs"
+          className="w-full h-full object-contain transform group-hover:scale-115 transition-transform duration-500 ease-out drop-shadow-xs"
         />
 
         {/* Out of Stock Badge (if applicable) */}
         {!product.inStock && (
-          <span className="absolute bottom-2 left-2 text-[10px] font-bold px-2 py-0.5 rounded-md bg-red-600/90 text-white z-10 shadow-xs">
+          <span className="absolute bottom-2.5 left-2.5 text-[10px] sm:text-xs font-bold px-2.5 py-0.5 rounded-md bg-red-600/90 text-white z-10 shadow-xs">
             স্টক শেষ
           </span>
         )}
@@ -82,24 +82,24 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
       {/* Product Content: ONLY Product Name & Ratings (NO Description, matching Reference) */}
       <div className="flex-1 flex flex-col justify-between">
         <div>
-          <h3 className="font-bold text-xs sm:text-sm text-[#0F172A] tracking-tight uppercase line-clamp-2 min-h-[2.4rem] group-hover:text-blue-600 transition-colors">
+          <h3 className="font-bold text-sm sm:text-base text-[#0F172A] tracking-tight uppercase line-clamp-2 min-h-[2.6rem] group-hover:text-blue-600 transition-colors">
             {title}
           </h3>
 
           {/* Star Rating (Compact row matching Reference) */}
           {product.rating > 0 && (
-            <div className="flex items-center space-x-1.5 mt-1">
+            <div className="flex items-center space-x-1.5 mt-1.5">
               <div className="flex text-amber-400">
                 {[...Array(5)].map((_, i) => (
                   <Star
                     key={i}
-                    className={`w-3 h-3 ${
+                    className={`w-3.5 h-3.5 ${
                       i < Math.floor(product.rating) ? 'fill-amber-400 text-amber-400' : 'text-gray-200'
                     }`}
                   />
                 ))}
               </div>
-              <span className="text-[11px] text-slate-500 font-semibold">
+              <span className="text-xs text-slate-500 font-semibold">
                 {product.rating.toFixed(1)} {product.reviewCount ? `(${product.reviewCount})` : ''}
               </span>
             </div>
@@ -107,27 +107,27 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
         </div>
 
         {/* Price and Sold Row (Matching Reference) */}
-        <div className="mt-2.5 pt-1 border-t border-gray-50">
-          <div className="flex items-baseline space-x-1.5">
-            <span className="text-base sm:text-lg font-black text-[#0B1A30] tracking-tight">
+        <div className="mt-3 pt-1 border-t border-gray-100">
+          <div className="flex items-baseline space-x-2">
+            <span className="text-lg sm:text-xl md:text-2xl font-black text-[#0B1A30] tracking-tight">
               ৳{product.price.toLocaleString('en-US')}
             </span>
             {product.originalPrice && product.originalPrice > product.price && (
-              <span className="line-through text-xs text-slate-400 font-normal">
+              <span className="line-through text-xs sm:text-sm text-slate-400 font-normal">
                 ৳{product.originalPrice.toLocaleString('en-US')}
               </span>
             )}
           </div>
 
-          <div className="flex items-center justify-between mt-2">
+          <div className="flex items-center justify-between mt-2.5">
             <div className="flex items-center space-x-1.5 text-slate-400">
-              <Tag className="w-3.5 h-3.5 stroke-[1.8]" />
-              <span className="text-xs text-slate-500 font-medium">
+              <Tag className="w-4 h-4 stroke-[1.8]" />
+              <span className="text-xs sm:text-sm text-slate-500 font-semibold">
                 {soldCount} Sold
               </span>
             </div>
 
-            <span className="text-[11px] font-bold text-slate-700 bg-gray-100 group-hover:bg-gray-200 px-2.5 py-0.5 rounded-full transition-colors flex items-center space-x-0.5 shadow-2xs">
+            <span className="text-xs font-bold text-slate-700 bg-gray-100 group-hover:bg-gray-200 px-3 py-1 rounded-full transition-colors flex items-center space-x-1 shadow-2xs">
               <span>View</span>
               <span>→</span>
             </span>

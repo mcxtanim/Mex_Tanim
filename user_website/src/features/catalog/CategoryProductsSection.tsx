@@ -48,6 +48,32 @@ const CATEGORY_SECTIONS: CategorySectionDef[] = [
         specs: ['Magnetic Mount', 'RGB Light', 'Silent Fan'],
       },
       {
+        id: 'cooler-piva-b3',
+        name: 'PIVA B3 25W PHONE COOLER',
+        nameBn: 'পিভা B3 ২৫ ওয়াট ফোন কুলার',
+        category: 'gaming-cooler',
+        categoryBn: 'গেমিং কুলার',
+        brand: 'PIVA',
+        brandBn: 'পিভা',
+        price: 1700,
+        originalPrice: 1950,
+        discountBadge: '-13%',
+        rating: 4.9,
+        reviewCount: 13,
+        soldCount: 13,
+        image: 'https://images.unsplash.com/photo-1550745165-9bc0b252726f?w=500&auto=format&fit=crop&q=80',
+        comboImages: [],
+        inStock: true,
+        isPopular: true,
+        isFeatured: true,
+        isBestSeller: true,
+        isNewArrival: true,
+        isComboOffer: false,
+        description: '25W ultra high power semiconductor phone cooler with rainbow RGB.',
+        descriptionBn: '২৫ ওয়াট আল্ট্রা হাই পাওয়ার সেমিকন্ডাক্টর ফোন কুলার।',
+        specs: ['25W Power', 'RGB Rainbow', 'Instant Ice'],
+      },
+      {
         id: 'cooler-ex2',
         name: 'PLEXTONE EX2 ULTRA',
         nameBn: 'প্লেক্সটোন EX2 আল্ট্রা ফোন কুলার',
@@ -603,7 +629,7 @@ const CategoryRowItem: React.FC<CategoryRowItemProps> = ({
         {products.map((product) => (
           <div
             key={product.id}
-            className="min-w-[190px] sm:min-w-[220px] md:min-w-[245px] lg:min-w-[255px] max-w-[265px] shrink-0 snap-start"
+            className="min-w-[220px] sm:min-w-[250px] md:min-w-[275px] lg:min-w-[295px] max-w-[310px] shrink-0 snap-start"
           >
             <ProductCard product={product} />
           </div>
