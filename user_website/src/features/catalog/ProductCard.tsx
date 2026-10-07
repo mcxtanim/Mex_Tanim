@@ -39,7 +39,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
       className="bg-white rounded-2xl sm:rounded-3xl border border-gray-150 hover:border-gray-300/80 shadow-[0_2px_12px_rgba(0,0,0,0.04)] hover:shadow-[0_12px_32px_rgba(0,0,0,0.09)] hover:-translate-y-1.5 transition-all duration-300 ease-out group flex flex-col justify-between overflow-hidden cursor-pointer relative h-full select-none"
     >
       {/* Product Image & Badges (Matching Reference: Light Gray Top Half with Large Image) */}
-      <div className="relative w-full aspect-square bg-[#F1F3F5] flex items-center justify-center p-2 sm:p-2.5 overflow-hidden">
+      <div className={`relative w-full aspect-square ${product.isComboOffer ? 'bg-white' : 'bg-[#F1F3F5]'} flex items-center justify-center p-2 sm:p-2.5 overflow-hidden`}>
         {/* Black Discount Badge on Top-Left */}
         {discountPercent > 0 && (
           <span className="absolute top-2.5 left-2.5 bg-black text-white text-[10px] sm:text-xs font-black px-2.5 py-0.5 rounded-full shadow-xs uppercase tracking-tight z-10">
@@ -48,19 +48,31 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
         )}
 
         {/* Wishlist Heart Icon on Top-Right */}
-        <button
-          type="button"
-          onClick={(e) => {
-            e.stopPropagation();
-            setIsWishlisted(!isWishlisted);
-          }}
-          className={`absolute top-2.5 right-2.5 w-8 h-8 rounded-full bg-white/90 hover:bg-white flex items-center justify-center shadow-2xs transition-all active:scale-90 z-10 cursor-pointer ${
-            isWishlisted ? 'text-red-500' : 'text-gray-400 hover:text-red-500'
-          }`}
-          title="Wishlist"
-        >
-          <Heart className={`w-4.5 h-4.5 stroke-[1.8] ${isWishlisted ? 'fill-current text-red-500' : ''}`} />
-        </button>
+        {product.isComboOffer ? (
+          <button
+            type="button"
+            onClick={(e) => {
+              e.stopPropagation();
+              setIsWishlisted(!isWishlisted);
+            }}
+            className="absolute top-2.5 right-2.5 w-8 h-8 rounded-full opacity-0 z-10 cursor-pointer"
+            title="Wishlist"
+          />
+        ) : (
+          <button
+            type="button"
+            onClick={(e) => {
+              e.stopPropagation();
+              setIsWishlisted(!isWishlisted);
+            }}
+            className={`absolute top-2.5 right-2.5 w-8 h-8 rounded-full bg-white/90 hover:bg-white flex items-center justify-center shadow-2xs transition-all active:scale-90 z-10 cursor-pointer ${
+              isWishlisted ? 'text-red-500' : 'text-gray-400 hover:text-red-500'
+            }`}
+            title="Wishlist"
+          >
+            <Heart className={`w-4.5 h-4.5 stroke-[1.8] ${isWishlisted ? 'fill-current text-red-500' : ''}`} />
+          </button>
+        )}
 
         {/* If combo product with multiple images, show them together! */}
         {product.comboImages && product.comboImages.length > 1 ? (
@@ -93,7 +105,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
             alt={title}
             loading="lazy"
             decoding="async"
-            className="w-full h-full object-contain p-1 transform group-hover:scale-110 transition-transform duration-500 ease-out drop-shadow-xs"
+            className={`w-full h-full ${product.isComboOffer ? 'object-contain p-0 sm:p-0.5' : 'object-contain p-1'} transform group-hover:scale-105 transition-transform duration-500 ease-out drop-shadow-xs`}
           />
         )}
 
