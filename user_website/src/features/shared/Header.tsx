@@ -100,6 +100,13 @@ export const Header: React.FC<HeaderProps> = ({
     ? 'পণ্য খুঁজুন...'
     : 'Search products...';
 
+  const handleSearchSubmit = (e?: React.FormEvent) => {
+    if (e) e.preventDefault();
+    if (searchQuery.trim() && typeof window !== 'undefined' && window.location.pathname !== '/') {
+      router.push(`/?search=${encodeURIComponent(searchQuery.trim())}`);
+    }
+  };
+
   return (
     <>
       <header className="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-gray-100 shadow-xs transition-all">
@@ -159,92 +166,69 @@ export const Header: React.FC<HeaderProps> = ({
               </Link>
             </div>
 
-            {/* Center Search Bar: Large Centered Pill with Black Search Button */}
-            <div className="flex-1 max-w-lg md:max-w-xl lg:max-w-2xl mx-2 sm:mx-4 lg:mx-6">
-              <div className="relative flex items-center w-full bg-gray-50/90 hover:bg-white focus-within:bg-white rounded-full border border-gray-200/90 focus-within:border-gray-400 focus-within:ring-2 focus-within:ring-slate-900/10 transition-all shadow-inner">
-                <Search className="w-4 h-4 text-gray-400 ml-3.5 sm:ml-4 shrink-0" />
+            {/* Center Search Bar: Styled identically to Reference Image 2 */}
+            <div className="flex-1 max-w-lg md:max-w-xl lg:max-w-2xl mx-3 sm:mx-6 lg:mx-8">
+              <form
+                onSubmit={handleSearchSubmit}
+                className="relative flex items-center w-full bg-[#f1f3f5] hover:bg-gray-200/70 focus-within:bg-white rounded-full border border-gray-200/90 focus-within:border-gray-400 focus-within:ring-2 focus-within:ring-slate-900/10 transition-all shadow-inner h-10 sm:h-11 md:h-12"
+              >
+                <Search className="w-4 h-4 sm:w-4.5 sm:h-4.5 text-gray-400 ml-3.5 sm:ml-4.5 shrink-0 stroke-[2]" />
                 <input
                   type="text"
                   placeholder={animatedPlaceholder}
                   value={searchQuery}
                   onChange={(e) => setSearchQuery?.(e.target.value)}
-                  className="w-full bg-transparent text-gray-800 placeholder-gray-400 font-medium pl-2.5 sm:pl-3 pr-20 py-2 sm:py-2.5 text-xs sm:text-sm outline-none"
+                  className="w-full bg-transparent text-gray-800 placeholder-gray-400 font-medium pl-2.5 sm:pl-3 pr-14 sm:pr-16 py-2 text-xs sm:text-sm outline-none"
                 />
                 {searchQuery && (
                   <button
+                    type="button"
                     onClick={() => setSearchQuery?.('')}
-                    className="absolute right-11 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 text-xs bg-gray-200/80 rounded-full w-4 h-4 flex items-center justify-center cursor-pointer"
+                    className="absolute right-12 sm:right-14 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 text-xs bg-gray-200/80 rounded-full w-4 h-4 flex items-center justify-center cursor-pointer"
                   >
                     ×
                   </button>
                 )}
-                {/* Black Circle Search Action Button */}
+                {/* Black Squircle Search Action Button (Matching Reference Image 2) */}
                 <button
-                  type="button"
-                  className="absolute right-1 top-1/2 -translate-y-1/2 w-7.5 h-7.5 sm:w-8 sm:h-8 bg-black hover:bg-slate-800 text-white rounded-full flex items-center justify-center transition active:scale-95 cursor-pointer shadow-xs shrink-0"
+                  type="submit"
+                  className="absolute right-1 sm:right-1.5 top-1/2 -translate-y-1/2 w-8 h-8 sm:w-9 sm:h-9 md:w-9.5 md:h-9.5 bg-black hover:bg-slate-900 text-white rounded-xl sm:rounded-2xl flex items-center justify-center transition active:scale-95 cursor-pointer shadow-xs shrink-0"
                   title="Search"
                   aria-label="Search"
                 >
-                  <Search className="w-3.5 h-3.5 text-white stroke-[2.5]" />
+                  <Search className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-white stroke-[2.5]" />
                 </button>
-              </div>
+              </form>
             </div>
 
-            {/* Right Action Controls: Unified, Compact Toolbar ([Cart] → [Orders] → [EN / বাংলা]) */}
-            <div className="flex items-center space-x-2 sm:space-x-2.5 shrink-0">
-              
-              {/* 1. Cart Icon with Badge (Directly after Search) */}
+            {/* Right Action Controls: Matching Reference Image 2 (ONLY Circular Cart with Black Badge) */}
+            <div className="flex items-center shrink-0">
               <Link
                 href="/cart"
                 prefetch={false}
-                className="relative h-9 w-9 sm:h-10 sm:w-10 rounded-full bg-gray-100 hover:bg-gray-200/90 text-slate-800 border border-gray-200/80 shadow-2xs transition flex items-center justify-center active:scale-95 cursor-pointer shrink-0"
+                className="relative w-10 h-10 sm:w-11 sm:h-11 rounded-full bg-[#e9ecef] hover:bg-[#dee2e6] text-slate-900 transition flex items-center justify-center active:scale-95 cursor-pointer shrink-0 shadow-2xs"
                 title={t.cart}
+                aria-label="Shopping Cart"
               >
-                <ShoppingCart className="w-4.5 h-4.5 sm:w-5 sm:h-5 text-slate-900" />
+                <ShoppingCart className="w-5 h-5 sm:w-5.5 sm:h-5.5 text-slate-900 stroke-[2.2]" />
                 {totalItems > 0 && (
-                  <span className="absolute -top-1 -right-1 bg-black text-white text-[10px] font-black rounded-full h-4.5 min-w-[18px] px-1 flex items-center justify-center border-2 border-white shadow-xs">
+                  <span className="absolute -top-1 -right-1 bg-black text-white text-[10px] sm:text-[11px] font-black rounded-full h-4.5 min-w-[18px] sm:h-5 sm:min-w-[20px] px-1 flex items-center justify-center border-2 border-white shadow-xs">
                     {totalItems}
                   </span>
                 )}
               </Link>
-
-              {/* 2. Orders Control (Visually distinct compact pill on desktop) */}
-              <Link
-                href="/orders"
-                prefetch={false}
-                className="h-9 sm:h-10 px-2.5 sm:px-3 rounded-full bg-gray-100 hover:bg-gray-200/90 text-slate-700 hover:text-slate-900 border border-gray-200/80 shadow-2xs transition flex items-center gap-1.5 active:scale-95 cursor-pointer shrink-0 text-xs font-bold"
-                title={language === 'bn' ? 'আমার অর্ডার ও ট্র্যাকিং' : 'My Orders & Tracking'}
-              >
-                <Package className="w-4 h-4 text-orange-500 shrink-0" />
-                <span className="hidden md:inline">
-                  {language === 'bn' ? 'আমার অর্ডার' : 'Orders'}
-                </span>
-              </Link>
-
-              {/* 3. Language Switcher Pill */}
-              <button
-                onClick={() => setLanguage(language === 'en' ? 'bn' : 'en')}
-                className="h-9 sm:h-10 px-2.5 sm:px-3 rounded-full bg-gray-100 hover:bg-gray-200/90 border border-gray-200/80 shadow-2xs text-xs font-bold text-slate-700 hover:text-slate-900 transition flex items-center space-x-1 active:scale-95 cursor-pointer shrink-0"
-                title="Switch Language / ভাষা পরিবর্তন করুন"
-              >
-                <Globe className="w-3.5 h-3.5 text-slate-500 shrink-0" />
-                <span className={language === 'en' ? 'text-black font-black' : 'text-gray-400'}>EN</span>
-                <span className="text-gray-300 text-[10px]">/</span>
-                <span className={language === 'bn' ? 'text-black font-black' : 'text-gray-400'}>বাং</span>
-              </button>
-
             </div>
           </div>
 
-          {/* Dedicated Mobile Layout (< sm): Clean 2-Row Layout */}
+          {/* Dedicated Mobile Layout (< sm): Clean 2-Row Layout Matching Reference */}
           <div className="sm:hidden py-2.5 space-y-2.5">
-            {/* Mobile Row 1: Left Menu + Larger Logo, Right Controls ([Cart] → [Orders] → [EN / বাংলা]) */}
+            {/* Mobile Row 1: Left Hamburger + Logo, Right Cart (Matching Reference Image 2) */}
             <div className="flex items-center justify-between gap-1.5">
               <div className="flex items-center space-x-2 shrink-0">
                 {/* Mobile Menu Button */}
                 <button
                   onClick={() => setIsCategoryDrawerOpen(true)}
-                  className="relative w-8.5 h-8.5 rounded-full bg-gray-100 hover:bg-gray-200 text-black flex items-center justify-center border border-gray-200 shadow-2xs active:scale-95 shrink-0 cursor-pointer"
+                  className="relative w-9 h-9 rounded-full bg-gray-100 hover:bg-gray-200 text-black flex items-center justify-center border border-gray-200 shadow-2xs active:scale-95 shrink-0 cursor-pointer"
                   title="Product Categories"
                   aria-label="Toggle Product Categories Drawer"
                 >
@@ -254,7 +238,7 @@ export const Header: React.FC<HeaderProps> = ({
                   )}
                 </button>
 
-                {/* Mobile Logo (Slightly larger, crisp) */}
+                {/* Mobile Logo */}
                 <Link href="/" className="flex items-center shrink-0">
                   <img
                     src="/images/logo.png"
@@ -264,59 +248,40 @@ export const Header: React.FC<HeaderProps> = ({
                 </Link>
               </div>
 
-              {/* Mobile Right Controls: Exact same order: [Cart] → [Orders] → [EN / বাংলা] */}
-              <div className="flex items-center space-x-1.5 shrink-0">
-                {/* Mobile Cart Link with Black Badge */}
+              {/* Mobile Right: ONLY Circular Cart with Black Badge (Matching Image 2) */}
+              <div className="flex items-center shrink-0">
                 <Link
                   href="/cart"
                   prefetch={false}
-                  className="relative w-8.5 h-8.5 rounded-full bg-gray-100 hover:bg-gray-200 text-slate-900 border border-gray-200 flex items-center justify-center shrink-0 cursor-pointer shadow-2xs active:scale-95"
+                  className="relative w-9 h-9 rounded-full bg-[#e9ecef] hover:bg-[#dee2e6] text-slate-900 flex items-center justify-center shrink-0 cursor-pointer shadow-2xs active:scale-95"
                   title={t.cart}
                 >
-                  <ShoppingCart className="w-4 h-4 text-slate-800" />
+                  <ShoppingCart className="w-4.5 h-4.5 text-slate-900 stroke-[2.2]" />
                   {totalItems > 0 && (
                     <span className="absolute -top-1 -right-1 bg-black text-white text-[9px] font-black rounded-full h-4 min-w-[16px] px-0.5 flex items-center justify-center border border-white shadow-xs">
                       {totalItems}
                     </span>
                   )}
                 </Link>
-
-                {/* Mobile Orders Link */}
-                <Link
-                  href="/orders"
-                  prefetch={false}
-                  className="w-8.5 h-8.5 rounded-full bg-gray-100 hover:bg-gray-200 text-slate-800 border border-gray-200 flex items-center justify-center shrink-0 cursor-pointer shadow-2xs active:scale-95"
-                  title={language === 'bn' ? 'আমার অর্ডার' : 'My Orders'}
-                >
-                  <Package className="w-4 h-4 text-orange-500" />
-                </Link>
-
-                {/* Mobile Language Switcher */}
-                <button
-                  onClick={() => setLanguage(language === 'en' ? 'bn' : 'en')}
-                  className="h-8.5 px-2 rounded-full bg-gray-100 hover:bg-gray-200 border border-gray-200 flex items-center space-x-0.5 text-[10px] font-bold text-slate-700 shrink-0 cursor-pointer shadow-2xs active:scale-95"
-                  title="Switch Language / ভাষা পরিবর্তন করুন"
-                >
-                  <Globe className="w-3 h-3 text-slate-500 shrink-0" />
-                  <span className={language === 'en' ? 'text-black font-black' : 'text-gray-400'}>EN</span>
-                  <span className="text-gray-300">/</span>
-                  <span className={language === 'bn' ? 'text-black font-black' : 'text-gray-400'}>বাং</span>
-                </button>
               </div>
             </div>
 
-            {/* Mobile Row 2: Full-Width Search Pill with Black Search Button */}
-            <div className="relative flex items-center w-full bg-gray-50/90 rounded-full border border-gray-200/90 focus-within:border-gray-400 focus-within:ring-2 focus-within:ring-slate-900/10 transition-all shadow-inner">
-              <Search className="w-4 h-4 text-gray-400 ml-3.5 shrink-0" />
+            {/* Mobile Row 2: Full-Width Search Pill with Black Squircle Search Button */}
+            <form
+              onSubmit={handleSearchSubmit}
+              className="relative flex items-center w-full bg-[#f1f3f5] rounded-full border border-gray-200/90 focus-within:border-gray-400 focus-within:ring-2 focus-within:ring-slate-900/10 transition-all shadow-inner h-9.5"
+            >
+              <Search className="w-4 h-4 text-gray-400 ml-3.5 shrink-0 stroke-[2]" />
               <input
                 type="text"
                 placeholder={animatedPlaceholder}
                 value={searchQuery}
                 onChange={(e) => setSearchQuery?.(e.target.value)}
-                className="w-full bg-transparent text-gray-800 placeholder-gray-400 font-medium pl-2.5 pr-16 py-2 text-xs outline-none"
+                className="w-full bg-transparent text-gray-800 placeholder-gray-400 font-medium pl-2.5 pr-14 py-1.5 text-xs outline-none"
               />
               {searchQuery && (
                 <button
+                  type="button"
                   onClick={() => setSearchQuery?.('')}
                   className="absolute right-10 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 text-xs bg-gray-200 rounded-full w-4 h-4 flex items-center justify-center cursor-pointer"
                 >
@@ -324,13 +289,13 @@ export const Header: React.FC<HeaderProps> = ({
                 </button>
               )}
               <button
-                type="button"
-                className="absolute right-1 top-1/2 -translate-y-1/2 w-7 h-7 bg-black text-white rounded-full flex items-center justify-center transition active:scale-95 cursor-pointer shadow-xs shrink-0"
+                type="submit"
+                className="absolute right-1 top-1/2 -translate-y-1/2 w-7.5 h-7.5 bg-black text-white rounded-lg flex items-center justify-center transition active:scale-95 cursor-pointer shadow-xs shrink-0"
                 title="Search"
               >
                 <Search className="w-3.5 h-3.5 text-white stroke-[2.5]" />
               </button>
-            </div>
+            </form>
 
             {/* Mobile Active Category Pill (if a category is active) */}
             {selectedCategory !== 'all' && (
@@ -389,6 +354,30 @@ export const Header: React.FC<HeaderProps> = ({
                 aria-label="Close category drawer"
               >
                 <X className="w-6 h-6" />
+              </button>
+            </div>
+
+            {/* Quick Actions Bar inside Drawer: My Orders & Language Switch */}
+            <div className="p-3 bg-gray-50 border-b border-gray-100 flex items-center justify-between gap-2 shrink-0">
+              <Link
+                href="/orders"
+                onClick={() => setIsCategoryDrawerOpen(false)}
+                className="flex-1 flex items-center justify-center gap-1.5 py-2 px-3 rounded-xl bg-white border border-gray-200/90 text-xs font-bold text-slate-800 hover:bg-gray-100 transition shadow-2xs cursor-pointer"
+              >
+                <Package className="w-4 h-4 text-orange-500 shrink-0" />
+                <span>{language === 'bn' ? 'আমার অর্ডার' : 'My Orders'}</span>
+              </Link>
+
+              <button
+                type="button"
+                onClick={() => setLanguage(language === 'en' ? 'bn' : 'en')}
+                className="flex items-center justify-center gap-1.5 py-2 px-3 rounded-xl bg-white border border-gray-200/90 text-xs font-bold text-slate-800 hover:bg-gray-100 transition shadow-2xs cursor-pointer"
+                title="Switch Language / ভাষা পরিবর্তন করুন"
+              >
+                <Globe className="w-3.5 h-3.5 text-slate-500 shrink-0" />
+                <span className={language === 'en' ? 'text-black font-black' : 'text-gray-400'}>EN</span>
+                <span className="text-gray-300 text-[10px]">/</span>
+                <span className={language === 'bn' ? 'text-black font-black' : 'text-gray-400'}>বাং</span>
               </button>
             </div>
 

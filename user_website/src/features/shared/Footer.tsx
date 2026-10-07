@@ -268,6 +268,14 @@ export const Footer: React.FC = () => {
         {/* Policy & Terms Links Bar */}
         <div className="border-t border-gray-200/80 pt-6 pb-2 text-center text-xs font-bold text-gray-600 flex flex-wrap items-center justify-center gap-x-4 sm:gap-x-6 gap-y-2">
           <Link
+            href="/orders"
+            prefetch={false}
+            className="hover:text-orange-600 transition-colors cursor-pointer text-slate-800 font-extrabold"
+          >
+            {language === 'bn' ? 'আমার অর্ডার ও ট্র্যাকিং' : 'My Orders & Tracking'}
+          </Link>
+          <span className="text-gray-300">•</span>
+          <Link
             href="/terms"
             prefetch={false}
             className="hover:text-orange-600 transition-colors cursor-pointer"
