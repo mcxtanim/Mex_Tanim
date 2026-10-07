@@ -6,6 +6,7 @@ import { HeroBanner } from '@/features/catalog/HeroBanner';
 import { CategoryShowcase } from '@/features/catalog/CategoryShowcase';
 import { ProductGrid } from '@/features/catalog/ProductGrid';
 import { ProductTabsSection } from '@/features/catalog/ProductTabsSection';
+import { CategoryProductsSection } from '@/features/catalog/CategoryProductsSection';
 import { ComboOfferSection } from '@/features/catalog/ComboOfferSection';
 import { Footer } from '@/features/shared/Footer';
 import { useLanguage } from '@/features/shared/LanguageContext';
@@ -95,6 +96,7 @@ export default function Home() {
                 onSelectCategory={setSelectedCategory}
               />
               <ProductTabsSection />
+              <CategoryProductsSection onSelectCategory={setSelectedCategory} />
               <ComboOfferSection />
             </>
           ) : (
