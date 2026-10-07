@@ -250,3 +250,14 @@ export function formatTelegramUrl(userOrUrl: string): string {
   return user ? `https://t.me/${user}` : "";
 }
 
+export function formatYouTubeUrl(userOrUrl: string): string {
+  if (!userOrUrl) return "";
+  const clean = userOrUrl.trim();
+  if (clean.startsWith("http://") || clean.startsWith("https://")) return clean;
+  if (clean.startsWith("www.")) return `https://${clean}`;
+  if (clean.startsWith("youtube.com") || clean.startsWith("youtu.be")) return `https://${clean}`;
+  if (clean.startsWith("@")) return `https://www.youtube.com/${clean}`;
+  if (clean.startsWith("UC") && clean.length > 20) return `https://www.youtube.com/channel/${clean}`;
+  return `https://www.youtube.com/@${clean}`;
+}
+

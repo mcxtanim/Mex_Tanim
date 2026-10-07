@@ -15,7 +15,7 @@ import {
 } from 'lucide-react';
 import { useLanguage } from './LanguageContext';
 import { WhatsAppIcon } from './WhatsAppIcon';
-import { useStoreSettings, formatWhatsAppUrl, formatMessengerUrl, formatTelegramUrl } from './storeSettingsService';
+import { useStoreSettings, formatWhatsAppUrl, formatMessengerUrl, formatTelegramUrl, formatYouTubeUrl } from './storeSettingsService';
 
 export const Footer: React.FC = () => {
   const { language } = useLanguage();
@@ -24,6 +24,7 @@ export const Footer: React.FC = () => {
   const messengerUrl = formatMessengerUrl(settings.messengerLink || settings.messengerUsername);
   const whatsappUrl = formatWhatsAppUrl(settings.whatsappNumber);
   const telegramUrl = formatTelegramUrl(settings.telegramLink || settings.telegramUsername);
+  const youtubeUrl = formatYouTubeUrl(settings.youtubeLink || 'https://youtube.com/@mextanimstore');
   const supportHours = language === 'bn' ? settings.supportHoursBn : settings.supportHoursEn;
 
   return (
@@ -134,9 +135,9 @@ export const Footer: React.FC = () => {
               )}
 
               {/* YouTube Button */}
-              {settings.youtubeLink && (
+              {youtubeUrl && (
                 <a
-                  href={settings.youtubeLink}
+                  href={youtubeUrl}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="bg-white hover:bg-[#FF0000] hover:text-white text-slate-800 border border-gray-200/90 px-4 py-2.5 rounded-xl text-xs sm:text-sm font-extrabold transition-all duration-300 shadow-2xs hover:shadow-md flex items-center space-x-2 cursor-pointer group"
