@@ -20,7 +20,7 @@ interface CategoriesViewProps {
   initialCategory?: string;
 }
 
-export const CategoriesView: React.FC<CategoriesViewProps> = ({ initialCategory }) => {
+const CategoriesViewContent: React.FC<CategoriesViewProps> = ({ initialCategory }) => {
   const router = useRouter();
   const searchParams = useSearchParams();
   const catParam = searchParams.get('cat');
@@ -262,5 +262,19 @@ export const CategoriesView: React.FC<CategoriesViewProps> = ({ initialCategory 
 
       </div>
     </div>
+  );
+};
+
+export const CategoriesView: React.FC<CategoriesViewProps> = (props) => {
+  return (
+    <React.Suspense
+      fallback={
+        <div className="min-h-[50vh] flex items-center justify-center bg-white text-slate-400 font-bold text-sm">
+          লোড হচ্ছে...
+        </div>
+      }
+    >
+      <CategoriesViewContent {...props} />
+    </React.Suspense>
   );
 };
