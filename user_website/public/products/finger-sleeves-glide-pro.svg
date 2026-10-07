@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400" width="100%" height="100%">
+  <defs>
+    <linearGradient id="sleeveLight" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stopColor="#f3f4f6" />
+      <stop offset="50%" stopColor="#e5e7eb" />
+      <stop offset="100%" stopColor="#d1d5db" />
+    </linearGradient>
+    <linearGradient id="redBand" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stopColor="#ef4444" />
+      <stop offset="100%" stopColor="#b91c1c" />
+    </linearGradient>
+    <filter id="shadow" x="-10%" y="-10%" width="120%" height="120%">
+      <feDropShadow dx="0" dy="12" stdDeviation="10" flood-opacity="0.12" />
+    </filter>
+  </defs>
+
+  <!-- Left Sleeve -->
+  <g filter="url(#shadow)">
+    <path d="M120 180 C110 210, 105 260, 108 280 L162 280 C165 260, 160 210, 150 180 C145 165, 125 165, 120 180 Z" fill="url(#sleeveLight)" stroke="#9ca3af" stroke-width="2"/>
+    <path d="M115 200 Q135 205 155 200 M112 220 Q135 225 158 220 M110 240 Q135 245 160 240 M109 260 Q135 265 161 260" stroke="#9ca3af" stroke-width="1" stroke-dasharray="2,3" fill="none" opacity="0.6"/>
+    <path d="M130 225 L140 225 L145 235 L125 235 Z M128 238 L142 238 L135 250 Z" fill="#4b5563"/>
+    <rect x="107" y="278" width="56" height="8" rx="3" fill="url(#redBand)"/>
+  </g>
+
+  <!-- Right Sleeve -->
+  <g filter="url(#shadow)">
+    <path d="M240 180 C230 210, 225 260, 228 280 L282 280 C285 260, 280 210, 270 180 C265 165, 245 165, 240 180 Z" fill="url(#sleeveLight)" stroke="#9ca3af" stroke-width="2"/>
+    <path d="M235 200 Q255 205 275 200 M232 220 Q255 225 278 220 M230 240 Q255 245 280 240 M229 260 Q255 265 281 260" stroke="#9ca3af" stroke-width="1" stroke-dasharray="2,3" fill="none" opacity="0.6"/>
+    <path d="M250 225 L260 225 L265 235 L245 235 Z M248 238 L262 238 L255 250 Z" fill="#4b5563"/>
+    <rect x="227" y="278" width="56" height="8" rx="3" fill="url(#redBand)"/>
+  </g>
+</svg>

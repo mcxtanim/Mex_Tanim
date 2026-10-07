@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400" width="100%" height="100%">
+  <defs>
+    <linearGradient id="memoCarbon" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stopColor="#374151" />
+      <stop offset="40%" stopColor="#1f2937" />
+      <stop offset="100%" stopColor="#0f172a" />
+    </linearGradient>
+    <linearGradient id="memoRedRing" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stopColor="#ef4444" />
+      <stop offset="100%" stopColor="#dc2626" />
+    </linearGradient>
+    <filter id="shadow" x="-10%" y="-10%" width="120%" height="120%">
+      <feDropShadow dx="4" dy="14" stdDeviation="10" flood-opacity="0.22" />
+    </filter>
+  </defs>
+
+  <!-- Angled Dynamic Single Sleeve View Matching Reference Image 3 -->
+  <g filter="url(#shadow)" transform="rotate(-15 200 200)">
+    <!-- Main Sleeve Body -->
+    <path d="M160 140 C140 180, 130 250, 140 280 L220 280 C240 250, 230 180, 205 140 C195 125, 170 125, 160 140 Z" fill="url(#memoCarbon)" stroke="#4b5563" stroke-width="2.5"/>
+    
+    <!-- Dense Carbon Fiber Micro-Knit Pattern -->
+    <path d="M150 170 Q180 180 215 170 M145 200 Q180 210 220 200 M140 230 Q180 240 225 230 M138 260 Q180 270 222 260" stroke="#4b5563" stroke-width="1.2" stroke-dasharray="2,3" fill="none" opacity="0.6"/>
+
+    <!-- Bold White MEMO Lightning / Wave 'W' Emblem -->
+    <path d="M165 210 L175 230 L185 215 L195 230 L205 210" fill="none" stroke="#ffffff" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+
+    <!-- Angled Red Collar Band -->
+    <path d="M152 135 C170 120, 195 120, 212 135 L208 145 C195 132, 172 132, 156 145 Z" fill="url(#memoRedRing)"/>
+  </g>
+</svg>

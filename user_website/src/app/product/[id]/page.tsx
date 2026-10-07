@@ -18,6 +18,10 @@ export async function generateStaticParams() {
     "prod-cloudinary-test-1",
     "prod_kb_custom_65",
     "prod-headset-1",
+    "sleeves-glide-v2",
+    "sleeves-glide-pro",
+    "sleeves-luminous",
+    "sleeves-memo-fs01",
   ]);
   try {
     const products = await fetchLiveProducts();

@@ -27,8 +27,144 @@ export interface CategoryItem {
   image: string;
 }
 
+// Exact 12 collections matching Reference Image 2 (media_1791405440395.png)
+export const DRAWER_COLLECTIONS: CategoryItem[] = [
+  {
+    id: 'gaming-cooler',
+    nameEn: 'GAMING COOLER',
+    nameBn: 'গেমিং কুলার',
+    badge: 'G',
+    badgeBg: 'bg-black text-white',
+    icon: Layers,
+    colorClass: 'bg-black text-white',
+    staticCount: 34,
+    image: '/categories/gaming-cooler.svg',
+  },
+  {
+    id: 'finger-sleeves',
+    nameEn: 'FINGER SLEEVES',
+    nameBn: 'ফিঙ্গার স্লিকস',
+    badge: 'F',
+    badgeBg: 'bg-black text-white',
+    icon: Shield,
+    colorClass: 'bg-black text-white',
+    staticCount: 20,
+    image: '/categories/finger-sleeves.svg',
+  },
+  {
+    id: 'gaming-earphone',
+    nameEn: 'GAMING EARPHONE',
+    nameBn: 'গেমিং ইয়ারফোন',
+    badge: 'G',
+    badgeBg: 'bg-gradient-to-br from-[#1e88e5] to-[#1565c0] text-white',
+    icon: Headphones,
+    colorClass: 'bg-blue-600 text-white',
+    staticCount: 18,
+    image: '/categories/gaming-headsets.svg',
+  },
+  {
+    id: 'gaming-powder',
+    nameEn: 'GAMING POWDER',
+    nameBn: 'গেমিং পাউডার',
+    badge: 'G',
+    badgeBg: 'bg-gradient-to-br from-[#00897b] to-[#004d40] text-white',
+    icon: Zap,
+    colorClass: 'bg-emerald-700 text-white',
+    staticCount: 4,
+    image: '/categories/all.svg',
+  },
+  {
+    id: 'magnetic-plates',
+    nameEn: 'MAGNETIC PLATES',
+    nameBn: 'ম্যাগনেটিক প্লেটস',
+    badge: 'M',
+    badgeBg: 'bg-black text-white',
+    icon: Layers,
+    colorClass: 'bg-black text-white',
+    staticCount: 9,
+    image: '/categories/all.svg',
+  },
+  {
+    id: 'gaming-triggers',
+    nameEn: 'GAMING TRIGGERS',
+    nameBn: 'গেমিং ট্রিগার্স',
+    badge: 'G',
+    badgeBg: 'bg-gradient-to-br from-[#d97706] to-[#78350f] text-white',
+    icon: Zap,
+    colorClass: 'bg-amber-700 text-white',
+    staticCount: 4,
+    image: '/categories/all.svg',
+  },
+  {
+    id: 'power-bank',
+    nameEn: 'POWER BANK',
+    nameBn: 'পাওয়ার ব্যাংক',
+    badge: 'P',
+    badgeBg: 'bg-black text-white',
+    icon: Zap,
+    colorClass: 'bg-black text-white',
+    staticCount: 9,
+    image: '/categories/fast-chargers.svg',
+  },
+  {
+    id: 'charger-adapter',
+    nameEn: 'CHARGER ADAPTER',
+    nameBn: 'চার্জার অ্যাডাপ্টার',
+    badge: 'C',
+    badgeBg: 'bg-black text-white',
+    icon: Zap,
+    colorClass: 'bg-black text-white',
+    staticCount: 6,
+    image: '/categories/fast-chargers.svg',
+  },
+  {
+    id: 'cable',
+    nameEn: 'CABLE',
+    nameBn: 'কেবল',
+    badge: 'C',
+    badgeBg: 'bg-gradient-to-br from-[#1e88e5] to-[#1565c0] text-white',
+    icon: Cable,
+    colorClass: 'bg-blue-600 text-white',
+    staticCount: 3,
+    image: '/categories/cables.svg',
+  },
+  {
+    id: 'gaming-mice',
+    nameEn: 'GAMING MICE',
+    nameBn: 'গেমিং মাউস',
+    badge: 'G',
+    badgeBg: 'bg-black text-white',
+    icon: Mouse,
+    colorClass: 'bg-black text-white',
+    staticCount: 12,
+    image: '/categories/gaming-mice.svg',
+  },
+  {
+    id: 'mechanical-keyboards',
+    nameEn: 'MECHANICAL KEYBOARDS',
+    nameBn: 'মেকানিক্যাল কিবোর্ড',
+    badge: 'M',
+    badgeBg: 'bg-black text-white',
+    icon: Keyboard,
+    colorClass: 'bg-black text-white',
+    staticCount: 8,
+    image: '/categories/mechanical-keyboards.svg',
+  },
+  {
+    id: 'combo-offers',
+    nameEn: 'COMBO OFFERS',
+    nameBn: 'কম্বো অফার',
+    badge: 'C',
+    badgeBg: 'bg-black text-white',
+    icon: Gift,
+    colorClass: 'bg-black text-white',
+    staticCount: 5,
+    image: '/categories/all.svg',
+  },
+];
+
 // Backward-compatibility export; dynamically populated from Supabase
-export const CATEGORIES: CategoryItem[] = [];
+export const CATEGORIES: CategoryItem[] = DRAWER_COLLECTIONS;
 
 export const CATEGORY_TRANSLATIONS: Record<string, { en: string; bn: string; badge: string }> = {
   'gaming-cooler': { en: 'GAMING COOLER', bn: 'গেমিং কুলার', badge: 'G' },
@@ -36,22 +172,32 @@ export const CATEGORY_TRANSLATIONS: Record<string, { en: string; bn: string; bad
   'finger-sleeves': { en: 'FINGER SLEEVES', bn: 'ফিঙ্গার স্লিকস', badge: 'F' },
   'sleeves': { en: 'FINGER SLEEVES', bn: 'ফিঙ্গার স্লিকস', badge: 'F' },
   'gaming-headsets': { en: 'GAMING HEADSETS', bn: 'গেমিং হেডসেট', badge: 'H' },
-  'gaming-earphone': { en: 'GAMING EARPHONE', bn: 'গেমিং ইয়ারফোন', badge: 'E' },
+  'gaming-earphone': { en: 'GAMING EARPHONE', bn: 'গেমিং ইয়ারফোন', badge: 'G' },
   'headphones': { en: 'GAMING HEADSETS', bn: 'গেমিং হেডসেট', badge: 'H' },
   'headphone': { en: 'GAMING HEADSETS', bn: 'গেমিং হেডসেট', badge: 'H' },
   'headsets': { en: 'GAMING HEADSETS', bn: 'গেমিং হেডসেট', badge: 'H' },
-  'earphone': { en: 'GAMING EARPHONE', bn: 'গেমিং ইয়ারফোন', badge: 'E' },
+  'earphone': { en: 'GAMING EARPHONE', bn: 'গেমিং ইয়ারফোন', badge: 'G' },
+  'gaming-powder': { en: 'GAMING POWDER', bn: 'গেমিং পাউডার', badge: 'G' },
+  'powder': { en: 'GAMING POWDER', bn: 'গেমিং পাউডার', badge: 'G' },
+  'magnetic-plates': { en: 'MAGNETIC PLATES', bn: 'ম্যাগনেটিক প্লেটস', badge: 'M' },
+  'plates': { en: 'MAGNETIC PLATES', bn: 'ম্যাগনেটিক প্লেটস', badge: 'M' },
+  'gaming-triggers': { en: 'GAMING TRIGGERS', bn: 'গেমিং ট্রিগার্স', badge: 'G' },
+  'triggers': { en: 'GAMING TRIGGERS', bn: 'গেমিং ট্রিগার্স', badge: 'G' },
+  'power-bank': { en: 'POWER BANK', bn: 'পাওয়ার ব্যাংক', badge: 'P' },
+  'power': { en: 'POWER BANK', bn: 'পাওয়ার ব্যাংক', badge: 'P' },
   'fast-chargers': { en: 'FAST CHARGERS', bn: 'ফাস্ট চার্জার', badge: 'F' },
   'chargers': { en: 'FAST CHARGERS', bn: 'ফাস্ট চার্জার', badge: 'F' },
   'charger': { en: 'FAST CHARGERS', bn: 'ফাস্ট চার্জার', badge: 'F' },
+  'charger-adapter': { en: 'CHARGER ADAPTER', bn: 'চার্জার অ্যাডাপ্টার', badge: 'C' },
+  'adapter': { en: 'CHARGER ADAPTER', bn: 'চার্জার অ্যাডাপ্টার', badge: 'C' },
   'cables': { en: 'CABLES', bn: 'কেবলস', badge: 'C' },
-  'cable': { en: 'CABLES', bn: 'কেবলস', badge: 'C' },
-  'gaming-mice': { en: 'GAMING MICE', bn: 'গেমিং মাউস', badge: 'M' },
-  'mice': { en: 'GAMING MICE', bn: 'গেমিং মাউস', badge: 'M' },
-  'mouse': { en: 'GAMING MICE', bn: 'গেমিং মাউস', badge: 'M' },
-  'mechanical-keyboards': { en: 'MECHANICAL KEYBOARDS', bn: 'মেকানিক্যাল কিবোর্ড', badge: 'K' },
-  'keyboards': { en: 'MECHANICAL KEYBOARDS', bn: 'মেকানিক্যাল কিবোর্ড', badge: 'K' },
-  'keyboard': { en: 'MECHANICAL KEYBOARDS', bn: 'মেকানিক্যাল কিবোর্ড', badge: 'K' },
+  'cable': { en: 'CABLE', bn: 'কেবল', badge: 'C' },
+  'gaming-mice': { en: 'GAMING MICE', bn: 'গেমিং মাউস', badge: 'G' },
+  'mice': { en: 'GAMING MICE', bn: 'গেমিং মাউস', badge: 'G' },
+  'mouse': { en: 'GAMING MICE', bn: 'গেমিং মাউস', badge: 'G' },
+  'mechanical-keyboards': { en: 'MECHANICAL KEYBOARDS', bn: 'মেকানিক্যাল কিবোর্ড', badge: 'M' },
+  'keyboards': { en: 'MECHANICAL KEYBOARDS', bn: 'মেকানিক্যাল কিবোর্ড', badge: 'M' },
+  'keyboard': { en: 'MECHANICAL KEYBOARDS', bn: 'মেকানিক্যাল কিবোর্ড', badge: 'M' },
   'soundboxes': { en: 'SOUNDBOXES', bn: 'সাউন্ডবক্স', badge: 'S' },
   'soundbox': { en: 'SOUNDBOXES', bn: 'সাউন্ডবক্স', badge: 'S' },
   'speakers': { en: 'SOUNDBOXES', bn: 'সাউন্ডবক্স', badge: 'S' },
@@ -173,16 +319,19 @@ export function mapRawCategoryToItem(item: any): CategoryItem {
   const rawName = String(item.name || '').trim();
   const slug = String(item.slug || item.id || rawName.toLowerCase().replace(/[^a-z0-9]+/g, '-')).toLowerCase();
   
-  const enName = rawName || getStaticTranslation(slug, 'en');
+  const predefined = DRAWER_COLLECTIONS.find((dc) => dc.id === slug || isCategorySelected(slug, dc.id));
+
+  const enName = rawName || (predefined ? predefined.nameEn : getStaticTranslation(slug, 'en'));
   const bnName = (item.name_bn && /[\u0980-\u09FF]/.test(item.name_bn))
     ? item.name_bn
-    : getStaticTranslation(slug, 'bn');
+    : (predefined ? predefined.nameBn : getStaticTranslation(slug, 'bn'));
 
-  const badge = rawName ? rawName.charAt(0).toUpperCase() : slug.charAt(0).toUpperCase();
+  const badge = predefined ? predefined.badge : (rawName ? rawName.charAt(0).toUpperCase() : slug.charAt(0).toUpperCase());
+  const badgeBg = predefined ? predefined.badgeBg : 'bg-black text-white';
 
   let finalImg = item.image_url || item.image || '';
   if (!finalImg || (typeof finalImg === 'string' && finalImg.startsWith('data:image') && finalImg.length > 500)) {
-    finalImg = getSvgImageForSlug(slug, finalImg);
+    finalImg = predefined ? predefined.image : getSvgImageForSlug(slug, finalImg);
   }
 
   return {
@@ -190,10 +339,10 @@ export function mapRawCategoryToItem(item: any): CategoryItem {
     nameEn: enName,
     nameBn: bnName,
     badge,
-    badgeBg: 'bg-slate-900 text-white',
-    icon: getLucideIconForSlug(slug),
-    colorClass: 'bg-slate-900 text-white',
-    staticCount: Number(item.product_count) || 0,
+    badgeBg,
+    icon: predefined ? predefined.icon : getLucideIconForSlug(slug),
+    colorClass: predefined ? predefined.colorClass : 'bg-black text-white',
+    staticCount: Number(item.product_count) || (predefined ? predefined.staticCount : 0) || 0,
     image: finalImg || getSvgImageForSlug(slug),
   };
 }
@@ -204,9 +353,10 @@ export function getCachedCategories(): CategoryItem[] {
   }
 
   if (isMappingCategories) {
-    return [];
+    return DRAWER_COLLECTIONS;
   }
 
+  let list: CategoryItem[] = [];
   if (typeof window !== 'undefined') {
     try {
       const stored = localStorage.getItem(STORAGE_KEY) || localStorage.getItem('mex_tanim_admin_categories');
@@ -215,9 +365,7 @@ export function getCachedCategories(): CategoryItem[] {
         if (Array.isArray(parsed) && parsed.length > 0) {
           isMappingCategories = true;
           try {
-            const mapped = parsed.map(mapRawCategoryToItem);
-            memoryCategoriesCache = mapped;
-            return mapped;
+            list = parsed.map(mapRawCategoryToItem);
           } finally {
             isMappingCategories = false;
           }
@@ -228,7 +376,21 @@ export function getCachedCategories(): CategoryItem[] {
     }
   }
 
-  return [];
+  // Ensure all 12 DRAWER_COLLECTIONS are always present
+  const existingSlugs = new Set(list.map((c) => c.id));
+  for (const dc of DRAWER_COLLECTIONS) {
+    if (!existingSlugs.has(dc.id)) {
+      list.push(dc);
+    }
+  }
+
+  if (list.length > 0) {
+    memoryCategoriesCache = list;
+    return list;
+  }
+
+  memoryCategoriesCache = DRAWER_COLLECTIONS;
+  return DRAWER_COLLECTIONS;
 }
 
 export function saveCachedCategories(cats: CategoryItem[]): void {
@@ -291,6 +453,14 @@ export async function fetchLiveCategories(forceRefresh = false): Promise<Categor
 
     // 3. Map database rows to dynamic CategoryItem list
     const mappedCategories: CategoryItem[] = rawList.map(mapRawCategoryToItem);
+
+    // Merge DRAWER_COLLECTIONS so all 12 are represented
+    const existingSlugs = new Set(mappedCategories.map((c) => c.id));
+    for (const dc of DRAWER_COLLECTIONS) {
+      if (!existingSlugs.has(dc.id)) {
+        mappedCategories.push(dc);
+      }
+    }
 
     memoryCategoriesCache = mappedCategories;
     lastCategoriesFetchTimestamp = Date.now();

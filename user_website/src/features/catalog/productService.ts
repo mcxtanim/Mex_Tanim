@@ -1,6 +1,7 @@
 import { Product } from './types';
 import { supabase } from '../../lib/supabase';
 import { getCategoryName } from './categoryData';
+import { PRODUCTS as FALLBACK_PRODUCTS } from './mockData';
 
 const ADMIN_STORAGE_KEY = 'mex_tanim_admin_products';
 
@@ -64,18 +65,16 @@ function mapRawProduct(item: any): Product {
  * Ensures the UI never shows empty loading skeletons if data was previously fetched.
  */
 export function getCachedProducts(): Product[] {
+  let list: Product[] = [];
   if (memoryProductsCache && memoryProductsCache.length > 0) {
-    return memoryProductsCache;
-  }
-
-  if (typeof window !== 'undefined') {
+    list = [...memoryProductsCache];
+  } else if (typeof window !== 'undefined') {
     try {
       const cached = localStorage.getItem(LIVE_PRODUCTS_CACHE_KEY) || localStorage.getItem(ADMIN_STORAGE_KEY);
       if (cached) {
         const parsed = JSON.parse(cached);
         if (Array.isArray(parsed) && parsed.length > 0) {
-          memoryProductsCache = parsed.map(mapRawProduct);
-          return memoryProductsCache;
+          list = parsed.map(mapRawProduct);
         }
       }
     } catch (e) {
@@ -83,7 +82,16 @@ export function getCachedProducts(): Product[] {
     }
   }
 
-  return [];
+  // Merge FALLBACK_PRODUCTS (e.g. Reference Image 3 Finger Sleeves)
+  const existingIds = new Set(list.map((p) => String(p.id)));
+  for (const fb of FALLBACK_PRODUCTS) {
+    if (!existingIds.has(String(fb.id))) {
+      list.push(fb);
+    }
+  }
+
+  memoryProductsCache = list;
+  return list;
 }
 
 /**
@@ -111,6 +119,14 @@ export async function fetchLiveProducts(forceRefresh = false): Promise<Product[]
 
         if (!error && data && data.length > 0) {
           const mapped = data.map(mapRawProduct);
+          // Merge FALLBACK_PRODUCTS
+          const existingIds = new Set(mapped.map((p) => String(p.id)));
+          for (const fb of FALLBACK_PRODUCTS) {
+            if (!existingIds.has(String(fb.id))) {
+              mapped.push(fb);
+            }
+          }
+
           memoryProductsCache = mapped;
           lastFetchTimestamp = Date.now();
 
@@ -137,7 +153,8 @@ export async function fetchLiveProducts(forceRefresh = false): Promise<Product[]
       return fallback;
     }
 
-    return [];
+    memoryProductsCache = FALLBACK_PRODUCTS;
+    return FALLBACK_PRODUCTS;
   })().finally(() => {
     inFlightPromise = null;
   });

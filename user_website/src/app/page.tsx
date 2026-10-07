@@ -8,6 +8,7 @@ import { ProductGrid } from '@/features/catalog/ProductGrid';
 import { ProductTabsSection } from '@/features/catalog/ProductTabsSection';
 import { CategoryProductsSection } from '@/features/catalog/CategoryProductsSection';
 import { ComboOfferSection } from '@/features/catalog/ComboOfferSection';
+import { CategoriesView } from '@/features/catalog/CategoriesView';
 import { Footer } from '@/features/shared/Footer';
 import { useLanguage } from '@/features/shared/LanguageContext';
 import { fetchLiveProducts, getCachedProducts } from '@/features/catalog/productService';
@@ -99,27 +100,24 @@ export default function Home() {
               <CategoryProductsSection onSelectCategory={setSelectedCategory} />
               <ComboOfferSection onSelectCategory={setSelectedCategory} />
             </>
-          ) : (
+          ) : searchQuery ? (
             <>
-              {/* Category / Search Header Bar */}
+              {/* Search Header Bar */}
               <div className="bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 text-white rounded-3xl p-5 sm:p-7 shadow-xl relative overflow-hidden flex flex-col sm:flex-row sm:items-center justify-between gap-4 border border-slate-700/60">
                 <div className="absolute -right-12 -bottom-12 w-48 h-48 bg-orange-500/15 rounded-full blur-3xl pointer-events-none" />
                 
                 <div className="flex items-center space-x-4 relative z-10">
                   <div className="w-12 h-12 rounded-2xl bg-orange-500 flex items-center justify-center shadow-lg shadow-orange-500/30 text-white font-black text-xl shrink-0">
-                    {currentMeta.badge}
+                    🔍
                   </div>
                   <div>
                     <div className="flex items-center space-x-2">
                       <span className="text-[11px] font-black text-orange-400 uppercase tracking-widest">
-                        {searchQuery ? (language === 'bn' ? 'সার্চ রেজাল্ট' : 'Search Results') : (language === 'bn' ? 'ক্যাটাগরি ভিউ' : 'Category View')}
-                      </span>
-                      <span className="bg-orange-500/20 text-orange-300 text-[11px] font-extrabold px-2.5 py-0.5 rounded-full border border-orange-500/30">
-                        {productCount} {language === 'bn' ? 'টি পণ্য' : 'products'}
+                        {language === 'bn' ? 'সার্চ রেজাল্ট' : 'Search Results'}
                       </span>
                     </div>
                     <h1 className="text-xl sm:text-2xl font-black text-white capitalize mt-0.5">
-                      {searchQuery ? `"${searchQuery}"` : (language === 'bn' ? currentMeta.bn : currentMeta.en)}
+                      "{searchQuery}"
                     </h1>
                   </div>
                 </div>
@@ -136,15 +134,15 @@ export default function Home() {
                 </button>
               </div>
 
-              {/* Category-Only or Search Product Grid */}
+              {/* Search Product Grid */}
               <ProductGrid
-                selectedCategory={selectedCategory}
+                selectedCategory="all"
                 searchQuery={searchQuery}
                 onSelectCategory={setSelectedCategory}
               />
-
-              <ComboOfferSection onSelectCategory={setSelectedCategory} />
             </>
+          ) : (
+            <CategoriesView initialCategory={selectedCategory} />
           )}
         </main>
       </div>

@@ -63,9 +63,43 @@ export const CategorySidebar: React.FC<CategorySidebarProps> = ({
     };
   }, []);
 
+  // Order categories to match Reference Image 2 exactly
+  const orderedCategories = React.useMemo(() => {
+    const list = [...categories];
+    const orderMap: Record<string, number> = {
+      'gaming-cooler': 1,
+      'cooler': 1,
+      'finger-sleeves': 2,
+      'sleeves': 2,
+      'gaming-earphone': 3,
+      'earphone': 3,
+      'gaming-powder': 4,
+      'powder': 4,
+      'magnetic-plates': 5,
+      'plates': 5,
+      'gaming-triggers': 6,
+      'triggers': 6,
+      'power-bank': 7,
+      'charger-adapter': 8,
+      'cable': 9,
+      'cables': 9,
+      'gaming-mice': 10,
+      'mouse': 10,
+      'mechanical-keyboards': 11,
+      'keyboard': 11,
+      'combo-offers': 12,
+      'combo': 12,
+    };
+    return list.sort((a, b) => {
+      const ordA = orderMap[a.id] || 99;
+      const ordB = orderMap[b.id] || 99;
+      return ordA - ordB;
+    });
+  }, [categories]);
+
   return (
-    <div className="w-full bg-white divide-y divide-gray-100 rounded-b-2xl overflow-hidden shadow-xs">
-      {categories.map((cat) => {
+    <div className="w-full bg-white divide-y divide-gray-100/70 overflow-hidden">
+      {orderedCategories.map((cat) => {
         const isSelected = isCategorySelected(selectedCategory, cat.id);
         const count = getCategoryProductCount(cat.id, cat.staticCount, products);
 
@@ -73,17 +107,15 @@ export const CategorySidebar: React.FC<CategorySidebarProps> = ({
           <button
             key={cat.id}
             onClick={() => onSelectCategory(cat.id)}
-            className={`w-full flex items-center justify-between px-4 py-3.5 transition-all duration-200 group cursor-pointer ${
-              isSelected
-                ? 'bg-slate-100/90 font-bold border-l-4 border-slate-900 pl-3'
-                : 'bg-white hover:bg-slate-50/80'
+            className={`w-full flex items-center justify-between px-4 py-3.5 transition-colors duration-150 group cursor-pointer border-b border-gray-100/60 ${
+              isSelected ? 'bg-slate-50' : 'bg-white hover:bg-slate-50/80'
             }`}
           >
             <div className="flex items-center space-x-3.5 min-w-0">
-              {/* Colored Badge Container */}
+              {/* Colored Squircle Badge (Matching Reference Image 2) */}
               <div
-                className={`w-10 h-10 rounded-xl flex items-center justify-center font-black text-sm font-mono shrink-0 shadow-2xs ${
-                  cat.badgeBg || 'bg-slate-900 text-white'
+                className={`w-12 h-12 rounded-[14px] flex items-center justify-center font-bold text-xl select-none shrink-0 shadow-xs ${
+                  cat.badgeBg || 'bg-black text-white'
                 }`}
               >
                 {cat.badge}
@@ -91,24 +123,18 @@ export const CategorySidebar: React.FC<CategorySidebarProps> = ({
 
               {/* Category Name & Product Count */}
               <div className="text-left truncate">
-                <h3
-                  className={`text-xs font-extrabold uppercase tracking-wide truncate ${
-                    isSelected ? 'text-slate-900 font-black' : 'text-slate-900 group-hover:text-orange-600'
-                  }`}
-                >
-                  {language === 'bn' ? (cat.nameBn || getCategoryName(cat.id, 'bn')) : (cat.nameEn || getCategoryName(cat.id, 'en'))}
+                <h3 className="text-[14px] font-bold uppercase tracking-wide truncate text-slate-900 group-hover:text-black">
+                  {cat.nameEn || getCategoryName(cat.id, 'en')}
                 </h3>
-                <p className="text-[11px] font-medium text-slate-400 mt-0.5">
-                  {count} {language === 'bn' ? 'টি প্রোডাক্ট' : 'products'}
+                <p className="text-[13px] font-medium text-slate-400 mt-0.5">
+                  {count} products
                 </p>
               </div>
             </div>
 
             {/* Right Chevron Arrow */}
             <ChevronRight
-              className={`w-4 h-4 shrink-0 transition-transform duration-200 group-hover:translate-x-1 ${
-                isSelected ? 'text-slate-900 font-bold' : 'text-gray-300 group-hover:text-slate-700'
-              }`}
+              className="w-4 h-4 text-slate-300 stroke-[2] group-hover:text-slate-500 group-hover:translate-x-0.5 transition-all shrink-0"
             />
           </button>
         );

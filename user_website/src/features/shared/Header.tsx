@@ -332,56 +332,32 @@ export const Header: React.FC<HeaderProps> = ({
           {/* Left Slide-Out Drawer Panel */}
           <div className="relative z-10 w-80 sm:w-96 h-full bg-white text-slate-900 shadow-2xl flex flex-col overflow-hidden animate-in slide-in-from-left duration-300">
             
-            {/* Black Drawer Header (Matching Image 1) */}
-            <div className="px-5 py-4 bg-black text-white flex items-center justify-between shrink-0 shadow-md">
+            {/* Black Drawer Header (Matching Reference Image 2) */}
+            <div className="px-4 py-3.5 bg-black text-white flex items-center justify-between shrink-0 shadow-md">
               <div className="flex items-center space-x-3">
-                <div className="w-10 h-10 rounded-xl bg-slate-900 border border-slate-700 flex items-center justify-center text-white shrink-0 shadow-xs">
+                <div className="w-11 h-11 rounded-2xl bg-white/10 flex items-center justify-center text-white shrink-0">
                   <LayoutGrid className="w-5 h-5 text-white" />
                 </div>
                 <div>
-                  <h3 className="font-extrabold text-white text-base leading-tight">
-                    {language === 'bn' ? 'ক্যাটাগরি' : 'Categories'}
+                  <h3 className="font-bold text-white text-[17px] leading-tight">
+                    ক্যাটাগরি
                   </h3>
-                  <p className="text-[11px] text-gray-400 font-medium">
-                    {categories.length}{language === 'bn' ? 'টি কালেকশন' : ' Collections'}
+                  <p className="text-xs text-gray-400 font-normal mt-0.5">
+                    12টি কালেকশন
                   </p>
                 </div>
               </div>
 
               <button
                 onClick={() => setIsCategoryDrawerOpen(false)}
-                className="p-1.5 text-gray-300 hover:text-white hover:bg-slate-800 rounded-full transition cursor-pointer"
+                className="p-1.5 text-gray-300 hover:text-white rounded-full transition cursor-pointer"
                 aria-label="Close category drawer"
               >
-                <X className="w-6 h-6" />
+                <X className="w-6 h-6 stroke-[1.8]" />
               </button>
             </div>
 
-            {/* Quick Actions Bar inside Drawer: My Orders & Language Switch */}
-            <div className="p-3 bg-gray-50 border-b border-gray-100 flex items-center justify-between gap-2 shrink-0">
-              <Link
-                href="/orders"
-                onClick={() => setIsCategoryDrawerOpen(false)}
-                className="flex-1 flex items-center justify-center gap-1.5 py-2 px-3 rounded-xl bg-white border border-gray-200/90 text-xs font-bold text-slate-800 hover:bg-gray-100 transition shadow-2xs cursor-pointer"
-              >
-                <Package className="w-4 h-4 text-orange-500 shrink-0" />
-                <span>{language === 'bn' ? 'আমার অর্ডার' : 'My Orders'}</span>
-              </Link>
-
-              <button
-                type="button"
-                onClick={() => setLanguage(language === 'en' ? 'bn' : 'en')}
-                className="flex items-center justify-center gap-1.5 py-2 px-3 rounded-xl bg-white border border-gray-200/90 text-xs font-bold text-slate-800 hover:bg-gray-100 transition shadow-2xs cursor-pointer"
-                title="Switch Language / ভাষা পরিবর্তন করুন"
-              >
-                <Globe className="w-3.5 h-3.5 text-slate-500 shrink-0" />
-                <span className={language === 'en' ? 'text-black font-black' : 'text-gray-400'}>EN</span>
-                <span className="text-gray-300 text-[10px]">/</span>
-                <span className={language === 'bn' ? 'text-black font-black' : 'text-gray-400'}>বাং</span>
-              </button>
-            </div>
-
-            {/* White Drawer Navigation List (Matching Image 1) */}
+            {/* White Drawer Navigation List (Directly below header - NO My Orders, NO Language) */}
             <div className="flex-1 overflow-y-auto bg-white scrollbar-thin">
               <CategorySidebar
                 selectedCategory={selectedCategory}
@@ -393,11 +369,6 @@ export const Header: React.FC<HeaderProps> = ({
                   router.push(`/categories?cat=${catId}`);
                 }}
               />
-            </div>
-
-            {/* Drawer Footer */}
-            <div className="p-3 border-t border-gray-100 bg-slate-50 text-center text-xs font-semibold text-slate-500 shrink-0">
-              Mex Tanim Store • 100% Authentic Gadgets
             </div>
           </div>
         </div>
